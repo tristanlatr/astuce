@@ -10,12 +10,26 @@ __docformat__ = 'restructuredtext'
 from functools import partial
 import sys
 import ast
-from typing import Any, Dict, List, Optional, cast
+from typing import Any, Callable, Dict, List, Optional, cast
 
 if sys.version_info >= (3,8):
     _parse = partial(ast.parse, type_comments=True)
 else:
     _parse = ast.parse
+
+_unparse: Optional[Callable[[ast.AST], str]]
+if sys.version_info >= (3,9):
+    _unparse = ast.unparse
+else:
+    try:
+        import astunparse
+        _unparse = astunparse.unparse
+    except ImportError:
+        try:
+            import astor
+            _unparse = astor.to_source
+        except ImportError:
+            _unparse = None
 
 from .nodes import ASTNode, get_context, Context, is_assign_name, is_del_name, is_scoped_node
 from . import _typing
@@ -122,8 +136,16 @@ class Parser:
         """
         Store wildcard ImportFrom to resolve them after building.
         """
+    
+    def unparse(self, node: ast.AST) -> str:
+        """
+        Unparse an ast.AST object and generate a code string.
+        """
+        assert _unparse is not None, \
+            "please install library 'astunparse' or 'astor' to use unparse() on python 3.8 or below"
+        return _unparse(node)
 
-    def parse(self, source:str, modname:str, is_package:bool=False, **kw:Any) -> ast.Module:
+    def parse(self, source:str, modname:str, is_package:bool=False, **kw:Any) -> _typing.Module:
         """
         Parse the python source string into a `ast.Module` instance.
         """
@@ -136,10 +158,10 @@ class Parser:
         self.modules[modname] = mod
 
         _AstuceModuleVisitor(self).visit(cast(ASTNode, mod))
-        return mod
+        return cast(_typing.Module, mod)
 
 _default_parser = Parser()
-def parse(source:str, modname:str, is_package:bool=False, **kw:Any) -> ast.Module:
+def parse(source:str, modname:str, is_package:bool=False, **kw:Any) -> _typing.Module:
     """
     Parse the python source string into a `ast.Module` instance.
 

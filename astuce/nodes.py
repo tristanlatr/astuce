@@ -395,6 +395,10 @@ class ASTNode:
         return False
     
     @lru_cache()
+    def unparse(self) -> str:
+        return self._parser.unparse(self)
+
+    @lru_cache()
     def lookup(self, name: str, offset:int=0) -> Tuple['ASTNode', List['ASTNode']]:
         """Lookup where the given variable is assigned.
 
