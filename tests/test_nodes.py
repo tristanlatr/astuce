@@ -2,16 +2,12 @@
 # For details: https://github.com/PyCQA/astroid/blob/main/LICENSE
 # Copyright (c) https://github.com/PyCQA/astroid/blob/main/CONTRIBUTORS.txt
 
-from typing import Optional
-import unittest
 
-import sys
-from textwrap import dedent
 import ast
 
 import pytest
 
-from astuce import nodes
+from astuce import nodes, _typing
 from . import AstuceTestCase, require_version
 
 class NodesTest(AstuceTestCase):
@@ -55,7 +51,7 @@ class NodesTest(AstuceTestCase):
 
     def test_if_elif_else_node(self) -> None:
         """test transformation for If node"""
-        mod = self.parser.parse(dedent(self.CODE), 'test')
+        mod = self.parse(self.CODE, 'test')
         
         self.assertEqual(len(mod.body), 6)
         for stmt in mod.body:
@@ -69,7 +65,7 @@ class NodesTest(AstuceTestCase):
     
     def test_lookup(self) -> None:
         """test transformation for If node"""
-        mod = self.parser.parse(dedent(self.CODE), 'test')
+        mod = self.parse(self.CODE, 'test')
         
         assert mod.lookup('List') == (mod, [mod.body[0]])
         
@@ -88,7 +84,7 @@ class NodesTest(AstuceTestCase):
 
     def test_lineno(self) -> None:
 
-        mod = self.parser.parse(dedent(self.CODE), 'test')
+        mod = self.parse(self.CODE, 'test')
         self.assertEqual(mod.lineno, 0)
         self.assertEqual(mod.body[0].lineno, 2)
         self.assertEqual(mod.body[1].lineno, 4)

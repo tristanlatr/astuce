@@ -5,7 +5,7 @@ from textwrap import dedent
 
 import pytest, unittest
 
-from astuce import nodes, parser
+from astuce import nodes, parser, _typing
 
 require_version = lambda _v:pytest.mark.skipif(sys.version_info < _v, reason=f"requires python {'.'.join((str(v) for v in _v))}")
 
@@ -36,5 +36,5 @@ class AstuceTestCase(unittest.TestCase):
     def setUp(self):
         self.parser = parser.Parser()
 
-    def parse(self, source:str, modname:str='test', **kw:Any) -> ast.Module:
+    def parse(self, source:str, modname:str='test', **kw:Any) -> _typing.Module:
         return self.parser.parse(dedent(source), modname, **kw)
