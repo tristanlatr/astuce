@@ -300,9 +300,92 @@ class TestNamedExprNode(AstuceTestCase):
         assert inherited_class.keywords[0].value.scope == module
 
         assert lambda_assignment.args.args[0].scope == lambda_assignment
-        assert lambda_assignment.args.defaults[0].scope
+        assert lambda_assignment.args.defaults[0].scope == module
 
         lambda_named_expr = module.body[5].args.defaults[0]
         assert lambda_named_expr.value.args.defaults[0].scope == module
 
         assert comprehension.generators[0].ifs[0].scope == module
+
+class TestScopeNode(AstuceTestCase):
+    """Tests for some scoped nodes"""
+    CODE = """
+            def func(var_1):
+                pass
+
+            def func_two(var_2, var_2 = "default"):
+                pass
+
+            class MyBaseClass:
+                name:str
+                pass
+
+            class MyInheritedClass(MyBaseClass):
+                def func():
+                    pass
+                    def innerfunc():
+                        pass
+                class Inner:
+                    class reInner(MyBaseClass):
+                        def yes():...
+                    def no():...
+
+            VAR = lambda y: print(y)
+
+            def func():
+                pass
+
+            COMPREHENSION = [y for i in (1, 2) if i]
+        """
+    def test_frame(self) -> None:
+
+        module = self.parse(self.CODE)
+        function = module.body[0]
+        assert isinstance(function, ast.FunctionDef)
+        function_two = module.body[1]
+        assert isinstance(function_two, ast.FunctionDef)
+        inherited_class = module.body[3]
+        assert isinstance(inherited_class, ast.ClassDef)
+        lambda_assignment = module.body[4].value
+        assert isinstance(lambda_assignment, ast.Lambda)
+
+        assert function.args.frame == function
+
+        assert function_two.args.args[0].frame == function_two
+        assert function_two.args.args[1].frame == function_two
+        assert function_two.args.defaults[0].frame == function_two
+        
+        assert lambda_assignment.args.args[0].frame == lambda_assignment
+
+        comprehension = module.body[6].value
+        assert comprehension.generators[0].ifs[0].frame == module
+
+        # TODO: tests nested frames in MyInheritedClass()
+
+    def test_scope(self) -> None:
+
+        module = self.parse(self.CODE)
+        function = module.body[0]
+        assert isinstance(function, ast.FunctionDef)
+        function_two = module.body[1]
+        assert isinstance(function_two, ast.FunctionDef)
+        inherited_class = module.body[3]
+        assert isinstance(inherited_class, ast.ClassDef)
+        lambda_assignment = module.body[4].value
+        assert isinstance(lambda_assignment, ast.Lambda)
+        comprehension = module.body[6].value
+        assert isinstance(comprehension, ast.ListComp)
+
+        assert function.args.scope == function
+
+        assert function_two.args.args[0].scope == function_two
+        assert function_two.args.args[1].scope == function_two
+        assert function_two.args.defaults[0].scope == function_two
+
+        assert inherited_class.bases[0].scope == inherited_class # TODO: Should it be module instead?
+
+        assert lambda_assignment.args.args[0].scope == lambda_assignment
+
+        assert comprehension.generators[0].ifs[0].scope == comprehension
+
+        # TODO: test scope of arg nodes
