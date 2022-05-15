@@ -27,10 +27,9 @@ class _AstuceModuleVisitor(ast.NodeVisitor):
 
     parent: ASTNode = cast('ASTNode', None)
 
-    def __init__(self, parser:'Parser', modname:str) -> None:
+    def __init__(self, parser:'Parser') -> None:
         super().__init__()
         self.parser = parser
-        self.modname = modname
     
     def visit(self, node: ASTNode) -> None: # type:ignore[override]
 
@@ -51,9 +50,6 @@ class _AstuceModuleVisitor(ast.NodeVisitor):
         if self.parent == None:
             assert isinstance(node, ast.Module)
     
-    def visti_Module(self, node: ast.Module) -> None:
-        node._modname = self.modname
-        self.generic_visit(node)
 
     def visit_FunctionDef(self, node: ast.FunctionDef) -> None:
         self.parent._set_local(node.name, node)
@@ -127,17 +123,23 @@ class Parser:
         Store wildcard ImportFrom to resolve them after building.
         """
 
-    def parse(self, source:str, modname:str, **kw:Any) -> ast.Module:
+    def parse(self, source:str, modname:str, is_package:bool=False, **kw:Any) -> ast.Module:
         """
         Parse the python source string into a `ast.Module` instance.
         """
         mod = _parse(source, **kw)
-        _AstuceModuleVisitor(self, modname).visit(cast(ASTNode, mod))
+        
+        if is_package:
+            mod._is_package = True
+        
+        mod._modname = modname
         self.modules[modname] = mod
+
+        _AstuceModuleVisitor(self).visit(cast(ASTNode, mod))
         return mod
 
 _default_parser = Parser()
-def parse(source:str, modname:str, **kw:Any) -> ast.Module:
+def parse(source:str, modname:str, is_package:bool=False, **kw:Any) -> ast.Module:
     """
     Parse the python source string into a `ast.Module` instance.
 
@@ -150,8 +152,8 @@ def parse(source:str, modname:str, **kw:Any) -> ast.Module:
         kw
             Other arguments are passed to the `ast.parse` function directly.
             Including:
-            
+
             - ``filename``: The filename where we can find the module source
                 (only used for ast error messages)
     """
-    return _default_parser.parse(source, modname, **kw)
+    return _default_parser.parse(source, modname, is_package=is_package, **kw)

@@ -30,9 +30,11 @@ class ASTNode:
     """
 
     parent: 'ASTNode' = None # type:ignore
+    
     _locals: Dict[str, List[_typing.LocalsAssignT]] = None # type:ignore
     _parser: 'Parser' = None # type:ignore
     _modname: Optional[str] = None
+    _is_package: bool = False
     
     @cached_property
     def lineno(self) -> int:
