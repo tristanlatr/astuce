@@ -1,2 +1,3 @@
 # astuce
-Provide AST inference utilities
+
+AST inference utilities.
