@@ -8,6 +8,7 @@ is the signature of the `parse` function.
 __docformat__ = 'restructuredtext'
 
 from functools import partial
+import warnings
 import sys
 import ast
 from typing import Any, Callable, Dict, List, Optional, cast
@@ -36,7 +37,7 @@ else:
             _unparse = _astunparse.unparse
 
 from .nodes import ASTNode, get_context, Context, is_assign_name, is_del_name, is_scoped_node
-from . import _typing
+from . import _typing, exceptions
 
 class _AstuceModuleVisitor(ast.NodeVisitor):
     """
@@ -124,19 +125,19 @@ class Parser:
     """
 
     def __init__(self) -> None:
-        self.modules:Dict[str, ast.Module] = {}
+        self.modules:Dict[str, _typing.Module] = {}
         """
         The parsed modules.
         """
 
-        self._assignattr:List[ast.Attribute] = []
+        self._assignattr:List[_typing.Attribute] = []
         """
         A list to store assignments to attributes. 
 
         We might want to resolve them after building.
         """
 
-        self._wildcard_import:List[ast.ImportFrom] = []
+        self._wildcard_import:List[_typing.ImportFrom] = []
         """
         Store wildcard ImportFrom to resolve them after building.
         """
@@ -145,8 +146,13 @@ class Parser:
         """
         Unparse an ast.AST object and generate a code string.
         """
+        strip_extra_parenthesis = True # could be made an argument?
         try:
-            return _unparse(node).strip()
+            unparsed = _unparse(node).strip()
+            # Workaround the extra parenthesis added by the unparse() function.
+            if strip_extra_parenthesis and unparsed.startswith('(') and unparsed.endswith(')'):
+                unparsed = unparsed[1:-1]
+            return unparsed
         except Exception as e:
             raise ValueError(f"can't unparse {node}") from e
 
@@ -156,14 +162,46 @@ class Parser:
         """
         mod = _parse(source, **kw)
         
+        # Store whether this module is package
         if is_package:
             mod._is_package = True
         
+        # Store module file name
+        filename = kw.get('filename')
+        if filename:
+            mod._filename = filename
+        
+        # Store module name
         mod._modname = modname
         self.modules[modname] = mod
 
+        # Build locals 
         _AstuceModuleVisitor(self).visit(cast(ASTNode, mod))
         return cast(_typing.Module, mod)
+    
+    def _report(self, descr: str, lineno_offset: int = 0) -> None:
+        """Log an error or warning about this node object."""
+
+        def description(node: ASTNode) -> str:
+            """A string describing our source location to the user.
+
+            If this module's code was read from a file, this returns
+            its file path. In other cases, such as during unit testing,
+            the full module name is returned.
+            """
+            source_path = node.root._filename
+            return node.root.qname if source_path is None else str(source_path)
+
+        linenumber: object
+        linenumber = self.line
+        if linenumber:
+            linenumber += lineno_offset
+        elif lineno_offset and self.root is self:
+            linenumber = lineno_offset
+        else:
+            linenumber = '???'
+
+        warnings.warn(f'{description(self)}:{linenumber}: {descr}', category=exceptions.StaticAnalysisWarning)
 
 _default_parser = Parser()
 def parse(source:str, modname:str, is_package:bool=False, **kw:Any) -> _typing.Module:
@@ -182,5 +220,9 @@ def parse(source:str, modname:str, is_package:bool=False, **kw:Any) -> _typing.M
 
             - ``filename``: The filename where we can find the module source
                 (only used for ast error messages)
+    
+    Attention, using this function alters some global state, use a `Parser` instance
+    to parse modules in isolated environments.
+    
     """
     return _default_parser.parse(source, modname, is_package=is_package, **kw)

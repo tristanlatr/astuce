@@ -6,3 +6,6 @@ class RootNodeError(Exception):
 
 class NameResolutionError(Exception):
     """Exception for names that cannot be resolved in a object scope."""
+
+class StaticAnalysisWarning(Warning):
+    ...

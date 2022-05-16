@@ -1,7 +1,8 @@
 import builtins
 import enum
 from functools import lru_cache
-from typing import Any, Callable, Dict, Iterator, Optional, Sequence, List, Tuple, Type, Union, cast, TYPE_CHECKING
+import re
+from typing import Any, Callable, Dict, Iterable, Iterator, Optional, Sequence, List, Tuple, Type, Union, cast, TYPE_CHECKING
 import sys
 import ast
 from ast import AST
@@ -30,11 +31,26 @@ class ASTNode:
     """
 
     parent: 'ASTNode' = None # type:ignore
+    """
+    `None` for Modules.
+    """
     
     _locals: Dict[str, List[_typing.LocalsAssignT]] = None # type:ignore
     _parser: 'Parser' = None # type:ignore
     _modname: Optional[str] = None
     _is_package: bool = False
+    _filename: Optional[str] = None
+
+    @cached_property
+    def root(self) -> _typing.Module:
+        """Return the root node of the syntax tree.
+
+        :returns: The root node.
+        :rtype: Module
+        """
+        if self.parent:
+            return self.parent.root
+        return self
     
     @cached_property
     def lineno(self) -> int:
@@ -361,10 +377,47 @@ class ASTNode:
         msg = "Could not find %s in %s's children"
         raise ValueError(msg % (repr(child), repr(self)))
 
-    def resolve(self, name:str) -> str:
-        ...
-        # TODO: adjust code from astroid to provide lookup() method. 
-        # Then use this lookup() method here to provide name resolving. 
+    # The MIT License (MIT)
+    # Copyright (c) 2015 Read the Docs, Inc
+    def resolve(self, basename: str) -> str:
+        """
+        Resolve a basename to get its fully qualified name.
+
+        :param ctx: The node representing the base name.
+        :param basename: The partial base name to resolve.
+        :returns: The fully resolved base name.
+        """
+        full_basename = basename
+
+        top_level_name = re.sub(r"\(.*\)", "", basename).split(".", 1)[0]
+
+        assigns = self.lookup(top_level_name)[1]
+
+        for assignment in assigns:
+            if isinstance(assignment, ast.ImportFrom):
+                import_name = get_full_import_name(assignment, top_level_name)
+                full_basename = basename.replace(top_level_name, import_name, 1)
+                break
+            if isinstance(assignment, ast.Import):
+                import_name = resolve_import_alias(top_level_name, assignment.names)
+                full_basename = basename.replace(top_level_name, import_name, 1)
+                break
+            if isinstance(assignment, ast.ClassDef):
+                full_basename = assignment.qname()
+                break
+            if isinstance(assignment, ast.Name) and is_assign_name(assignment):
+                full_basename = "{}.{}".format(assignment.scope.qname, assignment.id)
+
+        full_basename = re.sub(r"\(.*\)", "()", full_basename)
+
+        # Some unecessary -yet- support for builtins:
+        # if full_basename.startswith("builtins."):
+        #     return full_basename[len("builtins.") :]
+
+        # if full_basename.startswith("__builtin__."):
+        #     return full_basename[len("__builtin__.") :]
+
+        return full_basename
 
     def node_ancestors(self) -> Iterator["ASTNode"]:
         """Yield parent, grandparent, etc until there are no more."""
@@ -410,8 +463,8 @@ class ASTNode:
         :param offset: The line offset to filter statements up to.
 
         :returns: The scope node and the list of assignments associated to the
-            given name according to the scope node where it has been found (locals,
-            globals or builtin).
+            given name according to the scope node where it has been found.
+        :returntype: tuple[ASTNode, List[_typing.LocalsAssignT]]
         """
         if is_scoped_node(self):
             return self._scope_lookup(self, name, offset=offset)
@@ -513,7 +566,7 @@ class ASTNode:
                 return pscope._scope_lookup(node, name)
             pscope = pscope.parent and pscope.parent.scope
 
-        # self is at the top level of a module, or is enclosed only by ClassDefs
+        # self is at the top level of a module, and we counldn't find references to this name
         raise LookupError()
         # return builtin_lookup(name)
     
@@ -587,3 +640,96 @@ def is_scoped_node(node: 'ASTNode') -> bool:
     """
     return isinstance(node, (ast.AsyncFunctionDef, ast.FunctionDef, ast.ClassDef, ast.Module, 
                              ast.GeneratorExp, ast.DictComp, ast.SetComp, ast.ListComp, ast.Lambda))
+
+
+def get_module_package(node: _typing.Module) -> Optional[_typing.Module]:
+    """
+    Returns the parent package of this module or `None` if not found. 
+
+    Some code rely on the fact that ast.Module.parent property is always None. So we do 
+    not overide this behaviour.
+    """
+    parent_name = '.'.join(node.qname.split('.')[:-1])
+    if not parent_name:
+        # top-level module
+        return None
+    return node._parser.modules.get(parent_name)
+
+# ==========================================================
+# relative imports
+
+# The MIT License (MIT)
+# Copyright (c) 2015 Read the Docs, Inc
+def get_full_import_name(import_from:ast.ImportFrom, name:str) -> str:
+    """Get the full path of a name from a ``from x import y`` statement.
+    :param import_from: The astroid node to resolve the name of.
+    :param name:
+    :returns: The full import path of the name.
+    """
+    partial_basename = resolve_import_alias(name, import_from.names)
+
+    module_name = import_from.module
+    if import_from.level:
+        module_name = relative_to_absolute(import_from)
+
+    return "{}.{}".format(module_name, partial_basename)
+
+# The MIT License (MIT)
+# Copyright (c) 2015 Read the Docs, Inc
+def resolve_import_alias(name:str, import_names:Iterable[ast.alias]) -> str:
+    """Resolve a name from an aliased import to its original name.
+    :param name: The potentially aliased name to resolve.
+    :param import_names: The pairs of original names and aliases
+        from the import.
+    :returns: The original name.
+    """
+    resolved_name = name
+
+    for importname in import_names:
+        import_name, imported_as = importname.name, importname.asname
+        if import_name == name:
+            break
+        if imported_as == name:
+            resolved_name = import_name
+            break
+
+    return resolved_name
+
+def relative_to_absolute(node: ast.ImportFrom) -> str:
+    """Convert a relative import path to an absolute one.
+
+    Parameters:
+        node: The "from ... import ..." AST node.
+        name: The imported name.
+
+    Returns:
+        The absolute import path of the module this nodes imports from.
+    """
+    modname = node.module
+    level = node.level
+    
+    if level:
+        # Relative import.
+        parent: Optional[_typing.Module] = node.root
+        if parent._is_package:
+            level -= 1
+        for _ in range(level):
+            if parent is None:
+                break
+            parent = get_module_package(parent)
+        if parent is None:
+            node.root._report(
+                "relative import level (%d) too high" % node.level,
+                lineno_offset=node.lineno
+                )
+            return
+        if modname is None:
+            modname = parent.qname
+        else:
+            modname = f'{parent.qname}.{modname}'
+    else:
+        # The module name can only be omitted on relative imports.
+        assert modname is not None
+    
+    return modname
+

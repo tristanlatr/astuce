@@ -1,5 +1,14 @@
 """This module contains utilities for extracting information from nodes."""
 
+# Definition of 'Inference':
+# Inference is the action to statically evaluate an AST node into another object that express the runtime 
+# behaviour.
+
+# Definition of 'Looking-up':
+
+# Definition of 'Resolving':
+
+
 from __future__ import annotations
 
 import logging
@@ -23,7 +32,6 @@ def _join(sequence: list[str | Name| Expression], item:str) -> list[str | Name| 
     for element in sequence[1:]:
         new_sequence.extend((item, element))
     return new_sequence
-
 
 
 def _parse__all__constant(node: ast.Constant) -> list[str]:

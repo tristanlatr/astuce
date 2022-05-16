@@ -21,7 +21,9 @@ class SetComp(ast.DictComp, ConcreteASTNode):...
 class ListComp(ast.List, ConcreteASTNode):...
 class Lambda(ast.Lambda, ConcreteASTNode):...
 
-LocalsAssignT = Union[ClassDef, FunctionDef, AsyncFunctionDef, Name, arg, Import, ImportFrom]
+LocalsAssignT = Union[ClassDef,
+            FunctionDef, AsyncFunctionDef, 
+            Name, arg, Import, ImportFrom]
 """
 This type represent all possible types stored in scopes locals dict.
 """

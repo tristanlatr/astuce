@@ -50,10 +50,5 @@ class TestAstUnparseFunction(AstuceTestCase):
             assert "a" in module.locals
             value = module.locals["a"][0].statement.value
             unparsed = value.unparse()
-
-            # Workaround the extra parenthesis added by the unparse() function.
-            if unparsed.startswith('(') and unparsed.endswith(')'):
-                unparsed = unparsed[1:-1]
-
             assert unparsed == expression
             assert _astunparse.unparse(value) == expression
