@@ -69,24 +69,23 @@ class _AstuceModuleVisitor(ast.NodeVisitor):
         if self.parent == None:
             assert isinstance(node, ast.Module)
     
-
     def visit_FunctionDef(self, node: ast.FunctionDef) -> None:
-        self.parent._set_local(node.name, node)
+        node.parent._set_local(node.name, node)
         self.generic_visit(node)
     
     def visit_AsyncFunctionDef(self, node: ast.AsyncFunctionDef) -> None:
-        self.parent._set_local(node.name, node)
+        node.parent._set_local(node.name, node)
         self.generic_visit(node)
     
     def visit_ClassDef(self, node: ast.ClassDef) -> None:
-        self.parent._set_local(node.name, node)
+        node.parent._set_local(node.name, node)
         self.generic_visit(node)
     
     def visit_Import(self, node: ast.Import) -> None:
         # save import names in parent's locals:
         for a in node.names:
             name = a.asname or a.name
-            self.parent._set_local(name.split(".")[0], node)
+            node.parent._set_local(name.split(".")[0], node)
         self.generic_visit(node)
 
     def visit_ImportFrom(self, node: ast.ImportFrom) -> None:
@@ -96,17 +95,17 @@ class _AstuceModuleVisitor(ast.NodeVisitor):
         else:
             for a in node.names:
                 name = a.asname or a.name
-                self.parent._set_local(name, node)
+                node.parent._set_local(name, node)
         self.generic_visit(node)
     
     def visit_arg(self, node: ast.arg) -> None:
-        self.parent._set_local(node.arg, node)
+        node.parent._set_local(node.arg, node)
         self.generic_visit(node)
     
     def visit_Name(self, node: ast.Name) -> None:
 
         if is_assign_name(node) or is_del_name(node):
-            self.parent._set_local(node.id, node)
+            node.parent._set_local(node.id, node)
 
         self.generic_visit(node)
     

@@ -91,7 +91,7 @@ class ASTNode:
         """
         if isinstance(self, ast.NamedExpr):
             return self.frame._set_local(name, node)
-        if not is_frame_node(self):
+        if not is_scoped_node(self):
             return self.parent._set_local(name, node)
 
         # nodes that can be stored in the locals dict
