@@ -398,16 +398,17 @@ class ASTNode:
                 import_name = get_full_import_name(assignment, top_level_name)
                 full_basename = basename.replace(top_level_name, import_name, 1)
                 break
-            if isinstance(assignment, ast.Import):
+            elif isinstance(assignment, ast.Import):
                 import_name = resolve_import_alias(top_level_name, assignment.names)
                 full_basename = basename.replace(top_level_name, import_name, 1)
                 break
-            if isinstance(assignment, ast.ClassDef):
+            elif isinstance(assignment, ast.ClassDef):
                 full_basename = assignment.qname()
                 break
-            if isinstance(assignment, ast.Name) and is_assign_name(assignment):
+            elif isinstance(assignment, ast.Name) and is_assign_name(assignment):
                 full_basename = "{}.{}".format(assignment.scope.qname, assignment.id)
-
+            elif isinstance(assignment, ast.arg):
+                full_basename = "{}.{}".format(assignment.scope.qname, assignment.arg)
         full_basename = re.sub(r"\(.*\)", "()", full_basename)
 
         # Some unecessary -yet- support for builtins:
@@ -566,9 +567,8 @@ class ASTNode:
                 return pscope._scope_lookup(node, name)
             pscope = pscope.parent and pscope.parent.scope
 
-        # self is at the top level of a module, and we counldn't find references to this name
-        raise LookupError()
-        # return builtin_lookup(name)
+        # self is at the top level of a module, and we couldn't find references to this name
+        raise LookupError("couldn't find references to {name!r}")
     
     # def nodes_of_class(
     #     self,

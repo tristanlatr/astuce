@@ -42,7 +42,7 @@ ASSIGNMENT_NODES = ( ast.arguments, ast.Delete,
 
 # nodes that do not directly assigns a value to a name, but parent is maybe.
 # the following expression can appear in assignment context:
-PARENT_ASSIGNMENT_NODES = (ast.Name, ast.Attribute, ast.List, 
+PARENT_ASSIGNMENT_NODES = (ast.Name, ast.Attribute, ast.arg, ast.List, 
                            ast.Tuple, ast.Set, ast.Starred)
 
 # isinstance(self, ast.AssignAttr, ast.AssignName, ast.DelAttr, ast.DelName, ast.node_classes.BaseContainer, ast.Starred

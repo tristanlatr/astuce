@@ -7,6 +7,34 @@ from typing import Iterator, Tuple
 import pytest
 
 from astuce import parser
+from . import AstuceTestCase
+
+class ResolveTest(AstuceTestCase):
+
+    def test_resolve_function_argument(self,):
+        mod = self.parse('''
+        from typing import Any
+        def func(a,b:int,c=True,*d,**e:Any):
+            ...
+        ''')
+        func = mod.body[-1]
+        assert isinstance(func, ast.FunctionDef)
+        elips = func.body[0]
+        assert func == mod.locals['func'][0]
+
+        # Assert that we filter the right assigments when trying to lookup
+        # a name that is not accessible in the context of the scope
+        with pytest.raises(LookupError):
+            True_node = func.args.defaults[0]
+            assert True_node.lookup('a')
+
+        assert func.lookup('a')[1] == [func.args.args[0]]
+
+        assert func.resolve('a') == elips.resolve('a') == f"{func.qname}.a"
+        assert func.resolve('b') == elips.resolve('b') == f"{func.qname}.b"
+        assert func.resolve('c') == elips.resolve('c') == f"{func.qname}.c"
+        assert func.resolve('d') == elips.resolve('d') == f"{func.qname}.d"
+        assert func.resolve('e') == elips.resolve('e') == f"{func.qname}.e"
 
 _parse_mod = lambda text:parser.Parser().parse(dedent(text), modname='test')
 

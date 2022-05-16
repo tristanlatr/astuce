@@ -31,7 +31,7 @@ class LookupTest(AstuceTestCase):
             from os import path
             class path:...
         ''')
-        assert list(mod.locals) == ['path', 'lol']
+        assert list(mod.locals) == ['path']
         
         assert len(mod.locals['path']) == 2
         
