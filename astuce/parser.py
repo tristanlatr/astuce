@@ -17,7 +17,10 @@ if sys.version_info >= (3,8):
 else:
     _parse = ast.parse
 
-_unparse: Optional[Callable[[ast.AST], str]]
+# Try very hard to import a full-complete unparse() function.
+# Fallback to code in _astunparse.py if function could be imported 
+# either from the standard library from python 3.9 or from 'astunparse' or 'astor' library.
+_unparse: Callable[[ast.AST], str]
 if sys.version_info >= (3,9):
     _unparse = ast.unparse
 else:
@@ -29,7 +32,8 @@ else:
             import astor
             _unparse = astor.to_source
         except ImportError:
-            _unparse = None
+            from . import _astunparse 
+            _unparse = _astunparse.unparse
 
 from .nodes import ASTNode, get_context, Context, is_assign_name, is_del_name, is_scoped_node
 from . import _typing
@@ -141,9 +145,10 @@ class Parser:
         """
         Unparse an ast.AST object and generate a code string.
         """
-        assert _unparse is not None, \
-            "please install library 'astunparse' or 'astor' to use unparse() on python 3.8 or below"
-        return _unparse(node)
+        try:
+            return _unparse(node).strip()
+        except Exception as e:
+            raise ValueError(f"can't unparse {node}") from e
 
     def parse(self, source:str, modname:str, is_package:bool=False, **kw:Any) -> _typing.Module:
         """
