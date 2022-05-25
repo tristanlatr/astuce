@@ -392,7 +392,7 @@ def filter_stmts(base_node: 'ASTNode', stmts:List[LocalsAssignT], frame: 'ASTNod
             elif not optional_assign and mystmt and stmt.parent is mystmt.parent:
                 _stmts = []
                 _stmt_parents = []
-        elif isinstance(node, ast.Del):
+        elif is_del_name(node):
             # Remove all previously stored assignments
             _stmts = []
             _stmt_parents = []
