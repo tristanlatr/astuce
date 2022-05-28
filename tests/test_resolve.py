@@ -6,8 +6,28 @@ from textwrap import dedent
 from typing import Iterator, Tuple
 import pytest
 
-from astuce import parser
-from . import AstuceTestCase
+from astuce import parser, nodes
+from . import AstuceTestCase, fromtext
+
+@pytest.mark.parametrize(
+        ("source", "expected"), 
+        [("var: typing.Generic[T]", "typing.Generic -> typing.Generic"), 
+        ("var: typing.Generic[T, _KV]", "typing.Generic -> typing.Generic"),
+        ("from typing import Generic\nvar: Generic[T]", "Generic -> typing.Generic"),
+        ("from pydocspec import _model as m\nvar: m.TreeRoot[T]", "m.TreeRoot -> pydocspec._model.TreeRoot"),
+        ("var: dict[str, str]", "dict -> dict"),]
+    )
+def test_node2fullname_nodes(source:str, expected:str) -> None:
+
+    mod = fromtext(source)
+    var = mod.locals['var'][0]
+    assert isinstance(var, ast.Name)
+    annassing = var.parent
+    assert isinstance(annassing, ast.AnnAssign)
+    ann = annassing.annotation
+    dottedname = '.'.join(nodes.node2dottedname(ann))
+
+    assert f"{dottedname} -> {ann.resolve(dottedname)}" == expected
 
 class ResolveTest(AstuceTestCase):
 
@@ -35,8 +55,26 @@ class ResolveTest(AstuceTestCase):
         assert func.resolve('c') == elips.resolve('c') == f"{func.qname}.c"
         assert func.resolve('d') == elips.resolve('d') == f"{func.qname}.d"
         assert func.resolve('e') == elips.resolve('e') == f"{func.qname}.e"
+    
+    def test_resolve_alias(self,):
+        mod = self.parse('''
+        from typing import Any
+        AnyT = Any
 
-_parse_mod = lambda text:parser.Parser().parse(dedent(text), modname='test')
+        def func(a,b:int,c=True,*d,**e:Any):
+            ...
+        
+        class klass:
+            f = func
+        ''')
+        klass = mod.body[-1]
+        assert isinstance(klass, ast.ClassDef)
+        func = mod.body[-2]
+        assert isinstance(klass, ast.ClassDef)
+
+        assert func.resolve('AnyT') == klass.resolve('AnyT') == "typing.Any"
+        assert klass.resolve('f') == func.qname == 'test.func'
+       
 
 def generate_module_names() -> Iterator[str]:
     for i in range(1, 5):
@@ -101,7 +139,7 @@ def test_can_get_full_imported_basename(import_:str, basename:str, expected:str)
     """.format(
         import_, basename
     )
-    mod = _parse_mod(source)
+    mod = fromtext(source)
 
     node = mod.body[-1]
     # This fails with keyerror? wtf
@@ -123,7 +161,7 @@ def test_can_get_full_function_basename(import_:str, basename:str, expected:str)
     """.format(
         import_, basename
     )
-    mod = _parse_mod(source)
+    mod = fromtext(source)
 
     node = mod.body[-1]
     # assert node == mod.locals['ThisClass'][0]
