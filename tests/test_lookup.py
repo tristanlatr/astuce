@@ -473,7 +473,6 @@ class LookupTest2(AstuceTestCase):
         assert len(it)==1
         obj = it[0]
         self.assertIsInstance(obj, ast.ClassDef)
-        # self.assertRaises(StopIteration, functools.partial(next, it))
 
     def test_global_delete(self) -> None:
         code = """
@@ -547,11 +546,7 @@ class LookupControlFlowTest(AstuceTestCase):
         _, stmts = x_name.lookup("x")
         self.assertEqual(len(stmts), 1)
         self.assertEqual(stmts[0].lineno, 4)
-    
-    ####################################
-    ####################################
 
-    # TODO: Ajust the rest
 
     def test_if_assign(self) -> None:
         """Assignment in if statement is added to lookup results, but does not replace
