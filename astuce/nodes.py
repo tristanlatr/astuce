@@ -1,11 +1,15 @@
 import builtins
+import contextlib
 import enum
 from functools import lru_cache
+import functools
 import re
-from typing import Any, Callable, Dict, Iterable, Iterator, Optional, Sequence, List, Tuple, Type, Union, cast, TYPE_CHECKING
+from typing import Any, Callable, Dict, Iterable, Iterator, Optional, Sequence, List, Tuple, Type, Union, cast, TYPE_CHECKING, overload
 import sys
 import ast
 from ast import AST
+
+import attr
 
 # TODO: remove once Python 3.7 support is dropped
 if sys.version_info < (3, 8):
@@ -14,12 +18,35 @@ else:
     from functools import cached_property  # noqa: WPS440
 
 from .exceptions import LastNodeError, RootNodeError
-from . import _typing
+from . import _typing, _astutils
 
 if TYPE_CHECKING:
     from .parser import Parser
+    from ._context import OptionalInferenceContext
 
 _builtins_names = dir(builtins)
+
+@object.__new__
+class Uninferable:
+    """Special object which is returned when inference fails."""
+
+    def __repr__(self):
+        return "<Uninferable>"
+
+    __str__ = __repr__
+
+    # TODO: Is this code required?
+    # def __getattribute__(self, name):
+    #     if name.startswith("__") and name.endswith("__"):
+    #         return object.__getattribute__(self, name)
+    #     return self
+
+    # def __call__(self, *args, **kwargs):
+    #     return self
+
+    def __bool__(self):
+        return False
+
 
 class ASTNode:
     """This class is dynamically added to the bases of each AST node class.
@@ -56,7 +83,7 @@ class ASTNode:
     def lineno(self) -> int:
         if isinstance(self, ast.Module):
             return 0
-        return getattr(self, 'lineno', -1)
+        return getattr(super(), 'lineno', -1)
 
     @property
     def qname(self) -> str:
@@ -377,13 +404,22 @@ class ASTNode:
         msg = "Could not find %s in %s's children"
         raise ValueError(msg % (repr(child), repr(self)))
 
+    def infer(self, context:'OptionalInferenceContext'=None) -> Iterator['ASTNode']:
+        # workaround cyclic import
+        from . import inference
+        return inference.infer(self, context)
+    
+    @lru_cache()
+    def literal_eval(self) -> Any:
+        return ast.literal_eval(self)
+
     # The MIT License (MIT)
     # Copyright (c) 2015 Read the Docs, Inc
     def resolve(self, basename: str) -> str:
         """
         Resolve a basename to get its fully qualified name.
 
-        :param ctx: The node representing the base name.
+        :param self: The node representing the base name.
         :param basename: The partial base name to resolve.
         :returns: The fully resolved base name.
         """
@@ -391,7 +427,10 @@ class ASTNode:
 
         top_level_name = re.sub(r"\(.*\)", "", basename).split(".", 1)[0]
 
-        assigns = self.lookup(top_level_name)[1]
+        try:
+            assigns = self.lookup(top_level_name)[1]
+        except LookupError:
+            assigns = []
 
         for assignment in assigns:
             if isinstance(assignment, ast.ImportFrom):
@@ -407,8 +446,10 @@ class ASTNode:
                 break
             elif isinstance(assignment, ast.Name) and is_assign_name(assignment):
                 full_basename = "{}.{}".format(assignment.scope.qname, assignment.id)
+                # TODO: handle aliases
             elif isinstance(assignment, ast.arg):
                 full_basename = "{}.{}".format(assignment.scope.qname, assignment.arg)
+        
         full_basename = re.sub(r"\(.*\)", "()", full_basename)
 
         # Some unecessary -yet- support for builtins:
@@ -417,6 +458,12 @@ class ASTNode:
 
         # if full_basename.startswith("__builtin__."):
         #     return full_basename[len("__builtin__.") :]
+
+        # dottedname = full_basename.split('.')
+        # if dottedname[0] in self._parser.modules:
+        #     origin_module = self._parser.modules[dottedname[0]]
+        #     ...
+        #     # TODO: finish me
 
         return full_basename
 
@@ -566,37 +613,15 @@ class ASTNode:
             if not isinstance(pscope, ast.ClassDef):
                 return pscope._scope_lookup(node, name)
             pscope = pscope.parent and pscope.parent.scope
-
+        
         # self is at the top level of a module, and we couldn't find references to this name
-        raise LookupError("couldn't find references to {name!r}")
+        return (node, [])
+        # NameInferenceError is raised by callers.
+        # raise LookupError(f"couldn't find references to {name!r}")
     
-    # def nodes_of_class(
-    #     self,
-    #     klass: Union[Type[ast.AST], Tuple[Type[ast.AST], ...]],
-    #     skip_klass: Optional[Union[Type[ast.AST], Tuple[Type[ast.AST], ...]]] = None,
-    # ) -> Iterator['ASTNode']:
-    #     """Get the nodes (including this one or below) of the given types.
-
-    #     :param klass: The types of node to search for.
-
-    #     :param skip_klass: The types of node to ignore. This is useful to ignore
-    #         subclasses of :attr:`klass`.
-
-    #     :returns: The node of the given types.
-    #     """
-    #     if isinstance(self, klass):
-    #         yield self
-
-    #     if skip_klass is None:
-    #         for child_node in self.children:
-    #             yield from child_node.nodes_of_class(klass, skip_klass)
-
-    #         return
-
-    #     for child_node in self.children:
-    #         if isinstance(child_node, skip_klass):
-    #             continue
-    #         yield from child_node.nodes_of_class(klass, skip_klass)
+    def infer_name(self, name:str) -> Iterator['ASTNode']:
+        # TODO
+        return
 
 class Context(enum.Enum):
     Load = 1
@@ -622,11 +647,19 @@ def is_del_name(node: Union[ast.Name, ast.Attribute]) -> bool:
     """
     return get_context(node) == Context.Del
 
+@functools.lru_cache(maxsize=None)
 def get_context(node: Union[ast.Attribute, ast.List, ast.Name, ast.Subscript, ast.Starred, ast.Tuple]) -> Context:
     """
     Wraps the context ast context classes into a more friendly enumeration.
+
+    Dynamically created nodes do not have the ctx field, in this case fall back to Load context.
     """
-    return _CONTEXT_MAP[type(node.ctx)]
+
+    # Just in case, we use getattr because dynamically created nodes do not have the ctx field.
+    try:
+        return _CONTEXT_MAP[type(getattr(node, 'ctx', ast.Load))]
+    except KeyError as e:
+        raise ValueError(f"Can't get the context of {node!r}") from e
 
 def is_frame_node(node: 'ASTNode') -> bool:
     """
@@ -646,8 +679,8 @@ def get_module_package(node: _typing.Module) -> Optional[_typing.Module]:
     """
     Returns the parent package of this module or `None` if not found. 
 
-    Some code rely on the fact that ast.Module.parent property is always None. So we do 
-    not overide this behaviour.
+    Some code rely on the fact that `Module.parent` property is always None. 
+    So we should not overide this behaviour.
     """
     parent_name = '.'.join(node.qname.split('.')[:-1])
     if not parent_name:
@@ -733,3 +766,100 @@ def relative_to_absolute(node: ast.ImportFrom) -> str:
     
     return modname
 
+#   Copyright 2006-2008 Michael Hudson <mwh@python.net>
+#   Copyright 2006-2020 Pydoctor contributors
+
+@overload
+def node2dottedname(node: Union[ast.Attribute, ast.Name]) -> List[str]: ...
+@overload
+def node2dottedname(node: Optional[ast.expr], strict:bool=False) -> Optional[List[str]]:...
+def node2dottedname(node: Optional[ast.expr], strict:bool=False) -> Optional[List[str]]:
+    """
+    Resove expression composed by `ast.Attribute` and `ast.Name` nodes to a list of names. 
+    :note: Supports variants `AssignAttr` and `AssignName`.
+    :note: Strips the subscript slice, i.e. `Generic[T]` -> `Generic`, except if scrict=True.
+    """
+    parts = []
+    if isinstance(node, ast.Subscript) and not strict:
+        node = node.value
+    while isinstance(node, (ast.Attribute)):
+        parts.append(node.attr)
+        node = node.value
+    if isinstance(node, (ast.Name)):
+        parts.append(node.id)
+    else:
+        return None
+    parts.reverse()
+    return parts
+
+
+@attr.s(auto_attribs=True)
+class TypeInfo:
+    """
+    Optionnaly holds type information.
+    """
+    type_annotation: Optional[_typing.ASTexpr]
+    classdef: Optional[_typing.ClassDef]
+
+    def __bool__(self) -> bool:
+        """
+        Does this type info actually holds information?
+        """
+        return self.type_annotation is not None
+    
+    def __str__(self) -> str:
+        """
+        Type information as string.
+        """
+        return self.type_annotation.unparse() if self else '??'
+
+class Instance:
+    """
+    This class is selectively added to the bases of the following ast nodes:
+    `Constant`, `List`, `Tuple`, `Dict`, `Set`.
+
+    :var type_info: The type information of this instance.
+    """
+    type_info: TypeInfo
+
+    @classmethod
+    def create_instance(cls, *args:Any, 
+             classdef:Optional[ast.ClassDef]=None, 
+             type_annotation:Optional[ast.expr]=None, 
+             **kwargs:Any) -> 'Instance':
+        """
+        Special factory method to create instances of nodes that represent Instances. 
+
+        It can be instanciated directly to represent any object.
+        
+        It's also used to create inferred 
+        `ast.Constant`, `ast.List`, `ast.Tuple`, `ast.Dict` or `ast.Set` nodes.
+        """
+        i: Instance = cls(*args, **kwargs)
+        i._init_type_info(classdef, type_annotation)
+        return i
+    
+    def _init_type_info(self, classdef:Optional[ast.ClassDef]=None, 
+                type_annotation:Optional[ast.expr]=None, ) -> None:
+        self.type_info = self._get_type_info(classdef, type_annotation)
+
+    def _get_type_info(self, classdef:Optional[_typing.ClassDef], type_annotation:Optional[ast.expr], ) -> None:
+
+        _type = None
+        if type_annotation is not None:
+            _type = type_annotation
+        elif classdef is not None:
+            _type = _astutils.qname_to_ast(classdef.qname)
+        elif isinstance(self, ast.List):
+            _type = _astutils.qname_to_ast("list")
+        elif isinstance(self, ast.Set):
+            _type = _astutils.qname_to_ast("set")
+        elif isinstance(self, ast.Tuple):
+            _type = _astutils.qname_to_ast("tuple")
+        elif isinstance(self, ast.Dict):
+            _type = _astutils.qname_to_ast("dict")
+        elif isinstance(self, ast.Constant) and self.value is not ...:
+            _type = _astutils.qname_to_ast(self.value.__class__.__name__)
+        
+        return TypeInfo(_type, classdef=classdef)
+        

@@ -167,9 +167,17 @@ def _get_if_statement_ancestor(node: 'ASTNode') -> Optional['ASTNode']:
     return None
 
 def _get_filtered_stmts(self: 'ASTNode', base_node: 'ASTNode', node: 'ASTNode', _stmts:List['ASTNode'], mystmt:Optional['ASTNode'] ) -> Tuple[List['ASTNode'], bool]:
+    """
+    :param self: the assign_type.
+    :param base_node: the lookup context node in which the filtering happends.
+    :param node: the LocalsAssignT node where the node to filter was assigned.
+    :param _stmts: the already filtered statements (empty list on the first iteration)
+    :param mystmt: the statement of the base node.
+    """
+    # self is assign_type
     if isinstance(self, FILTER_STATEMENTS_NODES):
         return _filter_statement_get_filtered_stmts(self, base_node, node, _stmts, mystmt)
-    elif isinstance(self, ast.comprehension):
+    elif isinstance(self, ast.comprehension): # is this required?
         return _comprehension_get_filtered_stmts(self, base_node, node, _stmts, mystmt)
     elif isinstance(self, ASSIGNMENT_NODES) or isinstance(self, PARENT_ASSIGNMENT_NODES):
         return _assign_type_get_filtered_stmts(self, base_node, node, _stmts, mystmt)
@@ -258,6 +266,7 @@ def filter_stmts(base_node: 'ASTNode', stmts:List[LocalsAssignT], frame: 'ASTNod
         ):
             myframe = myframe.parent.frame
 
+    # mystmt is the statement of the base_node
     mystmt:Optional['ASTNode'] = None
     if base_node.parent:
         mystmt = base_node.statement
@@ -275,6 +284,8 @@ def filter_stmts(base_node: 'ASTNode', stmts:List[LocalsAssignT], frame: 'ASTNod
     _stmts:List['ASTNode'] = [] # this variable is the return value of the function, it's the "filtered statements"
     _stmt_parents = []
     statements = _get_filtered_node_statements(base_node, stmts)
+    
+    # Iterate over all statements anf filter ignorables
     for node, stmt in statements:
         # Context: 
         # node: Statement name node
@@ -297,7 +308,13 @@ def filter_stmts(base_node: 'ASTNode', stmts:List[LocalsAssignT], frame: 'ASTNod
         #     continue
 
         assign_type = get_assign_type(node)
-        _stmts, done = _get_filtered_stmts(assign_type, base_node, node, _stmts, mystmt)
+        _stmts, done = _get_filtered_stmts(assign_type, 
+            base_node, # base node = lookup node
+            node, # the LocalsAssignT node where the node to filter was assigned
+            _stmts, # the already filtered statements (empty list on the first iteration)
+            mystmt # the statement of the base node
+            )
+        
         if done:
             break
 
@@ -392,7 +409,7 @@ def filter_stmts(base_node: 'ASTNode', stmts:List[LocalsAssignT], frame: 'ASTNod
             elif not optional_assign and mystmt and stmt.parent is mystmt.parent:
                 _stmts = []
                 _stmt_parents = []
-        elif is_del_name(node):
+        elif isinstance(node, (ast.Name, ast.Attribute)) and is_del_name(node):
             # Remove all previously stored assignments
             _stmts = []
             _stmt_parents = []

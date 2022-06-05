@@ -108,36 +108,57 @@ class FirstInfenceTests(AstuceTestCase):
         mod = self.parse(code)
         n = mod.locals["l"][0]
         inferred = next(n.infer())
-        self.assertIsInstance(inferred, nodes.List)
-        
+        self.assertIsInstance(inferred, ast.List)
+        self.assertIsInstance(inferred, nodes.Instance)
+
+        # Not in scope not the moment
+        # self.assertEqual(inferred.getitem(ast.Const(0)).value, 1)
+
         # TODO: uncomment me when we better support builtins
-        # self.assertIsInstance(inferred, Instance)
-        # self.assertEqual(inferred.getitem(nodes.Const(0)).value, 1)
-        # self.assertIsInstance(inferred._proxied, nodes.ClassDef)
-        # self.assertEqual(inferred._proxied.name, "list")
+        # self.assertIsInstance(inferred.type_info.classdef, ast.ClassDef)
+
+        self.assertIsInstance(inferred.type_info.type_annotation, ast.Name)
+        self.assertEqual(inferred.type_info.type_annotation.id, "list")
+
+        # Not in scope not the moment
         # self.assertIn("append", inferred._proxied.locals)
         
         n = mod.locals["t"][0]
         inferred = next(n.infer())
         self.assertIsInstance(inferred, ast.Tuple)
+        self.assertIsInstance(inferred, nodes.Instance)
+        self.assertIsInstance(inferred.type_info.type_annotation, ast.Name)
+        self.assertEqual(inferred.type_info.type_annotation.id, "tuple")
+        # self.assertIsInstance(inferred.type_info.classdef, ast.ClassDef)
         
         # self.assertIsInstance(inferred, Instance)
-        # self.assertEqual(inferred.getitem(nodes.Const(0)).value, 2)
-        # self.assertIsInstance(inferred._proxied, nodes.ClassDef)
+        # self.assertEqual(inferred.getitem(ast.Const(0)).value, 2)
+        # self.assertIsInstance(inferred._proxied, ast.ClassDef)
         # self.assertEqual(inferred._proxied.name, "tuple")
         
+        # Dicts not in scope right now, but will be soon.
+        # TODO: Add _infer_Dict and co.
         n = mod.locals["d"][0]
         inferred = next(n.infer())
-        self.assertIsInstance(inferred, nodes.Dict)
+        assert inferred is nodes.Uninferable
+        # self.assertIsInstance(inferred, ast.Dict)
+        # self.assertIsInstance(inferred, nodes.Instance)
+        # self.assertIsInstance(inferred.type_info.type_annotation, ast.Name)
+        # self.assertEqual(inferred.type_info.type_annotation.id, "dict")
+        # self.assertIsInstance(inferred.type_info.classdef, ast.ClassDef)
         
         # self.assertIsInstance(inferred, Instance)
-        # self.assertIsInstance(inferred._proxied, nodes.ClassDef)
+        # self.assertIsInstance(inferred._proxied, ast.ClassDef)
         # self.assertEqual(inferred._proxied.name, "dict")
         # self.assertIn("get", inferred._proxied.locals)
         
         n = mod.locals["s"][0]
         inferred = next(n.infer())
         self.assertIsInstance(inferred, ast.Constant)
+        self.assertIsInstance(inferred, nodes.Instance)
+        self.assertIsInstance(inferred.type_info.type_annotation, ast.Name)
+        self.assertEqual(inferred.type_info.type_annotation.id, "str")
+        # self.assertIsInstance(inferred.type_info.classdef, ast.ClassDef)
         
         # self.assertIsInstance(inferred, Instance)
         # self.assertEqual(inferred.name, "str")
@@ -145,6 +166,10 @@ class FirstInfenceTests(AstuceTestCase):
         
         n = mod.locals["s2"][0]
         inferred = next(n.infer())
+        self.assertIsInstance(inferred, nodes.Instance)
+        self.assertIsInstance(inferred.type_info.type_annotation, ast.Name)
+        self.assertEqual(inferred.type_info.type_annotation.id, "str")
+        # self.assertIsInstance(inferred.type_info.classdef, ast.ClassDef)
         self.assertEqual(inferred.literal_eval(), "_")
 
         code = "s = {1}"
@@ -153,6 +178,10 @@ class FirstInfenceTests(AstuceTestCase):
         n = mod.locals["s"][0]
         inferred = next(n.infer())
         self.assertIsInstance(inferred, ast.Set)
+        self.assertIsInstance(inferred, nodes.Instance)
+        self.assertIsInstance(inferred.type_info.type_annotation, ast.Name)
+        self.assertEqual(inferred.type_info.type_annotation.id, "set")
+        # self.assertIsInstance(inferred.type_info.classdef, ast.ClassDef)
 
         # self.assertIsInstance(inferred, Instance)
         # self.assertEqual(inferred.name, "set")
@@ -345,7 +374,7 @@ class FirstInfenceTests(AstuceTestCase):
 #         new3
 #         """
 #         ass = extract_node(code)
-#         self.assertIsInstance(ass.inferred()[0], nodes.Dict)
+#         self.assertIsInstance(ass.inferred()[0], ast.Dict)
 
     def test_augassign(self) -> None:
             code = """
@@ -354,6 +383,15 @@ class FirstInfenceTests(AstuceTestCase):
                 a
             """
             mod = self.parse(code)
+
+            _first_name = mod.body[0].targets[0]
+            assert isinstance(_first_name, ast.Name)
+            inferred = list(_first_name.infer())
+
+            self.assertEqual(len(inferred), 1)
+            self.assertIsInstance(inferred[0], ast.Constant)
+            self.assertEqual(inferred[0].value, 1)
+            
             _last_name = mod.body[-1].value
             assert isinstance(_last_name, ast.Name)
             inferred = list(_last_name.infer())
@@ -374,9 +412,9 @@ class FirstInfenceTests(AstuceTestCase):
 #     """
 #     ast = fromtext(code)
 #     inferred = next(ast.body[-1].infer())
-#     self.assertIsInstance(inferred, nodes.List)
+#     self.assertIsInstance(inferred, ast.List)
 #     self.assertEqual(len(inferred.elts), 1)
-#     self.assertIsInstance(inferred.elts[0], nodes.Unknown)
+#     self.assertIsInstance(inferred.elts[0], ast.Unknown)
 
     def test_infer_coercion_rules_for_floats_complex(self) -> None:
         ast_nodes = [n.value for n in self.parse(
@@ -405,10 +443,10 @@ class FirstInfenceTests(AstuceTestCase):
 #     """
 #     )
 #     inferred = next(ast_node.infer())
-#     self.assertIsInstance(inferred, nodes.List)
+#     self.assertIsInstance(inferred, ast.List)
 #     self.assertEqual(len(inferred.elts), 2)
-#     self.assertIsInstance(inferred.elts[0], nodes.Const)
-#     self.assertIsInstance(inferred.elts[1], nodes.Unknown)
+#     self.assertIsInstance(inferred.elts[0], ast.Const)
+#     self.assertIsInstance(inferred.elts[1], ast.Unknown)
 
     def test_binop_same_types(self) -> None:
         ast_nodes = [n.value for n in self.parse(
@@ -424,10 +462,10 @@ class FirstInfenceTests(AstuceTestCase):
             # A() + A() #@
             """
             ).body]
-        expected_values = [2, 0, "ab", 42]
+        expected_values = [2, 0, "ab"]
         for node, expected in zip(ast_nodes, expected_values):
             inferred = next(node.infer())
-            self.assertIsInstance(inferred, nodes.Const)
+            self.assertIsInstance(inferred, ast.Constant)
             self.assertEqual(inferred.value, expected)
 
 # Not in scope:
@@ -466,10 +504,10 @@ class FirstInfenceTests(AstuceTestCase):
         """
         statements = self.parse(code).body
         self.assertEqual(next(statements[-5].value.infer()).literal_eval(), (0, 1, 2, 3))
-        self.assertEqual(next(statements[-4].value.infer()), (0, 1, 2, 3, 4))
-        self.assertEqual(next(statements[-3].value.infer()), (0, 1, 2, 3, 4, 5, 6, 7))
-        self.assertEqual(next(statements[-2].value.infer()), (0, 1, 2, 3, 4, 5, 6, 7, 8))
-        self.assertEqual(next(statements[-1].value.infer()), (0, 1, 2, 3, 4, 5, 6, 7, 999, 1000, 1001))
+        self.assertEqual(next(statements[-4].value.infer()).literal_eval(), (0, 1, 2, 3, 4))
+        self.assertEqual(next(statements[-3].value.infer()).literal_eval(), (0, 1, 2, 3, 4, 5, 6, 7))
+        self.assertEqual(next(statements[-2].value.infer()).literal_eval(), (0, 1, 2, 3, 4, 5, 6, 7, 8))
+        self.assertEqual(next(statements[-1].value.infer()).literal_eval(), (0, 1, 2, 3, 4, 5, 6, 7, 999, 1000, 1001))
 
     def test_starred_in_list_literal(self) -> None:
         code = """
@@ -484,10 +522,10 @@ class FirstInfenceTests(AstuceTestCase):
         """
         statements = self.parse(code).body
         self.assertEqual(next(statements[-5].value.infer()).literal_eval(), [0, 1, 2, 3])
-        self.assertEqual(next(statements[-4].value.infer()), [0, 1, 2, 3, 4])
-        self.assertEqual(next(statements[-3].value.infer()), [0, 1, 2, 3, 4, 5, 6, 7])
-        self.assertEqual(next(statements[-2].value.infer()), [0, 1, 2, 3, 4, 5, 6, 7, 8])
-        self.assertEqual(next(statements[-1].value.infer()), [0, 1, 2, 3, 4, 5, 6, 7, 999, 1000, 1001])
+        self.assertEqual(next(statements[-4].value.infer()).literal_eval(), [0, 1, 2, 3, 4])
+        self.assertEqual(next(statements[-3].value.infer()).literal_eval(), [0, 1, 2, 3, 4, 5, 6, 7])
+        self.assertEqual(next(statements[-2].value.infer()).literal_eval(), [0, 1, 2, 3, 4, 5, 6, 7, 8])
+        self.assertEqual(next(statements[-1].value.infer()).literal_eval(), [0, 1, 2, 3, 4, 5, 6, 7, 999, 1000, 1001])
 
     def test_starred_in_set_literal(self) -> None:
         code = """
@@ -502,10 +540,10 @@ class FirstInfenceTests(AstuceTestCase):
         """
         statements = self.parse(code).body
         self.assertEqual(next(statements[-5].value.infer()).literal_eval(), {0, 1, 2, 3})
-        self.assertEqual(next(statements[-4].value.infer()), {0, 1, 2, 3, 4})
-        self.assertEqual(next(statements[-3].value.infer()), {0, 1, 2, 3, 4, 5, 6, 7})
-        self.assertEqual(next(statements[-2].value.infer()), {0, 1, 2, 3, 4, 5, 6, 7, 8})
-        self.assertEqual(next(statements[-1].value.infer()), {0, 1, 2, 3, 4, 5, 6, 7, 999, 1000, 1001})
+        self.assertEqual(next(statements[-4].value.infer()).literal_eval(), {0, 1, 2, 3, 4})
+        self.assertEqual(next(statements[-3].value.infer()).literal_eval(), {0, 1, 2, 3, 4, 5, 6, 7})
+        self.assertEqual(next(statements[-2].value.infer()).literal_eval(), {0, 1, 2, 3, 4, 5, 6, 7, 8})
+        self.assertEqual(next(statements[-1].value.infer()).literal_eval(), {0, 1, 2, 3, 4, 5, 6, 7, 999, 1000, 1001})
 
     def test_starred_in_literals_inference_issues(self) -> None:
         # TODO:
