@@ -564,11 +564,11 @@ class LookupControlFlowTest(AstuceTestCase):
                     x = 100
                 print(x)
         """
-        astroid = builder.parse(code)
-        x_name = [n for n in astroid.nodes_of_class(nodes.Name) if n.name == "x"][0]
+        astroid = self.parse(code)
+        x_name = get_load_names(astroid, "x")[0]
         _, stmts = x_name.lookup("x")
         self.assertEqual(len(stmts), 2)
-        self.assertCountEqual([stmt.lineno for stmt in stmts], [3, 5])
+        self.assertEqual([stmt.lineno for stmt in stmts], [3, 5])
 
     def test_if_assigns_same_branch(self) -> None:
         """When if branch has multiple assignment statements, only the last one
@@ -582,8 +582,8 @@ class LookupControlFlowTest(AstuceTestCase):
                     x = 1000
                 print(x)
         """
-        astroid = builder.parse(code)
-        x_name = [n for n in astroid.nodes_of_class(nodes.Name) if n.name == "x"][0]
+        astroid = self.parse(code)
+        x_name = get_load_names(astroid, "x")[0]
         _, stmts = x_name.lookup("x")
         self.assertEqual(len(stmts), 2)
         self.assertCountEqual([stmt.lineno for stmt in stmts], [3, 6])
@@ -604,11 +604,11 @@ class LookupControlFlowTest(AstuceTestCase):
                     x = 4
                 print(x)
         """
-        astroid = builder.parse(code)
-        x_name = [n for n in astroid.nodes_of_class(nodes.Name) if n.name == "x"][0]
+        astroid = self.parse(code)
+        x_name = get_load_names(astroid, "x")[0]
         _, stmts = x_name.lookup("x")
         self.assertEqual(len(stmts), 4)
-        self.assertCountEqual([stmt.lineno for stmt in stmts], [3, 6, 8, 10])
+        self.assertEqual([stmt.lineno for stmt in stmts], [3, 6, 8, 10])
 
     def test_assign_exclusive(self) -> None:
         """When the variable appears inside a branch of an if statement,
@@ -627,8 +627,8 @@ class LookupControlFlowTest(AstuceTestCase):
                 else:
                     print(x)
         """
-        astroid = builder.parse(code)
-        x_name = [n for n in astroid.nodes_of_class(nodes.Name) if n.name == "x"][0]
+        astroid = self.parse(code)
+        x_name = get_load_names(astroid, "x")[0]
         _, stmts = x_name.lookup("x")
         self.assertEqual(len(stmts), 1)
         self.assertEqual(stmts[0].lineno, 3)
@@ -651,8 +651,8 @@ class LookupControlFlowTest(AstuceTestCase):
                 else:
                     x = 5
         """
-        astroid = builder.parse(code)
-        x_name = [n for n in astroid.nodes_of_class(nodes.Name) if n.name == "x"][0]
+        astroid = self.parse(code)
+        x_name = get_load_names(astroid, "x")[0]
         _, stmts = x_name.lookup("x")
         self.assertEqual(len(stmts), 1)
         self.assertEqual(stmts[0].lineno, 10)
@@ -671,8 +671,8 @@ class LookupControlFlowTest(AstuceTestCase):
                     x = 1000
                 print(x)
         """
-        astroid = builder.parse(code)
-        x_name = [n for n in astroid.nodes_of_class(nodes.Name) if n.name == "x"][0]
+        astroid = self.parse(code)
+        x_name = get_load_names(astroid, "x")[0]
         _, stmts = x_name.lookup("x")
         self.assertEqual(len(stmts), 3)
         self.assertCountEqual([stmt.lineno for stmt in stmts], [3, 5, 7])
@@ -686,10 +686,8 @@ class LookupControlFlowTest(AstuceTestCase):
             elif x > 0:
                 print('b')
         """
-        astroid = builder.parse(code)
-        x_name1, x_name2 = (
-            n for n in astroid.nodes_of_class(nodes.Name) if n.name == "x"
-        )
+        astroid = self.parse(code)
+        x_name1, x_name2 = get_load_names(astroid, "x")
 
         _, stmts1 = x_name1.lookup("x")
         self.assertEqual(len(stmts1), 1)
@@ -715,8 +713,8 @@ class LookupControlFlowTest(AstuceTestCase):
             else:
                 x = 400
         """
-        astroid = builder.parse(code)
-        x_names = [n for n in astroid.nodes_of_class(nodes.Name) if n.name == "x"]
+        astroid = self.parse(code)
+        x_names = get_load_names(astroid, "x")
 
         # All lookups should refer only to the initial x = 10.
         for x_name in x_names:
@@ -740,8 +738,8 @@ class LookupControlFlowTest(AstuceTestCase):
                     x = 4  # Only this assignment statement is returned
                 print(x)
         """
-        astroid = builder.parse(code)
-        x_name = [n for n in astroid.nodes_of_class(nodes.Name) if n.name == "x"][0]
+        astroid = self.parse(code)
+        x_name = get_load_names(astroid, "x")[0]
         _, stmts = x_name.lookup("x")
         self.assertEqual(len(stmts), 1)
         self.assertEqual(stmts[0].lineno, 9)
@@ -760,8 +758,8 @@ class LookupControlFlowTest(AstuceTestCase):
                 else:
                     print(x)
         """
-        astroid = builder.parse(code)
-        x_name = [n for n in astroid.nodes_of_class(nodes.Name) if n.name == "x"][0]
+        astroid = self.parse(code)
+        x_name = get_load_names(astroid, "x")[0]
         _, stmts = x_name.lookup("x")
         self.assertEqual(len(stmts), 1)
         self.assertEqual(stmts[0].lineno, 3)
@@ -780,17 +778,15 @@ class LookupControlFlowTest(AstuceTestCase):
                 if True:
                     print(x)
         """
-        astroid = builder.parse(code)
-        x_name1, x_name2 = (
-            n for n in astroid.nodes_of_class(nodes.Name) if n.name == "x"
-        )
+        astroid = self.parse(code)
+        x_name1, x_name2 = get_load_names(astroid, "x")
         _, stmts1 = x_name1.lookup("x")
         self.assertEqual(len(stmts1), 1)
         self.assertEqual(stmts1[0].lineno, 3)
 
         _, stmts2 = x_name2.lookup("x")
         self.assertEqual(len(stmts2), 1)
-        self.assertEqual(stmts2[0].lineno, 7)
+        self.assertEqual(stmts2[0].lineno, 6)
 
     def test_assign_after_kwonly_param(self) -> None:
         """When an assignment statement overwrites a function keyword-only parameter,
@@ -806,17 +802,15 @@ class LookupControlFlowTest(AstuceTestCase):
                 if True:
                     print(x)
         """
-        astroid = builder.parse(code)
-        x_name1, x_name2 = (
-            n for n in astroid.nodes_of_class(nodes.Name) if n.name == "x"
-        )
+        astroid = self.parse(code)
+        x_name1, x_name2 = get_load_names(astroid, "x")
         _, stmts1 = x_name1.lookup("x")
         self.assertEqual(len(stmts1), 1)
         self.assertEqual(stmts1[0].lineno, 3)
 
         _, stmts2 = x_name2.lookup("x")
         self.assertEqual(len(stmts2), 1)
-        self.assertEqual(stmts2[0].lineno, 7)
+        self.assertEqual(stmts2[0].lineno, 6)
 
     @require_version((3,8))
     def test_assign_after_posonly_param(self):
@@ -833,17 +827,15 @@ class LookupControlFlowTest(AstuceTestCase):
                 if True:
                     print(x)
         """
-        astroid = builder.parse(code)
-        x_name1, x_name2 = (
-            n for n in astroid.nodes_of_class(nodes.Name) if n.name == "x"
-        )
+        astroid = self.parse(code)
+        x_name1, x_name2 = get_load_names(astroid, "x")
         _, stmts1 = x_name1.lookup("x")
         self.assertEqual(len(stmts1), 1)
         self.assertEqual(stmts1[0].lineno, 3)
 
         _, stmts2 = x_name2.lookup("x")
         self.assertEqual(len(stmts2), 1)
-        self.assertEqual(stmts2[0].lineno, 7)
+        self.assertEqual(stmts2[0].lineno, 6)
 
     def test_assign_after_args_param(self) -> None:
         """When an assignment statement overwrites a function parameter, only the
@@ -856,128 +848,127 @@ class LookupControlFlowTest(AstuceTestCase):
                 if True:
                     print(args, kwargs)
         """
-        astroid = builder.parse(code)
-        x_name = [n for n in astroid.nodes_of_class(nodes.Name) if n.name == "args"][0]
+        astroid = self.parse(code)
+        x_name, = get_load_names(astroid, "args")
         _, stmts1 = x_name.lookup("args")
         self.assertEqual(len(stmts1), 1)
         self.assertEqual(stmts1[0].lineno, 3)
 
-        x_name = [n for n in astroid.nodes_of_class(nodes.Name) if n.name == "kwargs"][
-            0
-        ]
+        x_name, = get_load_names(astroid, "kwargs")
         _, stmts2 = x_name.lookup("kwargs")
         self.assertEqual(len(stmts2), 1)
         self.assertEqual(stmts2[0].lineno, 4)
 
-    def test_except_var_in_block(self) -> None:
-        """When the variable bound to an exception in an except clause, it is returned
-        when that variable is used inside the except block.
-        """
-        code = """
-            try:
-                1 / 0
-            except ZeroDivisionError as e:
-                print(e)
-        """
-        astroid = builder.parse(code)
-        x_name = [n for n in astroid.nodes_of_class(nodes.Name) if n.name == "e"][0]
-        _, stmts = x_name.lookup("e")
-        self.assertEqual(len(stmts), 1)
-        self.assertEqual(stmts[0].lineno, 4)
+    # Variables defined in expect blocks not in scope right now, but maybe soon.
+    # def test_except_var_in_block(self) -> None:
+    #     """When the variable bound to an exception in an except clause, it is returned
+    #     when that variable is used inside the except block.
+    #     """
+    #     code = """
+    #         try:
+    #             1 / 0
+    #         except ZeroDivisionError as e:
+    #             print(e)
+    #     """
+    #     astroid = self.parse(code)
+    #     x_name, = get_load_names(astroid, "e")
+    #     _, stmts = x_name.lookup("e")
+    #     self.assertEqual(len(stmts), 1)
+    #     self.assertEqual(stmts[0].lineno, 4)
 
-    def test_except_var_in_block_overwrites(self) -> None:
-        """When the variable bound to an exception in an except clause, it is returned
-        when that variable is used inside the except block, and replaces any previous
-        assignments.
-        """
-        code = """
-            e = 0
-            try:
-                1 / 0
-            except ZeroDivisionError as e:
-                print(e)
-        """
-        astroid = builder.parse(code)
-        x_name = [n for n in astroid.nodes_of_class(nodes.Name) if n.name == "e"][0]
-        _, stmts = x_name.lookup("e")
-        self.assertEqual(len(stmts), 1)
-        self.assertEqual(stmts[0].lineno, 5)
+    # def test_except_var_in_block_overwrites(self) -> None:
+    #     """When the variable bound to an exception in an except clause, it is returned
+    #     when that variable is used inside the except block, and replaces any previous
+    #     assignments.
+    #     """
+    #     code = """
+    #         e = 0
+    #         try:
+    #             1 / 0
+    #         except ZeroDivisionError as e:
+    #             print(e)
+    #     """
+    #     astroid = builder.parse(code)
+    #     x_name = [n for n in astroid.nodes_of_class(nodes.Name) if n.name == "e"][0]
+    #     _, stmts = x_name.lookup("e")
+    #     self.assertEqual(len(stmts), 1)
+    #     self.assertEqual(stmts[0].lineno, 5)
 
-    def test_except_var_in_multiple_blocks(self) -> None:
-        """When multiple variables with the same name are bound to an exception
-        in an except clause, and the variable is used inside the except block,
-        only the assignment from the corresponding except clause is returned.
-        """
-        code = """
-            e = 0
-            try:
-                1 / 0
-            except ZeroDivisionError as e:
-                print(e)
-            except NameError as e:
-                print(e)
-        """
-        astroid = builder.parse(code)
-        x_names = [n for n in astroid.nodes_of_class(nodes.Name) if n.name == "e"]
+    # def test_except_var_in_multiple_blocks(self) -> None:
+    #     """When multiple variables with the same name are bound to an exception
+    #     in an except clause, and the variable is used inside the except block,
+    #     only the assignment from the corresponding except clause is returned.
+    #     """
+    #     code = """
+    #         e = 0
+    #         try:
+    #             1 / 0
+    #         except ZeroDivisionError as e:
+    #             print(e)
+    #         except NameError as e:
+    #             print(e)
+    #     """
+    #     astroid = builder.parse(code)
+    #     x_names = [n for n in astroid.nodes_of_class(nodes.Name) if n.name == "e"]
 
-        _, stmts1 = x_names[0].lookup("e")
-        self.assertEqual(len(stmts1), 1)
-        self.assertEqual(stmts1[0].lineno, 5)
+    #     _, stmts1 = x_names[0].lookup("e")
+    #     self.assertEqual(len(stmts1), 1)
+    #     self.assertEqual(stmts1[0].lineno, 5)
 
-        _, stmts2 = x_names[1].lookup("e")
-        self.assertEqual(len(stmts2), 1)
-        self.assertEqual(stmts2[0].lineno, 7)
+    #     _, stmts2 = x_names[1].lookup("e")
+    #     self.assertEqual(len(stmts2), 1)
+    #     self.assertEqual(stmts2[0].lineno, 7)
 
-    def test_except_var_after_block_single(self) -> None:
-        """When the variable bound to an exception in an except clause, it is NOT returned
-        when that variable is used after the except block.
-        """
-        code = """
-            try:
-                1 / 0
-            except NameError as e:
-                pass
-            print(e)
-        """
-        astroid = builder.parse(code)
-        x_name = [n for n in astroid.nodes_of_class(nodes.Name) if n.name == "e"][0]
-        _, stmts = x_name.lookup("e")
-        self.assertEqual(len(stmts), 0)
+    # def test_except_var_after_block_single(self) -> None:
+    #     """When the variable bound to an exception in an except clause, it is NOT returned
+    #     when that variable is used after the except block.
+    #     """
+    #     code = """
+    #         try:
+    #             1 / 0
+    #         except NameError as e:
+    #             pass
+    #         print(e)
+    #     """
+    #     astroid = builder.parse(code)
+    #     x_name = [n for n in astroid.nodes_of_class(nodes.Name) if n.name == "e"][0]
+    #     _, stmts = x_name.lookup("e")
+    #     self.assertEqual(len(stmts), 0)
 
-    def test_except_var_after_block_multiple(self) -> None:
-        """When the variable bound to an exception in multiple except clauses, it is NOT returned
-        when that variable is used after the except blocks.
-        """
-        code = """
-            try:
-                1 / 0
-            except NameError as e:
-                pass
-            except ZeroDivisionError as e:
-                pass
-            print(e)
-        """
-        astroid = builder.parse(code)
-        x_name = [n for n in astroid.nodes_of_class(nodes.Name) if n.name == "e"][0]
-        _, stmts = x_name.lookup("e")
-        self.assertEqual(len(stmts), 0)
+    # def test_except_var_after_block_multiple(self) -> None:
+    #     """When the variable bound to an exception in multiple except clauses, it is NOT returned
+    #     when that variable is used after the except blocks.
+    #     """
+    #     code = """
+    #         try:
+    #             1 / 0
+    #         except NameError as e:
+    #             pass
+    #         except ZeroDivisionError as e:
+    #             pass
+    #         print(e)
+    #     """
+    #     astroid = builder.parse(code)
+    #     x_name = [n for n in astroid.nodes_of_class(nodes.Name) if n.name == "e"][0]
+    #     _, stmts = x_name.lookup("e")
+    #     self.assertEqual(len(stmts), 0)
 
-    def test_except_assign_in_block(self) -> None:
-        """When a variable is assigned in an except block, it is returned
-        when that variable is used in the except block.
-        """
-        code = """
-            try:
-                1 / 0
-            except ZeroDivisionError as e:
-                x = 10
-                print(x)
-        """
-        astroid = builder.parse(code)
-        x_name = [n for n in astroid.nodes_of_class(nodes.Name) if n.name == "x"][0]
-        _, stmts = x_name.lookup("x")
-        self.assertEqual(len(stmts), 1)
-        self.assertEqual(stmts[0].lineno, 5)
+    # def test_except_assign_in_block(self) -> None:
+    #     """When a variable is assigned in an except block, it is returned
+    #     when that variable is used in the except block.
+    #     """
+    #     code = """
+    #         try:
+    #             1 / 0
+    #         except ZeroDivisionError as e:
+    #             x = 10
+    #             print(x)
+    #     """
+    #     astroid = builder.parse(code)
+    #     x_name = [n for n in astroid.nodes_of_class(nodes.Name) if n.name == "x"][0]
+    #     _, stmts = x_name.lookup("x")
+    #     self.assertEqual(len(stmts), 1)
+    #     self.assertEqual(stmts[0].lineno, 5)
 
     def test_except_assign_in_block_multiple(self) -> None:
         """When a variable is assigned in multiple except blocks, and the variable is
@@ -992,8 +983,8 @@ class LookupControlFlowTest(AstuceTestCase):
                 x = 100
                 print(x)
         """
-        astroid = builder.parse(code)
-        x_name = [n for n in astroid.nodes_of_class(nodes.Name) if n.name == "x"][0]
+        astroid = self.parse(code)
+        x_name, = get_load_names(astroid, "x")
         _, stmts = x_name.lookup("x")
         self.assertEqual(len(stmts), 1)
         self.assertEqual(stmts[0].lineno, 7)
@@ -1011,8 +1002,8 @@ class LookupControlFlowTest(AstuceTestCase):
                 x = 100
             print(x)
         """
-        astroid = builder.parse(code)
-        x_name = [n for n in astroid.nodes_of_class(nodes.Name) if n.name == "x"][0]
+        astroid = self.parse(code)
+        x_name, = get_load_names(astroid, "x")
         _, stmts = x_name.lookup("x")
         self.assertEqual(len(stmts), 2)
         self.assertCountEqual([stmt.lineno for stmt in stmts], [5, 7])
@@ -1031,8 +1022,8 @@ class LookupControlFlowTest(AstuceTestCase):
             x = 1000
             print(x)
         """
-        astroid = builder.parse(code)
-        x_name = [n for n in astroid.nodes_of_class(nodes.Name) if n.name == "x"][0]
+        astroid = self.parse(code)
+        x_name, = get_load_names(astroid, "x")
         _, stmts = x_name.lookup("x")
         self.assertEqual(len(stmts), 1)
         self.assertEqual(stmts[0].lineno, 8)
