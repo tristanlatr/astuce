@@ -28,7 +28,7 @@ def _infer_stmts(
     _parser = stmts[0]._parser 
     inferred = False
     if context is not None:
-        context = context.clone()
+        context = copy_context(context)
     else:
         context = _parser._new_context()
 
@@ -118,7 +118,8 @@ def safe_infer(node, context=None):
 class infer_load_name:
     """
     Code to infer a `ast.Name` instance with a ``Load`` context to possible values.
-    @note
+    
+    :note: This is also used to infer augmented assigments.
     """
 
     @staticmethod
@@ -157,7 +158,7 @@ class infer_load_name:
                 raise exceptions.NameInferenceError(
                     name=self.id, scope=self.scope, context=context
                 )
-        context = _context.copy_context(context)
+        context = copy_context(context)
         return _infer_stmts(stmts, context, frame)
 
 def _raise_no_infer_method(node:ASTNodeT, context: OptionalInferenceContext) -> Iterator[ASTNodeT]:
@@ -250,7 +251,7 @@ def _infer_IfExp(node:_typing.IfExp, context: OptionalInferenceContext=None) -> 
     lhs_context = copy_context(context)
     rhs_context = copy_context(context)
     try:
-        test = next(node.test.infer(context=context.clone()))
+        test = next(node.test.infer(context=copy_context(context)))
     except (exceptions.InferenceError, StopIteration):
         both_branches = True
     else:
@@ -406,7 +407,7 @@ def _infer_lhs(node: ASTNodeT, context:InferenceContext) -> Iterator[ASTNodeT]:
     @note: It only supports ast.Name instances at the moment.
     """
     if isinstance(node, ast.Name):
-        return infer_load_name.infer_name(node, context)
+        yield from infer_load_name.infer_name(node, context)
     else:
         # TODO: we could support Attribute and Subscript nodes in the future
         yield nodes.Uninferable
@@ -415,34 +416,26 @@ def _infer_lhs(node: ASTNodeT, context:InferenceContext) -> Iterator[ASTNodeT]:
 @path_wrapper
 def _infer_AugAssign(self:_typing.AugAssign, context: OptionalInferenceContext=None) -> Iterator[ASTNodeT]:
     """Inference logic for augmented binary operations."""
-    if context is None:
-        context = InferenceContext()
+    context = context or self._parser._new_context()
+    lhs_context = copy_context(context)
+    rhs_context = copy_context(context)
+    lhs_iter = list(_infer_lhs(self.target, context=lhs_context))
+    rhs_iter = list(self.value.infer(context=rhs_context))
+    print(f'_infer_AugAssign left: {lhs_iter}, right: {rhs_iter}', file=sys.stderr)
 
-    rhs_context = context.clone()
-
-    lhs_iter = _infer_lhs(self.target, context=context)
-    rhs_iter = self.value.infer(context=rhs_context)
     for lhs, rhs in itertools.product(lhs_iter, rhs_iter):
         if any(value is nodes.Uninferable for value in (rhs, lhs)):
             # Don't know how to process this.
             yield nodes.Uninferable
             return
+        
 
-        # try:
-        yield from _invoke_binop_inference(lhs, self, self.op, rhs, context)
-        # yield from _infer_binary_operation(
-        #     left=lhs,
-        #     right=rhs,
-        #     binary_opnode=self,
-        #     context=context,
-        #     flow_factory=_get_aug_flow,
-        # )
-        # except _NonDeducibleTypeHierarchy:
-        #     yield util.Uninferable
-
+        yield from _invoke_binop_inference(lhs, self, self.op, rhs, rhs_context)
+        
 # Defers to self.value.infer()
 def _infer_Expr(self:_typing.Expr, context: OptionalInferenceContext=None) -> Iterator[ASTNodeT]:
     return self.value.infer(context=context)
 
 def _infer_Subscript(self:_typing.Subscript, context: OptionalInferenceContext=None) -> Iterator[ASTNodeT]:
     return
+    # TODO
