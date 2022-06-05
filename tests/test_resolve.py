@@ -44,9 +44,9 @@ class ResolveTest(AstuceTestCase):
 
         # Assert that we filter the right assigments when trying to lookup
         # a name that is not accessible in the context of the scope
-        with pytest.raises(LookupError):
-            True_node = func.args.defaults[0]
-            assert True_node.lookup('a')
+
+        True_node = func.args.defaults[0]
+        assert True_node.lookup('a')[1] == []
 
         assert func.lookup('a')[1] == [func.args.args[0]]
 
@@ -72,7 +72,8 @@ class ResolveTest(AstuceTestCase):
         func = mod.body[-2]
         assert isinstance(klass, ast.ClassDef)
 
-        assert func.resolve('AnyT') == klass.resolve('AnyT') == "typing.Any"
+        assert klass.resolve('AnyT') == "typing.Any", klass.resolve('AnyT')
+        assert func.resolve('AnyT') == "typing.Any", func.resolve('AnyT')
         assert klass.resolve('f') == func.qname == 'test.func'
        
 
