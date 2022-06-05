@@ -392,6 +392,16 @@ class FirstInfenceTests(AstuceTestCase):
             self.assertIsInstance(inferred[0], ast.Constant)
             self.assertEqual(inferred[0].value, 1)
             
+            # 'a' from the locals
+            augassign_name = mod.locals['a'][-1]
+            assert augassign_name.lookup('a')[1][0] == _first_name, augassign_name.lookup('a')
+            
+            inferred = list(augassign_name.infer())
+            self.assertEqual(len(inferred), 1)
+            self.assertIsInstance(inferred[0], ast.Constant)
+            self.assertEqual(inferred[0].value, 3)
+
+            # 'a' expr name load
             _last_name = mod.body[-1].value
             assert isinstance(_last_name, ast.Name)
             inferred = list(_last_name.infer())
