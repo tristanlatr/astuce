@@ -3,6 +3,8 @@ import ast
 from functools import partial
 from typing import Any
 
+import pytest
+
 from astuce import nodes
 from astuce.exceptions import InferenceError
 from . import AstuceTestCase
@@ -11,6 +13,7 @@ from . import AstuceTestCase
 class SequenceInfenceTests(AstuceTestCase):
     
     def test_list_extend(self):
+        return NotImplemented
         mod1 = self.parse('''
         from mod2 import l as _l
         l = ['f', 'k']

@@ -377,6 +377,8 @@ class LookupTest2(AstuceTestCase):
     #     self.assertIsInstance(gener.getattr("close")[0], nodes.FunctionDef)
 
     def test_explicit___name__(self) -> None:
+        return NotImplemented
+
         code = """
             class Pouet:
                 __name__ = "pouet"
