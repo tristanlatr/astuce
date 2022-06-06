@@ -193,7 +193,7 @@ def _infer_assign_name(node:ASTNodeT, context: OptionalInferenceContext) -> Infe
         return node.parent.infer(context)
 
     stmts = list(assigned_stmts(node, context=context))
-    return _infer_stmts(stmts, context or node._parser._new_context())
+    return _infer_stmts(stmts, context)
 
 @path_wrapper
 @raise_if_nothing_inferred
@@ -269,8 +269,14 @@ def _infer_IfExp(node:_typing.IfExp, context: OptionalInferenceContext=None) -> 
 def _infer_Index(self:ASTNodeT, context: OptionalInferenceContext=None) -> InferResult:
     return self.value.infer(context)
 
-def _infer_sequence_helper(node:Union[_typing.Tuple, _typing.List, _typing.Set], context: OptionalInferenceContext=None) -> List[ASTNodeT]:
-    """Infer all values based on elts"""
+def _infer_sequence_helper(node:Union[_typing.Tuple, _typing.List, _typing.Set], 
+                           context: OptionalInferenceContext=None, 
+                           infer_all_elements:bool=True) -> List[ASTNodeT]:
+    """
+    Infer all values based on elts. 
+    
+    If infer_all_elements is False, will only infer Starred and NamedExpr inside the list, this is used for tuple assignments.
+    """
     values = []
 
     for elt in node.elts:
@@ -287,17 +293,27 @@ def _infer_sequence_helper(node:Union[_typing.Tuple, _typing.List, _typing.Set],
                 raise exceptions.InferenceError(node=node, context=context)
             values.append(value)
         else:
-            values.append(elt)
+            if infer_all_elements:
+                value = safe_infer(elt, context)
+                if not value:
+                    raise exceptions.InferenceError(node=node, context=context)
+                values.append(value)
+            else:
+                values.append(elt)
     return values
 
 
 @raise_if_nothing_inferred
-def infer_sequence(self:Union[_typing.Tuple, _typing.List, _typing.Set], context: OptionalInferenceContext=None) -> InferResult:
+def infer_sequence(self:Union[_typing.Tuple, _typing.List, _typing.Set], context: OptionalInferenceContext=None, assign_context:bool=False) -> InferResult:
+
+    # avoids cyclic inferences on lists by checking if the node has Starred or NamedExpr nodes, 
+    # but that's only applicable if we're in an assigment context, otherwise always infer all values of the list.
+    
     has_starred_named_expr = any(
         isinstance(e, (ast.Starred, ast.NamedExpr)) for e in self.elts
     )
-    if has_starred_named_expr:
-        values = _infer_sequence_helper(self, context)
+    if has_starred_named_expr or not assign_context:
+        values = _infer_sequence_helper(self, context, infer_all_elements=not assign_context)
         
         new_seq = type(self).create_instance(
             lineno=self.lineno, col_offset=self.col_offset, elts=values,
@@ -375,6 +391,8 @@ def _invoke_binop_inference(left: ASTNodeT, opnode: Union[_typing.BinOp, _typing
 def _infer_BinOp(self: _typing.BinOp, context: OptionalInferenceContext) -> InferResult:
     """
     Binary operation inference logic.
+
+    :note: From astroid's inference._infer_binop() function.
     """
     left = self.left
     right = self.right
@@ -419,7 +437,7 @@ def _infer_AugAssign(self:_typing.AugAssign, context: OptionalInferenceContext=N
     rhs_context = copy_context(context)
     lhs_iter = list(_infer_lhs(self.target, context=lhs_context))
     rhs_iter = list(self.value.infer(context=rhs_context)) # type:ignore[attr-defined]
-    print(f'_infer_AugAssign left: {lhs_iter}, right: {rhs_iter}', file=sys.stderr)
+    # print(f'_infer_AugAssign left: {lhs_iter}, right: {rhs_iter}', file=sys.stderr)
 
     for lhs, rhs in itertools.product(lhs_iter, rhs_iter):
         if any(value is nodes.Uninferable for value in (rhs, lhs)):

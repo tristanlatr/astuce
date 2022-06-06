@@ -12,9 +12,10 @@ import ast
 from functools import lru_cache
 import sys
 from typing import Callable, Iterator, Optional, List, Any, Union
+
 from .import nodes, exceptions
 from .import _typing
-from ._typing import ASTNode as ASTNodeT, Name as ASTNameT
+from ._typing import ASTNode as ASTNodeT, Name as ASTNameT, InferResult
 from ._context import OptionalInferenceContext, copy_context, InferenceContext
 from ._inference_decorators import path_wrapper, yes_if_nothing_inferred, raise_if_nothing_inferred
 
@@ -94,9 +95,8 @@ def assend_assigned_stmts(
 ) -> Any:
     # if nodes.is_assign_name(self):
     # node=self here is important
-    return assigned_stmts(self.parent, node=self, context=context, assign_path=assign_path)
+    return assigned_stmts(self.parent, node=self, context=context)
     
-    assert False # TODO: check me
 
 @raise_if_nothing_inferred
 def assign_assigned_stmts(
@@ -108,12 +108,31 @@ def assign_assigned_stmts(
     if not assign_path:
         yield self.value
         return None
-    yield from _resolve_assignment_parts(
-        self.value.infer(context), assign_path, context
+    yield from _wrap_resolve_assignment_parts(
+        self.value, assign_path, context
     )
     # StopIteration
     return dict(node=self, unknown=node, assign_path=assign_path, context=context)
 
+def _wrap_resolve_assignment_parts(node:_typing.ASTNode, assign_path: list[int], context:OptionalInferenceContext) -> Any:
+    # This is needed because List.infer() infers all elements by default, but for resolving assigments,
+    # we should not try to infer names in the list...
+    # Lists inference infers elements by default, which we don't want in assigment context,
+    # but inference as a whole is a semi-recursive operation, which can be applied several times,
+    # this is why we need this recursive function. 
+    
+    # So there is this 'assign_context=True' option that provides the appropriate behaviour.
+    if isinstance(node, (ast.List, ast.Tuple)):
+        from astuce import inference
+        yield from _resolve_assignment_parts(
+            inference.infer_sequence(node, context=context, assign_context=True), 
+            assign_path, context
+        )
+    else:
+        yield from _resolve_assignment_parts(
+            node.infer(context=context), 
+            assign_path, context
+        )
 
 def assign_annassigned_stmts(
     self: _typing.AnnAssign,
@@ -127,7 +146,7 @@ def assign_annassigned_stmts(
         else:
             yield inferred
 
-def _resolve_assignment_parts(parts:Iterator[ASTNodeT], assign_path: list[int], context:OptionalInferenceContext):
+def _resolve_assignment_parts(parts:InferResult, assign_path: list[int], context:OptionalInferenceContext):
     # From astroid's protocols._resolve_assignment_parts()
     """
     :param parts: Inferred values for a given assigment.
@@ -157,8 +176,8 @@ def _resolve_assignment_parts(parts:Iterator[ASTNodeT], assign_path: list[int], 
             # we are not yet on the last part of the path search on each
             # possibly inferred value
             try:
-                yield from _resolve_assignment_parts(
-                    assigned.infer(context), assign_path, context
+                yield from _wrap_resolve_assignment_parts(
+                    assigned, assign_path, context
                 )
             except exceptions.InferenceError as e:
                 assigned._parser._report(assigned, str(e))
@@ -177,7 +196,7 @@ def assigned_stmts(
     self: ASTNodeT,
     node: AssignedStmtsPossibleNode = None,
     context: OptionalInferenceContext = None,
-    assign_path: list[int] | None = None,) -> Iterator[ASTNodeT]:
+    assign_path: list[int] | None = None,) -> InferResult:
     """
     Equivalent to astroid's NodeNG.assigned_stmts() method. 
     """

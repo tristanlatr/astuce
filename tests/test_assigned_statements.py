@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import ast
 
-from astuce import nodes
+from astuce import inference, nodes
 from astuce._assigned_statements import assigned_stmts
 from astuce.helpers import nodes_of_class
 from . import fromtext, AstuceTestCase
@@ -47,25 +47,29 @@ class TestAssignedStatements(AstuceTestCase):
 #             _assigned_statements.assigned_stmts(for2_assnode)
 
     def test_assigned_stmts_assignments(self) -> None:
-        assign_stmts = fromtext(
-            """
-            c = a #@
+        # This test ensure that the assigned_stmts() function does not 
+        # actually infers tuple assigment's values
+        for firstline in ['from whatever import a,b', '', 'a,b=None,None']:
+            assign_stmts = fromtext(
+                f"""
+                {firstline}
+                c = a #@
 
-            d, e = b, c #@
-            """
-            ).body
+                d, e = b, c #@
+                """
+                ).body
 
-        simple_assnode = next(nodes_of_class(assign_stmts[0], ast.Name, predicate=nodes.is_assign_name))
-        assigned = list(assigned_stmts(simple_assnode))
-        assertNameNodesEqual(["a"], assigned)
+            simple_assnode = next(nodes_of_class(assign_stmts[-2], ast.Name, predicate=nodes.is_assign_name))
+            assigned = list(assigned_stmts(simple_assnode))
+            assertNameNodesEqual(["a"], assigned)
 
-        assnames = nodes_of_class(assign_stmts[1], ast.Name, predicate=nodes.is_assign_name)
-        simple_mul_assnode_1 = next(assnames)
-        assigned = list(assigned_stmts(simple_mul_assnode_1))
-        assertNameNodesEqual(["b"], assigned)
-        simple_mul_assnode_2 = next(assnames)
-        assigned = list(assigned_stmts(simple_mul_assnode_2))
-        assertNameNodesEqual(["c"], assigned)
+            assnames = nodes_of_class(assign_stmts[-1], ast.Name, predicate=nodes.is_assign_name)
+            simple_mul_assnode_1 = next(assnames)
+            assigned = list(assigned_stmts(simple_mul_assnode_1))
+            assertNameNodesEqual(["b"], assigned)
+            simple_mul_assnode_2 = next(assnames)
+            assigned = list(assigned_stmts(simple_mul_assnode_2))
+            assertNameNodesEqual(["c"], assigned)
 
     def test_assigned_stmts_annassignments(self) -> None:
         annassign_stmts = fromtext(
@@ -89,13 +93,25 @@ class TestAssignedStatements(AstuceTestCase):
         assert assigned[0] is nodes.Uninferable
 
     def test_not_passing_uninferable_in_seq_inference(self) -> None:
-
+        
+        # This test ensures that list elements are inferred.
         parsed = fromtext(
             """
             a = []
+            y = []
+            z = [y*2,y]
             x = [a*2, a]*2*2
             """
             )
+        # The names individually links to the correct object
+        a_nodes = list(nodes_of_class(parsed, ast.Name, predicate=lambda n: n.id=='a'))
+        assert len(a_nodes) == 3
+        for node in a_nodes:
+            assert list(node.infer())[0].literal_eval()==[], list(node.infer())
 
         for node in nodes_of_class(parsed, ast.Name, predicate=nodes.is_assign_name):
-            assert nodes.Uninferable not in list(node.infer())
+            r = list(inference.infer(node.parent.value))
+            assert nodes.Uninferable not in r, (ast.dump(node), r)
+            # parsed._parser._report(node, 'Test logging')
+            assert list(assigned_stmts(node))==[node.parent.value], list(assigned_stmts(node))
+            assert nodes.Uninferable not in list(node.infer()), list(node.infer())
