@@ -1,5 +1,6 @@
 import ast
-from ._typing import ASTNode as ASTNodeT, _InferMethT
+from typing import Any
+from ._typing import ASTNode as ASTNodeT, _InferMethT, InferResult
 from ._context import OptionalInferenceContext
 from ._decorators import decorator
 
@@ -7,7 +8,7 @@ from . import nodes, exceptions
 
 # Inference decorators
 @decorator
-def path_wrapper(func:_InferMethT, node: ASTNodeT, context: OptionalInferenceContext):
+def path_wrapper(func:_InferMethT, node: ASTNodeT, context: OptionalInferenceContext) -> InferResult:
     """
     Return the given infer function wrapped to handle the path
 
@@ -39,7 +40,7 @@ def path_wrapper(func:_InferMethT, node: ASTNodeT, context: OptionalInferenceCon
             yielded.add(res)
 
 @decorator
-def yes_if_nothing_inferred(func:_InferMethT, node: ASTNodeT, *args, **kwargs):
+def yes_if_nothing_inferred(func:_InferMethT, node: ASTNodeT, *args:Any, **kwargs:Any) -> InferResult:
     """
     Return the given infer function wrapped to yield Uninferable if the generator is empty.
     """
@@ -55,7 +56,7 @@ def yes_if_nothing_inferred(func:_InferMethT, node: ASTNodeT, *args, **kwargs):
     yield from generator
 
 @decorator
-def raise_if_nothing_inferred(func:_InferMethT, node: ASTNodeT, *args, **kwargs):
+def raise_if_nothing_inferred(func:_InferMethT, node: ASTNodeT, *args:Any, **kwargs:Any) -> InferResult:
     """
     Return the given infer function wrapped to raise InferenceError if the generator is empty.
     """

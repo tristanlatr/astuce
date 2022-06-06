@@ -46,7 +46,7 @@ class LookupTest(AstuceTestCase):
         assert mod.lookup('path')[1] == [mod.body[1]]
 
     def test_annassigned_stmts(self):
-        # assert that an empty annassign node name can't be resolved an returns Uninferable.
+        # assert that an empty annassign node name can't be resolved and returns Uninferable.
         mod = self.parse("""
         a: str = "abc"
         b: str
@@ -55,7 +55,7 @@ class LookupTest(AstuceTestCase):
         simple_annassign_node = annassign_stmts[0].target
         empty_annassign_node = annassign_stmts[1].target
 
-        assert simple_annassign_node == mod.lookup('a')[1]
+        assert simple_annassign_node == mod.lookup('a')[1][0], mod.lookup('a')[1]
         
         simple_inferred = list(simple_annassign_node.infer())
         

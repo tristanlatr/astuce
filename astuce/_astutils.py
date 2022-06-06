@@ -1,5 +1,6 @@
 import ast
 from typing import Any, Union
+from ._typing import ASTNode as ASTNodeT
 
 def qname_to_ast(name:str) -> Union[ast.Name, ast.Attribute]:
     parts = name.split('.')
@@ -24,38 +25,38 @@ def literal_to_ast(ob:Any) -> ast.expr:
     """
     def _convert(thing:Any) -> ast.expr:
         if isinstance(thing, tuple):
-            return ast.Tuple.create_instance(elts=list(map(_convert, thing)))
+            return ast.Tuple.create_instance(elts=list(map(_convert, thing))) # type:ignore[no-any-return, attr-defined]
         elif isinstance(thing, list):
-            return ast.List.create_instance(elts=list(map(_convert, thing)))
+            return ast.List.create_instance(elts=list(map(_convert, thing))) # type:ignore[no-any-return, attr-defined]
         elif isinstance(thing, set):
-            return ast.Set.create_instance(elts=list(map(_convert, thing)))
+            return ast.Set.create_instance(elts=list(map(_convert, thing))) # type:ignore[no-any-return, attr-defined]
         elif isinstance(thing, dict):
             values = []
             keys = []
             for k,v in thing.items():
                 values.append(_convert(v))
                 keys.append(_convert(k))
-            return ast.Dict.create_instance(keys=keys, values=values)
+            return ast.Dict.create_instance(keys=keys, values=values) # type:ignore[no-any-return, attr-defined]
         elif isinstance(thing, (int, float, complex, bytes, str, bool)):
-            return ast.Constant.create_instance(thing)
+            return ast.Constant.create_instance(thing) # type:ignore[no-any-return, attr-defined]
         elif thing is None:
-            return ast.Constant.create_instance(None)
+            return ast.Constant.create_instance(None) # type:ignore[no-any-return, attr-defined]
         raise ValueError(f"Not a literal: {thing!r}")
     return _convert(ob)
 
-def fix_missing_parents(node:ast.AST, parent:ast.AST) -> ast.AST:
+def fix_missing_parents(node:ASTNodeT, parent:ASTNodeT) -> ASTNodeT:
     """
     Fix the missing ``parent`` attribute, starting at node.
     Also setup the ``_parser`` attribute.
     """
-    def _fix(_node:ast.AST, _parent:ast.AST) -> None:
+    def _fix(_node:ASTNodeT, _parent:ASTNodeT) -> None:
         _parent._parser._init_new_node(_node, _parent)
         for child in _node.children:
             _fix(child, _node)
     _fix(node, parent)
     return node
 
-def fix_ast(node:ast.AST, parent:ast.AST) -> ast.AST:
+def fix_ast(node:ASTNodeT, parent:ASTNodeT) -> ASTNodeT:
     """
     Fix a newly created AST tree to be compatible with astuce.
     """

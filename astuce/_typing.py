@@ -2,18 +2,21 @@
 These classes are for type annotations only, do not instanciate them.
 """
 
-from typing import TYPE_CHECKING, Callable, Iterator, NewType, Union
+from typing import TYPE_CHECKING, Callable, Iterator, NewType, Union, Type
 import ast
 
 if TYPE_CHECKING:
-    from .nodes import ASTNode as ConcreteASTNode, Instance
+    from .nodes import ASTNode as ConcreteASTNode, Instance, Uninferable
     from ._context import OptionalInferenceContext
     class ConcreteInstance(ConcreteASTNode, Instance):
         ...
+    UninferableT = Type[Uninferable]
 else:
     ConcreteASTNode = object
     ConcreteInstance = object
     OptionalInferenceContext = object
+    Uninferable = object
+    UninferableT = Type[object]
 
 class Module(ast.Module, ConcreteASTNode):...
 class ClassDef(ast.ClassDef, ConcreteASTNode):...
@@ -44,7 +47,7 @@ class List(ast.List, ConcreteInstance):...
 class Tuple(ast.Tuple, ConcreteInstance):...
 class Set(ast.Set, ConcreteInstance):...
 class Dict(ast.Dict, ConcreteInstance):...
-class Constant(ast.Constant, ConcreteInstance):...
+class Constant(ast.Constant, ConcreteInstance):... # type:ignore[misc]
 
 comprehension = Union[GeneratorExp, DictComp, SetComp, ListComp]
 
@@ -70,4 +73,6 @@ else:
     ASTexpr = ast.expr
     ASTNode = ast.AST
 
-_InferMethT = Callable[[ASTNode, OptionalInferenceContext], Iterator[ASTNode]]
+InferResult = Iterator[Union[ASTNode, Uninferable]]
+_InferMethT = Callable[[ASTNode, OptionalInferenceContext], InferResult]
+

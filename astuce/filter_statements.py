@@ -1,9 +1,9 @@
 from __future__ import annotations
 
 import ast
-from typing import List, Optional, Tuple
+from typing import List, Optional, Tuple, Union
 from .nodes import ASTNode, is_assign_name, is_del_name
-from ._typing import ASTstmt, LocalsAssignT
+from ._typing import ASTstmt, LocalsAssignT, Module as ASTModuleT
 """
 This module contains the code adjusted from astroid to filter statements. 
 """
@@ -142,7 +142,7 @@ def are_exclusive(stmt1: 'ASTNode', stmt2: 'ASTNode') -> bool:
 
 def _get_filtered_node_statements(
     base_node: 'ASTNode', stmt_nodes: List[LocalsAssignT]
-) -> List[Tuple[LocalsAssignT, ASTstmt]]:
+) -> List[Tuple[LocalsAssignT, Union[ASTstmt, ASTModuleT]]]:
     """
     Returns the list of tuples (node, node.statement) for all stmt_nodes.
     

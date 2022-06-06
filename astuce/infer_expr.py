@@ -107,7 +107,7 @@ def parse__all__(node: ast.Assign | ast.AugAssign) -> list[str | Name]:  # noqa:
     try:
         return _parse__all__(node.value)
     except KeyError as error:
-        logger.debug(f"Cannot parse __all__ assignment: {node.value.unparse()} ({error})")
+        logger.debug(f"Cannot parse __all__ assignment: {node.value.unparse()} ({error})") # type:ignore[attr-defined]
         return []
 
 

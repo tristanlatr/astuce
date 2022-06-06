@@ -70,7 +70,7 @@ class InferenceContext:
         """
         
     @property
-    def nodes_inferred(self):
+    def nodes_inferred(self) -> int:
         """
         Number of nodes inferred in this context and all its clones/descendents
 
@@ -80,7 +80,7 @@ class InferenceContext:
         return self._nodes_inferred[0]
 
     @nodes_inferred.setter
-    def nodes_inferred(self, value:int):
+    def nodes_inferred(self, value:int) -> None:
         self._nodes_inferred[0] = value
 
     @property
@@ -90,7 +90,7 @@ class InferenceContext:
         """
         return self._cache
 
-    def push(self, node):
+    def push(self, node:ASTNodeT) -> bool:
         """Push node into inference path
 
         :return: True if node is already in context path else False
@@ -104,7 +104,7 @@ class InferenceContext:
         self.path.append(node)
         return False
 
-    def clone(self):
+    def clone(self) -> 'InferenceContext':
         """
         Clone inference path
 
@@ -123,7 +123,7 @@ class InferenceContext:
         
         return clone
 
-    def __str__(self):
+    def __str__(self) -> str:
         state = (
             f"{field}={pprint.pformat(getattr(self, field), width=80 - len(field))}"
             for field in self.__slots__

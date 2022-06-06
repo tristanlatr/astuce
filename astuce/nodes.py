@@ -30,7 +30,7 @@ _builtins_names = dir(builtins)
 class Uninferable:
     """Special object which is returned when inference fails."""
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return "<Uninferable>"
 
     __str__ = __repr__
@@ -44,7 +44,7 @@ class Uninferable:
     # def __call__(self, *args, **kwargs):
     #     return self
 
-    def __bool__(self):
+    def __bool__(self) -> bool:
         return False
 
 
@@ -57,7 +57,7 @@ class ASTNode:
 
     """
 
-    parent: 'ASTNode' = None # type:ignore
+    parent: '_typing.ASTNode' = None # type:ignore
     """
     `None` for Modules.
     """
@@ -77,7 +77,8 @@ class ASTNode:
         """
         if self.parent:
             return self.parent.root
-        return self
+        assert isinstance(self, ast.Module)
+        return self # type:ignore[return-value]
     
     @cached_property
     def lineno(self) -> int:
@@ -150,27 +151,13 @@ class ASTNode:
         return self.__class__.__name__.lower()
 
     @cached_property
-    def children(self) -> Sequence['ASTNode']:
+    def children(self) -> Sequence['_typing.ASTNode']:
         """Build and return the children of this node.
 
         Returns:
             A list of children.
         """
-        children = []
-        for field_name in cast(ast.AST, self)._fields:
-            try:
-                field = getattr(self, field_name)
-            except AttributeError:
-                continue
-            if isinstance(field, ASTNode):
-                field.parent = self
-                children.append(field)
-            elif isinstance(field, list):
-                for child in field:
-                    if isinstance(child, ASTNode):
-                        child.parent = self
-                        children.append(child)
-        return children
+        return list(ast.iter_child_nodes(self)) # type:ignore
 
     @cached_property
     def position(self) -> int:
@@ -188,7 +175,7 @@ class ASTNode:
             raise RootNodeError("the root node does not have a parent, nor siblings, nor a position")
 
     @cached_property
-    def previous_siblings(self) -> Sequence['ASTNode']:
+    def previous_siblings(self) -> Sequence['_typing.ASTNode']:
         """Return the previous siblings of this node, starting from the closest.
 
         Returns:
@@ -199,7 +186,7 @@ class ASTNode:
         return self.parent.children[self.position - 1 :: -1]
 
     @cached_property
-    def next_siblings(self) -> Sequence['ASTNode']:
+    def next_siblings(self) -> Sequence['_typing.ASTNode']:
         """Return the next siblings of this node, starting from the closest.
 
         Returns:
@@ -210,7 +197,7 @@ class ASTNode:
         return self.parent.children[self.position + 1 :]
 
     @cached_property
-    def siblings(self) -> Sequence['ASTNode']:
+    def siblings(self) -> Sequence['_typing.ASTNode']:
         """Return the siblings of this node.
 
         Returns:
@@ -219,7 +206,7 @@ class ASTNode:
         return [*reversed(self.previous_siblings), *self.next_siblings]
 
     @cached_property
-    def previous(self) -> 'ASTNode':
+    def previous(self) -> '_typing.ASTNode':
         """Return the previous sibling of this node.
 
         Raises:
@@ -234,7 +221,7 @@ class ASTNode:
             raise LastNodeError("there is no previous node") from error
 
     @cached_property  # noqa: A003
-    def next(self) -> 'ASTNode':  # noqa: A003
+    def next(self) -> '_typing.ASTNode':  # noqa: A003
         """Return the next sibling of this node.
 
         Raises:
@@ -249,7 +236,7 @@ class ASTNode:
             raise LastNodeError("there is no next node") from error
 
     @cached_property
-    def first_child(self) -> 'ASTNode':
+    def first_child(self) -> '_typing.ASTNode':
         """Return the first child of this node.
 
         Raises:
@@ -264,7 +251,7 @@ class ASTNode:
             raise LastNodeError("there are no children node") from error
 
     @cached_property
-    def last_child(self) -> 'ASTNode':  # noqa: A003
+    def last_child(self) -> '_typing.ASTNode':  # noqa: A003
         """Return the lasts child of this node.
 
         Raises:
@@ -323,8 +310,7 @@ class ASTNode:
         When called on a :class:`Module` this returns self.
         """
         if isinstance(self, ast.Module):
-            assert isinstance(self, ASTNode)
-            return self
+            return self # type:ignore[return-value]
         
         if not self.parent:
             raise RootNodeError("parent missing")
@@ -356,7 +342,7 @@ class ASTNode:
     def _is_statement(self) -> bool:
         return isinstance(self, ast.stmt)
     
-    def has_base(self, node:'ASTNode') -> bool:
+    def has_base(self, node:ast.AST) -> bool:
         """
         Check if this `ast.ClassDef` node inherits from the given type.
 
@@ -368,7 +354,7 @@ class ASTNode:
             return False
         return bool(node in self.bases)
     
-    def locate_child(self, child:'ASTNode', recurse:bool=False) -> Tuple[str, Union['ASTNode', Sequence['ASTNode']]]:
+    def locate_child(self, child:'ASTNode', recurse:bool=False) -> Tuple[str, Union['_typing.ASTNode', Sequence['_typing.ASTNode']]]:
         """Find the field of this node that contains the given child.
         :param child: The child node to search fields for.
         :param recurse: Whether to recurse in all nested children to find the node.
@@ -404,22 +390,22 @@ class ASTNode:
         msg = "Could not find %s in %s's children"
         raise ValueError(msg % (repr(child), repr(self)))
 
-    def infer(self, context:'OptionalInferenceContext'=None) -> Iterator['ASTNode']:
+    def infer(self, context:'OptionalInferenceContext'=None) -> Iterator['_typing.ASTNode']:
         # workaround cyclic import
         from . import inference
-        return inference.infer(self, context)
+        return inference.infer(self, context) #type:ignore[arg-type]
     
     @lru_cache()
     def literal_eval(self) -> Any:
-        return ast.literal_eval(self)
+        return ast.literal_eval(cast(ast.AST, self))
 
     # The MIT License (MIT)
     # Copyright (c) 2015 Read the Docs, Inc
     def resolve(self, basename: str) -> str:
         """
-        Resolve a basename to get its fully qualified name.
+        Resolve a basename to get its fully qualified name in the context of self.
 
-        :param self: The node representing the base name.
+        :param self: The node representing the context in which to resolve the base name.
         :param basename: The partial base name to resolve.
         :returns: The fully resolved base name.
         """
@@ -429,7 +415,7 @@ class ASTNode:
 
         try:
             assigns = self.lookup(top_level_name)[1]
-        except LookupError:
+        except LookupError: # lookup() does not raise LookupError anymore, but maybe it should?
             assigns = []
 
         for assignment in assigns:
@@ -442,7 +428,7 @@ class ASTNode:
                 full_basename = basename.replace(top_level_name, import_name, 1)
                 break
             elif isinstance(assignment, ast.ClassDef):
-                full_basename = assignment.qname()
+                full_basename = assignment.qname
                 break
             elif isinstance(assignment, ast.Name) and is_assign_name(assignment):
                 full_basename = "{}.{}".format(assignment.scope.qname, assignment.id)
@@ -467,7 +453,7 @@ class ASTNode:
 
         return full_basename
 
-    def node_ancestors(self) -> Iterator["ASTNode"]:
+    def node_ancestors(self) -> Iterator["_typing.ASTNode"]:
         """Yield parent, grandparent, etc until there are no more."""
         parent = self.parent
         while parent is not None:
@@ -500,7 +486,7 @@ class ASTNode:
         return self._parser.unparse(self)
 
     @lru_cache()
-    def lookup(self, name: str, offset:int=0) -> Tuple['ASTNode', List['ASTNode']]:
+    def lookup(self, name: str, offset:int=0) -> Tuple['_typing.ASTNode', List['_typing.ASTNode']]:
         """Lookup where the given variable is assigned.
 
         The lookup starts from self's scope. If self is not a frame itself
@@ -519,7 +505,7 @@ class ASTNode:
         return self.scope._scope_lookup(self, name, offset=offset)
 
     # TODO: Move the lookup logic into it's own module.
-    def _scope_lookup(self, node: 'ASTNode', name:str, offset:int=0) -> Tuple['ASTNode', List['ASTNode']]:
+    def _scope_lookup(self, node: 'ASTNode', name:str, offset:int=0) -> Tuple['_typing.ASTNode', List['_typing.ASTNode']]:
         if isinstance(self, ast.Module):
             return self._module_lookup(node, name, offset)
         elif isinstance(self, (ast.FunctionDef, ast.AsyncFunctionDef)):
@@ -529,13 +515,13 @@ class ASTNode:
         else:
             return self._base_scope_lookup(node, name, offset)
     
-    def _module_lookup(self, node: 'ASTNode', name:str, offset:int=0) -> Tuple['ASTNode', List['ASTNode']]:
+    def _module_lookup(self, node: 'ASTNode', name:str, offset:int=0) -> Tuple['_typing.ASTNode', List['_typing.ASTNode']]:
         # TODO: Handle {"__name__", "__doc__", "__file__", "__path__", "__package__"}
         """The names of module attributes available through the global scope."""
 
         return self._base_scope_lookup(node, name, offset)
 
-    def _class_lookup(self, node: 'ASTNode', name:str, offset:int=0) -> Tuple['ASTNode', List['ASTNode']]:
+    def _class_lookup(self, node: 'ASTNode', name:str, offset:int=0) -> Tuple['_typing.ASTNode', List['_typing.ASTNode']]:
         # TODO: Handle __module__, __qualname__,
         assert isinstance(self, ast.ClassDef)
 
@@ -564,15 +550,15 @@ class ASTNode:
             # class A(name.Name):
             #     def name(self): ...
 
-            frame = self.parent.frame
+            frame:_typing.FrameNodeT = self.parent.frame
             # line offset to avoid that class A(A) resolve the ancestor to
             # the defined class
             offset = -1
         else:
-            frame = self
+            frame = cast(_typing.ClassDef, self)
         return frame._base_scope_lookup(node, name, offset)
 
-    def _function_lookup(self, node: 'ASTNode', name:str, offset:int=0) -> Tuple['ASTNode', List['ASTNode']]:
+    def _function_lookup(self, node: 'ASTNode', name:str, offset:int=0) -> Tuple['_typing.ASTNode', List['_typing.ASTNode']]:
         assert isinstance(self, (ast.FunctionDef, ast.AsyncFunctionDef))
         
         if name == "__class__":
@@ -582,7 +568,7 @@ class ASTNode:
             # when `__class__` is being used.
             frame = self.parent.frame
             if isinstance(frame, ast.ClassDef):
-                return self, [frame]
+                return self, [frame] # type:ignore[return-value, list-item]
 
         if node in self.args.defaults or node in self.args.kw_defaults:
             frame = self.parent.frame
@@ -591,10 +577,10 @@ class ASTNode:
             offset = -1
         else:
             # check this is not used in function decorators
-            frame = self
+            frame = self # type:ignore
         return frame._base_scope_lookup(node, name, offset)
 
-    def _base_scope_lookup(self, node: 'ASTNode', name:str, offset:int=0) -> Tuple['ASTNode', List['ASTNode']]:
+    def _base_scope_lookup(self, node: 'ASTNode', name:str, offset:int=0) -> Tuple['_typing.ASTNode', List['_typing.ASTNode']]:
         """XXX method for interfacing the scope lookup"""
 
         from .filter_statements import filter_stmts # workaround cyclic imports.
@@ -615,7 +601,7 @@ class ASTNode:
             pscope = pscope.parent and pscope.parent.scope
         
         # self is at the top level of a module, and we couldn't find references to this name
-        return (node, [])
+        return (node, []) #type:ignore[unreachable]
         # NameInferenceError is raised by callers.
         # raise LookupError(f"couldn't find references to {name!r}")
     
@@ -657,7 +643,7 @@ def get_context(node: Union[ast.Attribute, ast.List, ast.Name, ast.Subscript, as
 
     # Just in case, we use getattr because dynamically created nodes do not have the ctx field.
     try:
-        return _CONTEXT_MAP[type(getattr(node, 'ctx', ast.Load))]
+        return _CONTEXT_MAP[type(getattr(node, 'ctx', ast.Load()))] # type:ignore[index]
     except KeyError as e:
         raise ValueError(f"Can't get the context of {node!r}") from e
 
@@ -743,17 +729,16 @@ def relative_to_absolute(node: ast.ImportFrom) -> str:
     
     if level:
         # Relative import.
-        parent: Optional[_typing.Module] = node.root
-        if parent._is_package:
+        parent: Optional[_typing.Module] = cast(_typing.ASTNode, node).root
+        if parent._is_package: #type:ignore[union-attr]
             level -= 1
         for _ in range(level):
             if parent is None:
                 break
             parent = get_module_package(parent)
         if parent is None:
-            node.root._report(
+            cast(_typing.ASTNode, node)._parser._report(node,
                 "relative import level (%d) too high" % node.level,
-                lineno_offset=node.lineno
                 )
             return
         if modname is None:
@@ -843,7 +828,7 @@ class Instance:
                 type_annotation:Optional[ast.expr]=None, ) -> None:
         self.type_info = self._get_type_info(classdef, type_annotation)
 
-    def _get_type_info(self, classdef:Optional[_typing.ClassDef], type_annotation:Optional[ast.expr], ) -> None:
+    def _get_type_info(self, classdef:Optional[_typing.ClassDef], type_annotation:Optional[ast.expr], ) -> TypeInfo:
 
         _type = None
         if type_annotation is not None:

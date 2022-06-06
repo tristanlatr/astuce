@@ -1,3 +1,6 @@
+from typing import Any
+
+
 class StaticAnalysisException(Exception):
     """base exception class for all astuce related exceptions
 
@@ -12,13 +15,13 @@ class StaticAnalysisException(Exception):
     arguments.
     """
 
-    def __init__(self, message="", **kws):
+    def __init__(self, message:str="", **kws:Any):
         super().__init__(message)
         self.message = message
         for key, value in kws.items():
             setattr(self, key, value)
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.message.format(**vars(self))
 
 class LastNodeError(StaticAnalysisException):
@@ -53,7 +56,7 @@ class InferenceError(ResolveError):
     node = None
     context = None
 
-    def __init__(self, message="Inference failed for {node!r}.", **kws):
+    def __init__(self, message:str="Inference failed for {node!r}.", **kws:Any):
         super().__init__(message, **kws)
 
 
@@ -69,7 +72,7 @@ class NameInferenceError(InferenceError):
     name = None
     scope = None
 
-    def __init__(self, message="{name!r} not found in {scope!r}.", **kws):
+    def __init__(self, message:str="{name!r} not found in {scope!r}.", **kws:Any):
         super().__init__(message, **kws)
 
 # This class does not inherit InferenceError because it's the way astroid's exceptions are designed. 
@@ -86,7 +89,7 @@ class AttributeInferenceError(ResolveError):
     target = None
     attribute = None
 
-    def __init__(self, message="{attribute!r} not found on {target!r}.", **kws):
+    def __init__(self, message:str="{attribute!r} not found on {target!r}.", **kws:Any):
         super().__init__(message, **kws)
 
 

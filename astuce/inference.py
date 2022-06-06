@@ -7,10 +7,10 @@ import ast
 import functools
 import itertools
 import sys
-from typing import Any, Callable, Iterable, Iterator, Optional, List, Union
+from typing import Any, Callable, Iterable, Iterator, Optional, List, Type, Union, cast
 from . import _context, nodes, exceptions, _decorators
 from . import _typing
-from ._typing import ASTNode as ASTNodeT, _InferMethT
+from ._typing import ASTNode as ASTNodeT, _InferMethT, InferResult, UninferableT
 from ._context import OptionalInferenceContext, copy_context, InferenceContext
 from ._astutils import fix_ast, literal_to_ast
 from ._assigned_statements import assigned_stmts
@@ -19,18 +19,15 @@ from ._inference_decorators import path_wrapper, yes_if_nothing_inferred, raise_
 # An idea to improve support for builtins: https://stackoverflow.com/a/71969838
 
 def _infer_stmts(
-    stmts: List[ASTNodeT], 
-    context: OptionalInferenceContext, 
-    frame:Optional[ASTNodeT]=None) -> Iterator[ASTNodeT]:
+    stmts: List[Union[ASTNodeT, UninferableT]], 
+    context: InferenceContext, 
+    frame:Optional[ASTNodeT]=None) -> InferResult:
     """Return an iterator on statements inferred by each statement in *stmts*."""
     if not stmts:
         return # empty list
-    _parser = stmts[0]._parser 
+
     inferred = False
-    if context is not None:
-        context = copy_context(context)
-    else:
-        context = _parser._new_context()
+    context = copy_context(context)
 
     for stmt in stmts:
         if stmt is nodes.Uninferable:
@@ -55,7 +52,7 @@ def _infer_stmts(
             context=context,
         )
 
-def infer(self:ASTNodeT, context:Optional[_context.InferenceContext]=None) -> Iterator[ASTNodeT]:
+def infer(self:ASTNodeT, context: OptionalInferenceContext=None) -> InferResult:
     """
     Get a generator of the inferred values. See `ASTNode.infer`.
 
@@ -94,7 +91,7 @@ def infer(self:ASTNodeT, context:Optional[_context.InferenceContext]=None) -> It
     context.inferred[self] = tuple(results)
     return
 
-def safe_infer(node, context=None):
+def safe_infer(node, context: OptionalInferenceContext=None) -> Optional[ASTNodeT]:
     """Return the inferred value for the given node.
 
     Return None if inference failed or if there is some ambiguity (more than
@@ -144,8 +141,9 @@ class infer_load_name:
 
     # Arguably the most important inference logic:
     @classmethod
-    def infer_name(cls, self:_typing.Name, context:OptionalInferenceContext=None) -> Iterator[ASTNodeT]:
+    def infer_name(cls, self:ast.Name, context:OptionalInferenceContext=None) -> InferResult:
         """infer a Name: use name lookup rules"""
+        self = cast(_typing.Name, self)
         frame, stmts = self.lookup(self.id)
         if not stmts:
             # Try to see if the name is enclosed in a nested function
@@ -161,7 +159,7 @@ class infer_load_name:
         context = copy_context(context)
         return _infer_stmts(stmts, context, frame)
 
-def _raise_no_infer_method(node:ASTNodeT, context: OptionalInferenceContext) -> Iterator[ASTNodeT]:
+def _raise_no_infer_method(node:ASTNodeT, context: OptionalInferenceContext) -> InferResult:
     """we don't know how to resolve a statement by default"""
     raise exceptions.InferenceError(
         "No inference function for node {nodetype!r}. Context: {context!r}", nodetype=node.__class__.__name__, context=context
@@ -172,7 +170,7 @@ _globals = globals()
 def _get_infer_meth(node: ASTNodeT) -> _InferMethT:
     return _globals.get(f'_infer_{node.__class__.__name__}', _raise_no_infer_method)
 
-def _infer_end(node:ASTNodeT, context: OptionalInferenceContext) -> Iterator[ASTNodeT]:
+def _infer_end(node:ASTNodeT, context: OptionalInferenceContext) -> InferResult:
     """Inference's end for nodes that yield themselves on inference
 
     These are objects for which inference does not have any semantic,
@@ -180,14 +178,14 @@ def _infer_end(node:ASTNodeT, context: OptionalInferenceContext) -> Iterator[AST
     """
     yield node
 
-def _infer(node:ASTNodeT, context: OptionalInferenceContext) -> Iterator[ASTNodeT]:
+def _infer(node:ASTNodeT, context: OptionalInferenceContext) -> InferResult:
     """
     Redirects to the right method to infer a node. 
     Equivalent to ast astroid's NodeNG._infer() method. 
     """
     return _get_infer_meth(node)(node, context)
 
-def _infer_assign_name(node:ASTNodeT, context: OptionalInferenceContext) -> Iterator[ASTNodeT]:
+def _infer_assign_name(node:ASTNodeT, context: OptionalInferenceContext) -> InferResult:
     """
     From astroid's inference.infer_assign() function.
     """
@@ -195,30 +193,30 @@ def _infer_assign_name(node:ASTNodeT, context: OptionalInferenceContext) -> Iter
         return node.parent.infer(context)
 
     stmts = list(assigned_stmts(node, context=context))
-    return _infer_stmts(stmts, context)
+    return _infer_stmts(stmts, context or node._parser._new_context())
 
 @path_wrapper
 @raise_if_nothing_inferred
-def _infer_Name(node:ASTNodeT, context: OptionalInferenceContext) -> Iterator[ASTNodeT]:
+def _infer_Name(node:ASTNodeT, context: OptionalInferenceContext) -> InferResult:
     if nodes.is_assign_name(node):
         return _infer_assign_name(node, context)
     elif nodes.is_del_name(node):
         # TODO: Check what's the inference of a del name.
         assert False
-        return
     else:
         return infer_load_name.infer_name(node, context)
 
 @path_wrapper
 @raise_if_nothing_inferred
-def _infer_Attribute(node:ASTNodeT, context: OptionalInferenceContext) -> Iterator[ASTNodeT]:
+def _infer_Attribute(node:ASTNodeT, context: OptionalInferenceContext) -> InferResult:
+    yield nodes.Uninferable
     # We dont't support attribute inference right now.
-    if nodes.is_assign_name(node):
-        return
-    elif nodes.is_del_name(node):
-        return
-    else:
-        return #infer_load_name.infer_name(node, context)
+    # if nodes.is_assign_name(node):
+    #     return
+    # elif nodes.is_del_name(node):
+    #     return
+    # else:
+    #     return #infer_load_name.infer_name(node, context)
 
 # frame nodes infers to self, it's the end of the inference.
 _infer_ClassDef = _infer_end
@@ -235,7 +233,7 @@ _infer_Constant = _infer_end
 _infer_Slice = _infer_end
 
 @raise_if_nothing_inferred
-def _infer_IfExp(node:_typing.IfExp, context: OptionalInferenceContext=None) -> Iterator[ASTNodeT]:
+def _infer_IfExp(node:_typing.IfExp, context: OptionalInferenceContext=None) -> InferResult:
     """Support IfExp inference
 
     If we can't infer the truthiness of the condition, we default
@@ -268,7 +266,7 @@ def _infer_IfExp(node:_typing.IfExp, context: OptionalInferenceContext=None) -> 
 
 # for compatibility
 @raise_if_nothing_inferred
-def _infer_Index(self:ASTNodeT, context: OptionalInferenceContext=None) -> Iterator[ASTNodeT]:
+def _infer_Index(self:ASTNodeT, context: OptionalInferenceContext=None) -> InferResult:
     return self.value.infer(context)
 
 def _infer_sequence_helper(node:Union[_typing.Tuple, _typing.List, _typing.Set], context: OptionalInferenceContext=None) -> List[ASTNodeT]:
@@ -294,7 +292,7 @@ def _infer_sequence_helper(node:Union[_typing.Tuple, _typing.List, _typing.Set],
 
 
 @raise_if_nothing_inferred
-def infer_sequence(self:Union[_typing.Tuple, _typing.List, _typing.Set], context: OptionalInferenceContext=None) -> Iterator[ASTNodeT]:
+def infer_sequence(self:Union[_typing.Tuple, _typing.List, _typing.Set], context: OptionalInferenceContext=None) -> InferResult:
     has_starred_named_expr = any(
         isinstance(e, (ast.Starred, ast.NamedExpr)) for e in self.elts
     )
@@ -346,7 +344,7 @@ _OPPERATORS = {
       ast.Is     : lambda i,j: i is j,
     }
 
-def _invoke_binop_inference(left: ASTNodeT, opnode: _typing.BinOp, op:ast.operator, right: ASTNodeT, context: OptionalInferenceContext) -> Iterator[ASTNodeT]:
+def _invoke_binop_inference(left: ASTNodeT, opnode: Union[_typing.BinOp, _typing.AugAssign], op:ast.operator, right: ASTNodeT, context: OptionalInferenceContext) -> InferResult:
     """
     Infer a binary operation between a left operand and a right operand.
 
@@ -374,7 +372,7 @@ def _invoke_binop_inference(left: ASTNodeT, opnode: _typing.BinOp, op:ast.operat
 
 @yes_if_nothing_inferred
 @path_wrapper
-def _infer_BinOp(self: _typing.BinOp, context: OptionalInferenceContext) -> Iterator[ASTNodeT]:
+def _infer_BinOp(self: _typing.BinOp, context: OptionalInferenceContext) -> InferResult:
     """
     Binary operation inference logic.
     """
@@ -399,7 +397,7 @@ def _infer_BinOp(self: _typing.BinOp, context: OptionalInferenceContext) -> Iter
 
         yield from _invoke_binop_inference(lhs, self, self.op, rhs, context)
 
-def _infer_lhs(node: ASTNodeT, context:InferenceContext) -> Iterator[ASTNodeT]:
+def _infer_lhs(node: ast.expr, context:InferenceContext) -> InferResult:
     # won't work with a path wrapper
     """
     Infers the left hand side in augmented binary operations.
@@ -414,13 +412,13 @@ def _infer_lhs(node: ASTNodeT, context:InferenceContext) -> Iterator[ASTNodeT]:
 
 @raise_if_nothing_inferred
 @path_wrapper
-def _infer_AugAssign(self:_typing.AugAssign, context: OptionalInferenceContext=None) -> Iterator[ASTNodeT]:
+def _infer_AugAssign(self:_typing.AugAssign, context: OptionalInferenceContext=None) -> InferResult:
     """Inference logic for augmented binary operations."""
     context = context or self._parser._new_context()
     lhs_context = copy_context(context)
     rhs_context = copy_context(context)
     lhs_iter = list(_infer_lhs(self.target, context=lhs_context))
-    rhs_iter = list(self.value.infer(context=rhs_context))
+    rhs_iter = list(self.value.infer(context=rhs_context)) # type:ignore[attr-defined]
     print(f'_infer_AugAssign left: {lhs_iter}, right: {rhs_iter}', file=sys.stderr)
 
     for lhs, rhs in itertools.product(lhs_iter, rhs_iter):
@@ -433,9 +431,10 @@ def _infer_AugAssign(self:_typing.AugAssign, context: OptionalInferenceContext=N
         yield from _invoke_binop_inference(lhs, self, self.op, rhs, rhs_context)
         
 # Defers to self.value.infer()
-def _infer_Expr(self:_typing.Expr, context: OptionalInferenceContext=None) -> Iterator[ASTNodeT]:
-    return self.value.infer(context=context)
+def _infer_Expr(self:_typing.Expr, context: OptionalInferenceContext=None) -> InferResult:
+    return self.value.infer(context=context) # type:ignore[attr-defined, no-any-return]
 
-def _infer_Subscript(self:_typing.Subscript, context: OptionalInferenceContext=None) -> Iterator[ASTNodeT]:
-    return
-    # TODO
+# def _infer_Subscript(self:_typing.Subscript, context: OptionalInferenceContext=None) -> InferResult:
+#     yield
+#     return
+#     # TODO

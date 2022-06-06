@@ -93,7 +93,8 @@ def assend_assigned_stmts(
     assign_path: list[int] | None = None,
 ) -> Any:
     # if nodes.is_assign_name(self):
-    return assigned_stmts(self.parent, node, context, assign_path)
+    # node=self here is important
+    return assigned_stmts(self.parent, node=self, context=context, assign_path=assign_path)
     
     assert False # TODO: check me
 
@@ -159,7 +160,8 @@ def _resolve_assignment_parts(parts:Iterator[ASTNodeT], assign_path: list[int], 
                 yield from _resolve_assignment_parts(
                     assigned.infer(context), assign_path, context
                 )
-            except exceptions.InferenceError:
+            except exceptions.InferenceError as e:
+                assigned._parser._report(assigned, str(e))
                 return
 
 def _raise_no_assigned_stmts_method(self:ASTNodeT, _:ASTNodeT, context: OptionalInferenceContext, __:Any,) -> Iterator[ASTNodeT]:
