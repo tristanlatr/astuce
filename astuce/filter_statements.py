@@ -81,6 +81,10 @@ def optionally_assigns(self: 'ASTNode') -> bool:
     """
     return isinstance(self, OPTIONAL_ASSIGN_NODES)
 
+# TODO: Create a function to find the first common parent in beetween two nodes.
+# Use it in are_exclusive() and also use in the same fashion to filter nodes based
+# on pre-evaluated ifs conditions.
+
 def are_exclusive(stmt1: 'ASTNode', stmt2: 'ASTNode') -> bool:
     """
     return true if the two given statements are mutually exclusive
