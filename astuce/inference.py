@@ -314,6 +314,10 @@ def infer_sequence(self:Union[_typing.Tuple, _typing.List, _typing.Set], context
     )
     if has_starred_named_expr or not assign_context:
         values = _infer_sequence_helper(self, context, infer_all_elements=not assign_context)
+        if values == self.elts:
+            # Do not create a new List if all elements are already inferred.
+            yield self
+            return
         
         new_seq = type(self).create_instance(
             lineno=self.lineno, col_offset=self.col_offset, elts=values,

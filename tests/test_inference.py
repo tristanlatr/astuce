@@ -527,9 +527,13 @@ class FirstInfenceTests(AstuceTestCase):
 
     def test_starred_in_list_literal(self) -> None:
         code = """
+        bho = 42
+        pi = 3.14
         var = (1, 2, 3)
         bar = (5, 6, 7)
         foo = [999, 1000, 1001]
+        [0, 1, 2, 3, 4, 5, 6, 7, 999, 42, 3.14]
+        [0, *var, 4, *[*bar, *foo], pi, bho]
         [0, *var] #@
         [0, *var, 4] #@
         [0, *var, 4, *bar] #@
@@ -537,6 +541,8 @@ class FirstInfenceTests(AstuceTestCase):
         [0, *var, 4, *[*bar, *foo]] #@
         """
         statements = self.parse(code).body
+        self.assertEqual(next(statements[-7].value.infer()), statements[-7].value)
+        self.assertEqual(next(statements[-6].value.infer()).literal_eval(), [0, 1, 2, 3, 4, 5, 6, 7, 999, 1000, 1001, 3.14, 42])
         self.assertEqual(next(statements[-5].value.infer()).literal_eval(), [0, 1, 2, 3])
         self.assertEqual(next(statements[-4].value.infer()).literal_eval(), [0, 1, 2, 3, 4])
         self.assertEqual(next(statements[-3].value.infer()).literal_eval(), [0, 1, 2, 3, 4, 5, 6, 7])
