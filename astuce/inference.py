@@ -40,6 +40,7 @@ def _infer_stmts(
                 yield inf
                 inferred = True
         except exceptions.NameInferenceError:
+            # TODO: Why are we ignoring the name errors here?
             continue
         except exceptions.InferenceError:
             yield nodes.Uninferable
@@ -110,7 +111,32 @@ def safe_infer(node, context: OptionalInferenceContext=None) -> Optional[ASTNode
     except StopIteration:
         return value
 
+@raise_if_nothing_inferred
+def recursively_infer(node:ASTNodeT, context:OptionalInferenceContext=None) -> InferResult:
+    # From the unpack_infer() function in astroid, except in our case we do not yield inferred elements when the node is a List or Tuple,
+    # we return the inferred list/tuple, which is the excepted behaviour imo. This is also why the function is
+    # named differently in astuce, because it's not designed the same way.
+    """
+    Recursively yield nodes inferred by the given node until the 
+    node infers to self or we reached the Uninferable result.
+    """
+    
+    # if inferred is a final node, return it and stop
+    inferred = next(node.infer(context), nodes.Uninferable)
+    if inferred is node:
+        yield inferred
+        return dict(node=node, context=context)
+    # else, infer recursively, except Uninferable object that should be returned as is
+    for inferred in node.infer(context):
+        if inferred is nodes.Uninferable:
+            yield inferred
+        else:
+            yield from recursively_infer(inferred, context)
 
+    return dict(node=node, context=context)
+
+
+#### Inference functions:
 
 
 # Arguably the most important inference logic:
@@ -450,6 +476,9 @@ def _infer_AugAssign(self:_typing.AugAssign, context: OptionalInferenceContext=N
 # Defers to self.value.infer()
 def _infer_Expr(self:_typing.Expr, context: OptionalInferenceContext=None) -> InferResult:
     return self.value.infer(context=context) # type:ignore[attr-defined, no-any-return]
+
+def _infer_ImportFrom(self:_typing.ImportFrom, context: OptionalInferenceContext=None) -> InferResult:
+    ...
 
 # def _infer_Subscript(self:_typing.Subscript, context: OptionalInferenceContext=None) -> InferResult:
 #     yield
