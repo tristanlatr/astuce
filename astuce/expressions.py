@@ -58,15 +58,6 @@ class Name:
         """
         return self.source.rsplit(".", 1)[-1]
 
-    def as_dict(self, **kwargs: Any) -> dict[str, Any]:
-        """Return this name's data as a dictionary.
-        Parameters:
-            **kwargs: Additional serialization options.
-        Returns:
-            A dictionary.
-        """
-        return {"source": self.source, "full": self.full}
-
 
 class Expression(list): #type: ignore
     """This class represents a Python expression.

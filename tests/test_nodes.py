@@ -10,9 +10,7 @@ import pytest
 from astuce import nodes, _typing
 from . import AstuceTestCase, require_version
 
-class NodesTest(AstuceTestCase):
-
-    CODE = """
+CODE_IF_BRANCHES_STATEMENTS = """
         from typing import List
         
         if 0:
@@ -49,9 +47,11 @@ class NodesTest(AstuceTestCase):
             return 4*x
     """
 
+class NodesTest(AstuceTestCase):
+
     def test_if_elif_else_node(self) -> None:
         """test transformation for If node"""
-        mod = self.parse(self.CODE, 'test')
+        mod = self.parse(CODE_IF_BRANCHES_STATEMENTS)
         
         self.assertEqual(len(mod.body), 6)
         for stmt in mod.body:
@@ -63,28 +63,9 @@ class NodesTest(AstuceTestCase):
         self.assertIsInstance(mod.body[3].orelse[0], ast.If)  # If / elif
         self.assertIsInstance(mod.body[4].orelse[0].orelse[0], ast.If)
     
-    def test_lookup(self) -> None:
-        """test transformation for If node"""
-        mod = self.parse(self.CODE, 'test')
-        
-        assert mod.lookup('List') == (mod, [mod.body[0]])
-        
-        assert mod.lookup('var_maybe_unbound') == (mod, [mod.body[1].body[1].targets[0]])
-        
-        assert mod.lookup('var_always_set_in_exclusive_bracnhes') == (mod, [mod.body[2].body[1].targets[0], 
-                                                       mod.body[2].orelse[1].targets[0]])
-        
-        assert mod.lookup('var_unreachable') == (mod, [mod.body[3].body[1].targets[0], 
-                                                       mod.body[3].orelse[0].body[1].targets[0]])
-
-        assert mod.lookup('var_always_set') == (mod, [mod.body[4].body[1].targets[0], 
-                                                       mod.body[4].orelse[0].body[1].targets[0],
-                                                       mod.body[4].orelse[0].orelse[0].body[1].targets[0]],)
-
-
     def test_lineno(self) -> None:
 
-        mod = self.parse(self.CODE, 'test')
+        mod = self.parse(CODE_IF_BRANCHES_STATEMENTS, 'test')
         self.assertEqual(mod.lineno, 0)
         self.assertEqual(mod.body[0].lineno, 2)
         self.assertEqual(mod.body[1].lineno, 4)

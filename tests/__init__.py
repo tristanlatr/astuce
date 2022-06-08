@@ -31,6 +31,11 @@ def extract_node(expr: str, modname: str = 'test', allow_stmt: bool = False) -> 
     else:
         return stmt
 
+
+def fromtext(text:str, modname:str='test') -> ast.Module:
+    # test fucntion
+    return parser.Parser().parse(dedent(text), modname)
+
 class AstuceTestCase(unittest.TestCase):
 
     def setUp(self):

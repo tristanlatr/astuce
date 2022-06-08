@@ -1,3 +1,3 @@
 # astuce
 
-AST inference utilities.
+AST inference utilities (Work in progress).
