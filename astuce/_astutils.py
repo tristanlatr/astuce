@@ -1,5 +1,5 @@
 import ast
-from typing import Any, Union
+from typing import Any, Optional, Union
 from ._typing import ASTNode as ASTNodeT
 
 def qname_to_ast(name:str) -> Union[ast.Name, ast.Attribute]:
@@ -56,10 +56,13 @@ def fix_missing_parents(node:ASTNodeT, parent:ASTNodeT) -> ASTNodeT:
     _fix(node, parent)
     return node
 
-def fix_ast(node:ASTNodeT, parent:ASTNodeT) -> ASTNodeT:
+def fix_ast(node:ASTNodeT, parent:Optional[ASTNodeT]) -> ASTNodeT:
     """
     Fix a newly created AST tree to be compatible with astuce.
     """
+    if parent is None:
+        parent = getattr(node, 'parent', None)
+        assert parent is not None, f"missing required argument 'parent'"
     # TODO: Locations doesn't really makes sens for inferred nodes. 
     # But it's handy to have the context linenumber here.
     return fix_missing_parents(
