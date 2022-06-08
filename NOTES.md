@@ -65,7 +65,7 @@
 
 ```python
 
-from astuce import Parser
+from astuce import Parser, inference
 # maybe it could take an options parameter to tweak some stuff.
 parser = Parser() 
 
@@ -79,7 +79,7 @@ mod2 = parser.parse('''
 l = ('i', 'j')
 ''')
 
-inferred = list(mod2.infer_name('l'))
+inferred = list(inference.infer_local(mod2, 'l'))
 assert len(inferred) == 1
 assert inferred[0].literal_eval() == ['f', 'k', 'i', 'j']
 
