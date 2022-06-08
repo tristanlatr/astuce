@@ -8,12 +8,20 @@
 - Invalidate the inference cache everytime a new module is parsed.
 - Adjust _infer_Call to return an 'Instance' of the annotated type if the function uses type annotation.
 - Adjust _infer_Call to return an inferred node if we're talking about builtins (and all parties are inferable)
-- First apply set of transformations, as described in [Scalpel 2.1 Code Rewriter.](https://arxiv.org/pdf/2202.11840.pdf).
+- First apply set of transformations, as described in [Scalpel 2.1 Code Rewriter.](https://arxiv.org/pdf/2202.11840.pdf)
     - `ast.Str`, `ast.Bytes`, `ast.Num` to `ast.Constant` to ease support for python 3.6.
     - `__all__.extend(X)` -> `__all__ += X` (only at the module statements level)
     - `__all__.append(X)` -> `__all__ += [X]` (only at the module statements level)
     - `list()` -> `[]`, same for other builtins.
-
+- Investigate manners to move away from patching the AST classes
+- Create a module astuce._lookup and astuce.nodenav
+- Document the core principles of astuce:
+  - The inference system.
+     - It's an iterative process, meaning, an `ast.Name` node can be inferred to an `ast.ImportFrom` node, that can be inferred again to a `ast.Module` node. 
+  - Limitations: Will not proceed to inter-procedural analysis, this is not in the scope of this project.
+  - Type hints will be considered as a source of information rather than a post-condition to check, this is not a type checker.
+- Implement unary operator inference
+- 
 
 # Notes:
 - `list.pop()` is a good example where mutation and return value are important, it could be hard to make work...
@@ -47,7 +55,7 @@
 
 
     - To do the matching, search for data.* in the loadname dictionary.
-    - infer_load_name.infer_name should be adjusted such that it looks up in this dictionnary and 
+    - _infer_name() should be adjusted such that it looks up in this dictionnary and 
         applies the supported mutations to each inferable results, 
         - Use the same filter_stmt() code to filter the applicable loadnames statements
 
