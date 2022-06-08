@@ -13,7 +13,7 @@ class LookupTest(AstuceTestCase):
 
         mod = self.parse(CODE_IF_BRANCHES_STATEMENTS)
         
-        assert mod.lookup('List') == (mod, [mod.body[0]])
+        assert mod.lookup('List') == (mod, [mod.body[0].names[0]])
         
         assert mod.lookup('var_maybe_unbound') == (mod, [mod.body[1].body[1].targets[0]])
         

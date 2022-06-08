@@ -61,8 +61,8 @@ def _set_local(self:'_typing.ASTNode', name:str, node:'ast.AST') -> None:
                                 ast.AsyncFunctionDef, 
                                 ast.Name, 
                                 ast.arg, 
-                                ast.Import, 
-                                ast.ImportFrom) 
+                                ast.alias) 
+
         # ast.Attribute not supported at the moment, 
         # analysing assigments outside out the scope needs more work.
     
@@ -124,7 +124,7 @@ class _AstuceModuleVisitor(ast.NodeVisitor):
         for a in node.names:
             name = a.asname or a.name
             # TODO: Why the split() exactly?
-            _set_local(node.parent, name.split(".")[0], node)
+            _set_local(node.parent, name.split(".")[0], a)
         self.generic_visit(node)
 
     def visit_ImportFrom(self, node: _typing.ImportFrom) -> None:
@@ -134,7 +134,7 @@ class _AstuceModuleVisitor(ast.NodeVisitor):
         else:
             for a in node.names:
                 name = a.asname or a.name
-                _set_local(node.parent, name, node)
+                _set_local(node.parent, name, a)
         self.generic_visit(node)
     
     def visit_arg(self, node: _typing.arg) -> None:

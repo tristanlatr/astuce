@@ -477,7 +477,7 @@ def _infer_AugAssign(self:_typing.AugAssign, context: OptionalInferenceContext=N
 def _infer_Expr(self:_typing.Expr, context: OptionalInferenceContext=None) -> InferResult:
     return self.value.infer(context=context) # type:ignore[attr-defined, no-any-return]
 
-def _infer_ImportFrom(self:_typing.ImportFrom, context: OptionalInferenceContext=None) -> InferResult:
+def _infer_alias(self:_typing.alias, context: OptionalInferenceContext=None) -> InferResult:
     ...
 
 # def _infer_Subscript(self:_typing.Subscript, context: OptionalInferenceContext=None) -> InferResult:

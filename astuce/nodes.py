@@ -383,18 +383,11 @@ class ASTNode:
 
         top_level_name = re.sub(r"\(.*\)", "", basename).split(".", 1)[0]
 
-        try:
-            assigns = self.lookup(top_level_name)[1]
-        except LookupError: # lookup() does not raise LookupError anymore, but maybe it should?
-            assigns = []
+        assigns = self.lookup(top_level_name)[1]
 
         for assignment in assigns:
-            if isinstance(assignment, ast.ImportFrom):
-                import_name = get_full_import_name(assignment, top_level_name)
-                full_basename = basename.replace(top_level_name, import_name, 1)
-                break
-            elif isinstance(assignment, ast.Import):
-                import_name = resolve_import_alias(top_level_name, assignment.names)
+            if isinstance(assignment, ast.alias):
+                import_name = resolve_import_alias(top_level_name, [assignment])
                 full_basename = basename.replace(top_level_name, import_name, 1)
                 break
             elif isinstance(assignment, ast.ClassDef):
@@ -648,16 +641,13 @@ def relative_to_absolute(node: ast.ImportFrom) -> str:
 @overload
 def node2dottedname(node: Union[ast.Attribute, ast.Name]) -> List[str]: ...
 @overload
-def node2dottedname(node: Optional[ast.expr], strict:bool=False) -> Optional[List[str]]:...
-def node2dottedname(node: Optional[ast.expr], strict:bool=False) -> Optional[List[str]]:
+def node2dottedname(node: Optional[ast.expr]) -> Optional[List[str]]:...
+def node2dottedname(node: Optional[ast.expr]) -> Optional[List[str]]:
     """
     Resove expression composed by `ast.Attribute` and `ast.Name` nodes to a list of names. 
-    :note: Supports variants `AssignAttr` and `AssignName`.
-    :note: Strips the subscript slice, i.e. `Generic[T]` -> `Generic`, except if scrict=True.
     """
     parts = []
-    if isinstance(node, ast.Subscript) and not strict:
-        node = node.value
+
     while isinstance(node, (ast.Attribute)):
         parts.append(node.attr)
         node = node.value
