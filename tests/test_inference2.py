@@ -5,10 +5,87 @@ from typing import Any
 
 import pytest
 
-from astuce import nodes
+from astuce import nodes, inference
 from astuce.exceptions import InferenceError
 from . import AstuceTestCase
 
+class ImportsTests(AstuceTestCase):
+    def test_import_simple(self):
+        pack = self.parse('''
+        def f():...
+        ''', modname='pack', is_package=True)
+
+        subpack = self.parse('''
+        from external import E
+        class C: ...
+        ''', modname='pack.subpack')
+
+        mod1 = self.parse('''
+        import mod2 
+        import pack.subpack
+
+        mod2.k
+        mod2.l
+        mod2.m
+        pack.subpack.C
+        pack.subpack.E
+        pack.f
+        
+        ''', modname='mod1')
+
+        mod2 = self.parse('''
+        k = 'fr'
+        l = ('i', 'j')
+        m = range(10)
+        ''', modname='mod2')
+
+        assert list(inference.recursively_infer(mod1.body[-1])) == []
+        assert list(inference.recursively_infer(mod1.body[-2])) == []
+        assert list(inference.recursively_infer(mod1.body[-3])) == []
+        assert list(inference.recursively_infer(mod1.body[-4])) == []
+        assert list(inference.recursively_infer(mod1.body[-5])) == []
+        assert list(inference.recursively_infer(mod1.body[-6])) == []
+
+
+    def test_import_from_simple(self):
+        pack = self.parse('''
+        from .subpack import C, E
+        def f():...
+        ''', modname='pack', is_package=True)
+
+        subpack = self.parse('''
+        from external import E
+        class C: ...
+        ''', modname='pack.subpack')
+
+        mod1 = self.parse('''
+        from mod2 import _k as k, _l as l, _m as m
+        from pack import C, E, f
+
+        k
+        l
+        m
+        C
+        E
+        f
+        
+        ''', modname='mod1')
+
+        mod2 = self.parse('''
+        _k = 'fr'
+        _l = ('i', 'j')
+        _m = range(10)
+        ''', modname='mod2')
+
+        assert list(inference.recursively_infer(mod1.body[-1])) == []
+        assert list(inference.recursively_infer(mod1.body[-2])) == []
+        assert list(inference.recursively_infer(mod1.body[-3])) == []
+        assert list(inference.recursively_infer(mod1.body[-4])) == []
+        assert list(inference.recursively_infer(mod1.body[-5])) == []
+        assert list(inference.recursively_infer(mod1.body[-6])) == []
+
+    def test_import_cycles(self):
+        ...
 
 class SequenceInfenceTests(AstuceTestCase):
     
