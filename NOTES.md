@@ -21,7 +21,9 @@
   - Limitations: Will not proceed to inter-procedural analysis, this is not in the scope of this project.
   - Type hints will be considered as a source of information rather than a post-condition to check, this is not a type checker.
 - Implement unary operator inference
-- 
+- Remove ASTNode.infer_name(str) and create inference.infer_local(ctx, name)
+- Implement inference.infer_local
+- Implement _infer_alias for imports
 
 # Notes:
 - `list.pop()` is a good example where mutation and return value are important, it could be hard to make work...
