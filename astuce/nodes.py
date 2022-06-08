@@ -387,7 +387,10 @@ class ASTNode:
 
         for assignment in assigns:
             if isinstance(assignment, ast.alias):
-                import_name = resolve_import_alias(top_level_name, [assignment])
+                if isinstance(assignment.parent, ast.ImportFrom):
+                    import_name = get_full_import_name(assignment.parent, top_level_name)
+                else:
+                    import_name = resolve_import_alias(top_level_name, (assignment,))
                 full_basename = basename.replace(top_level_name, import_name, 1)
                 break
             elif isinstance(assignment, ast.ClassDef):
@@ -621,7 +624,7 @@ def relative_to_absolute(node: ast.ImportFrom) -> str:
                 break
             parent = get_module_package(parent)
         if parent is None:
-            cast(_typing.ASTNode, node)._parser._report(node,
+            cast(_typing.ASTNode, node)._report(
                 "relative import level (%d) too high" % node.level,
                 )
             return
@@ -634,29 +637,6 @@ def relative_to_absolute(node: ast.ImportFrom) -> str:
         assert modname is not None
     
     return modname
-
-#   Copyright 2006-2008 Michael Hudson <mwh@python.net>
-#   Copyright 2006-2020 Pydoctor contributors
-
-@overload
-def node2dottedname(node: Union[ast.Attribute, ast.Name]) -> List[str]: ...
-@overload
-def node2dottedname(node: Optional[ast.expr]) -> Optional[List[str]]:...
-def node2dottedname(node: Optional[ast.expr]) -> Optional[List[str]]:
-    """
-    Resove expression composed by `ast.Attribute` and `ast.Name` nodes to a list of names. 
-    """
-    parts = []
-
-    while isinstance(node, (ast.Attribute)):
-        parts.append(node.attr)
-        node = node.value
-    if isinstance(node, (ast.Name)):
-        parts.append(node.id)
-    else:
-        return None
-    parts.reverse()
-    return parts
 
 
 @attr.s(auto_attribs=True)
