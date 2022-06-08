@@ -39,6 +39,37 @@ else:
 from .nodes import ASTNode, Instance, get_context, Context, is_assign_name, is_del_name, is_scoped_node
 from . import _typing, exceptions, _context
 
+def _set_local(self:'_typing.ASTNode', name:str, node:'ast.AST') -> None:
+    """Define that the given name is declared in the given statement node.
+
+    .. seealso:: `ASTNode.scope`
+
+    :param name: The name that is being defined.
+    :type name: str
+
+    :param node: The node that defines the given name (i.e ast.Name objects).
+    :type node: ASTNode
+    """
+    if isinstance(self, ast.NamedExpr):
+        return _set_local(self.frame, name, node)
+    if not is_scoped_node(self):
+        return _set_local(self.parent, name, node)
+
+    # nodes that can be stored in the locals dict
+    LOCALS_ASSIGN_NAME_NODES = (ast.ClassDef, 
+                                ast.FunctionDef, 
+                                ast.AsyncFunctionDef, 
+                                ast.Name, 
+                                ast.arg, 
+                                ast.Import, 
+                                ast.ImportFrom) 
+        # ast.Attribute not supported at the moment, 
+        # analysing assigments outside out the scope needs more work.
+    
+    assert isinstance(node, LOCALS_ASSIGN_NAME_NODES), f"cannot set {node} as local"
+    assert not node in self.locals.get(name, ()), (self, node)
+    self.locals.setdefault(name, []).append(node) # type:ignore[arg-type]
+
 class _AstuceModuleVisitor(ast.NodeVisitor):
     """
     Obviously inspired by astroid rebuilder
@@ -46,7 +77,7 @@ class _AstuceModuleVisitor(ast.NodeVisitor):
     # custom ast.AT attributes are: 
     # '_parser' and 'parent' on all nodes
     # '_modname', '_is_package' and '_filename' on module nodes
-    # '_locals' and '_loadnames' on scoped nodes
+    # '_locals' on scoped nodes
     # 'type_info' on instance nodes
 
     parent: ASTNode = cast('ASTNode', None)
@@ -77,15 +108,15 @@ class _AstuceModuleVisitor(ast.NodeVisitor):
             assert isinstance(node, ast.Module)
     
     def visit_FunctionDef(self, node: _typing.FunctionDef) -> None:
-        node.parent._set_local(node.name, node)
+        _set_local(node.parent, node.name, node)
         self.generic_visit(node)
     
     def visit_AsyncFunctionDef(self, node: _typing.AsyncFunctionDef) -> None:
-        node.parent._set_local(node.name, node)
+        _set_local(node.parent, node.name, node)
         self.generic_visit(node)
     
     def visit_ClassDef(self, node: _typing.ClassDef) -> None:
-        node.parent._set_local(node.name, node)
+        _set_local(node.parent, node.name, node)
         self.generic_visit(node)
     
     def visit_Import(self, node: _typing.Import) -> None:
@@ -93,7 +124,7 @@ class _AstuceModuleVisitor(ast.NodeVisitor):
         for a in node.names:
             name = a.asname or a.name
             # TODO: Why the split() exactly?
-            node.parent._set_local(name.split(".")[0], node)
+            _set_local(node.parent, name.split(".")[0], node)
         self.generic_visit(node)
 
     def visit_ImportFrom(self, node: _typing.ImportFrom) -> None:
@@ -103,18 +134,16 @@ class _AstuceModuleVisitor(ast.NodeVisitor):
         else:
             for a in node.names:
                 name = a.asname or a.name
-                node.parent._set_local(name, node)
+                _set_local(node.parent, name, node)
         self.generic_visit(node)
     
     def visit_arg(self, node: _typing.arg) -> None:
-        node.parent._set_local(node.arg, node)
+        _set_local(node.parent, node.arg, node)
         self.generic_visit(node)
     
     def visit_Name(self, node: _typing.Name) -> None:
-
         if is_assign_name(node) or is_del_name(node):
-            node.parent._set_local(node.id, node)
-
+            _set_local(node.parent, node.id, node)
         self.generic_visit(node)
     
     def visit_Attribute(self, node: _typing.Attribute) -> None:
@@ -176,13 +205,26 @@ class Parser:
             raise ValueError(f"can't unparse {node}") from e
 
     @lru_cache
-    def parse(self, source:str, modname:str, is_package:bool=False, **kw:Any) -> _typing.Module:
+    def parse(self, source:str, modname:str, *, is_package:bool=False, **kw:Any) -> _typing.Module:
         """
         Parse the python source string into a `ast.Module` instance.
+
+        :Parameters:
+        source
+            The python code string.
+        modname
+            The full name of the module, required. 
+            This additional argument is the only breaking changed compared to `ast.parse`.
+        kw
+            Other arguments are passed to the `ast.parse` function directly.
+            Including:
+
+            - ``filename``: The filename where we can find the module source
+                (only used for ast error messages)
         """
         mod = cast(_typing.Module, _parse(source, **kw))
         
-        # Store whether this module is package
+        # Store whether this module is a package
         if is_package:
             mod._is_package = True
         
@@ -219,22 +261,11 @@ _default_parser = Parser()
 def parse(source:str, modname:str, is_package:bool=False, **kw:Any) -> _typing.Module:
     """
     Parse the python source string into a `ast.Module` instance.
-
-    :Parameters:
-        source
-            The python code string.
-        modname
-            The full name of the module, required. 
-            This additional argument is the only breaking changed compared to `ast.parse`.
-        kw
-            Other arguments are passed to the `ast.parse` function directly.
-            Including:
-
-            - ``filename``: The filename where we can find the module source
-                (only used for ast error messages)
+    
+    :see: `Parser.parse`
     
     Attention, using this function alters some global state, use a `Parser` instance
-    to parse modules in isolated environments.
+    to parse a set of modules in isolated environments.
     
     """
     return _default_parser.parse(source, modname, is_package=is_package, **kw)

@@ -107,37 +107,6 @@ class ASTNode:
         assert is_scoped_node(self), "use 'locals' only on scoped nodes"
         return self._locals
     
-    def _set_local(self, name:str, node:'ast.AST') -> None:
-        """Define that the given name is declared in the given statement node.
-
-        .. seealso:: `scope`
-
-        :param name: The name that is being defined.
-        :type name: str
-
-        :param node: The node that defines the given name (i.e ast.Name objects).
-        :type node: ASTNode
-        """
-        if isinstance(self, ast.NamedExpr):
-            return self.frame._set_local(name, node)
-        if not is_scoped_node(self):
-            return self.parent._set_local(name, node)
-
-        # nodes that can be stored in the locals dict
-        LOCALS_ASSIGN_NAME_NODES = (ast.ClassDef, 
-                                    ast.FunctionDef, 
-                                    ast.AsyncFunctionDef, 
-                                    ast.Name, 
-                                    ast.arg, 
-                                    ast.Import, 
-                                    ast.ImportFrom) 
-            # ast.Attribute not supported at the moment, 
-            # analysing assigments outside out the scope needs more work.
-        
-        assert isinstance(node, LOCALS_ASSIGN_NAME_NODES), f"cannot set {node} as local"
-        assert not node in self.locals.get(name, ()), (self, node)
-        self.locals.setdefault(name, []).append(node) # type:ignore[arg-type]
-
     # TODO: remove once Python 3.7 support is dropped
     if sys.version_info < (3, 8):  # noqa: WPS604
         end_lineno = property(lambda node: None)
