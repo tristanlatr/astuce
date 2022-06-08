@@ -112,14 +112,13 @@ def safe_infer(node, context: OptionalInferenceContext=None) -> Optional[ASTNode
 
 
 
-class infer_load_name:
-    """
-    Code to infer a `ast.Name` instance with a ``Load`` context to possible values.
-    
-    :note: This is also used to infer augmented assigments.
-    """
 
-    @staticmethod
+# Arguably the most important inference logic:
+# :note: This is also used to infer the left side of augmented assigments.
+def _infer_name(self:ast.Name, context:OptionalInferenceContext=None) -> InferResult:
+    """
+    Infer a Name: use name lookup rules.
+    """
     def _higher_function_scope(node:ASTNodeT) -> Optional[ASTNodeT]:
         """Search for the first function which encloses the given
         scope. This can be used for looking up in that function's
@@ -139,25 +138,21 @@ class infer_load_name:
             return current.parent
         return None
 
-    # Arguably the most important inference logic:
-    @classmethod
-    def infer_name(cls, self:ast.Name, context:OptionalInferenceContext=None) -> InferResult:
-        """infer a Name: use name lookup rules"""
-        self = cast(_typing.Name, self)
-        frame, stmts = self.lookup(self.id)
-        if not stmts:
-            # Try to see if the name is enclosed in a nested function
-            # and use the higher (first function) scope for searching.
-            parent_function = cls._higher_function_scope(self.scope)
-            if parent_function:
-                _, stmts = parent_function.lookup(self.id)
+    self = cast(_typing.Name, self)
+    frame, stmts = self.lookup(self.id)
+    if not stmts:
+        # Try to see if the name is enclosed in a nested function
+        # and use the higher (first function) scope for searching.
+        parent_function = _higher_function_scope(self.scope)
+        if parent_function:
+            _, stmts = parent_function.lookup(self.id)
 
-            if not stmts:
-                raise exceptions.NameInferenceError(
-                    name=self.id, scope=self.scope, context=context
-                )
-        context = copy_context(context)
-        return _infer_stmts(stmts, context, frame)
+        if not stmts:
+            raise exceptions.NameInferenceError(
+                name=self.id, scope=self.scope, context=context
+            )
+    context = copy_context(context)
+    return _infer_stmts(stmts, context, frame)
 
 def _raise_no_infer_method(node:ASTNodeT, context: OptionalInferenceContext) -> InferResult:
     """we don't know how to resolve a statement by default"""
@@ -204,7 +199,7 @@ def _infer_Name(node:ASTNodeT, context: OptionalInferenceContext) -> InferResult
         # TODO: Check what's the inference of a del name.
         assert False
     else:
-        return infer_load_name.infer_name(node, context)
+        return _infer_name(node, context)
 
 @path_wrapper
 @raise_if_nothing_inferred
@@ -216,7 +211,7 @@ def _infer_Attribute(node:ASTNodeT, context: OptionalInferenceContext) -> InferR
     # elif nodes.is_del_name(node):
     #     return
     # else:
-    #     return #infer_load_name.infer_name(node, context)
+    #     return #_infer_name(node, context)
 
 # frame nodes infers to self, it's the end of the inference.
 _infer_ClassDef = _infer_end
@@ -427,7 +422,7 @@ def _infer_lhs(node: ast.expr, context:InferenceContext) -> InferResult:
     @note: It only supports ast.Name instances at the moment.
     """
     if isinstance(node, ast.Name):
-        yield from infer_load_name.infer_name(node, context)
+        yield from _infer_name(node, context)
     else:
         # TODO: we could support Attribute and Subscript nodes in the future
         yield nodes.Uninferable
