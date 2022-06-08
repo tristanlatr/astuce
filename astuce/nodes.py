@@ -1,5 +1,4 @@
-import builtins
-import contextlib
+
 import enum
 from functools import lru_cache
 import functools
@@ -12,7 +11,7 @@ import warnings
 
 import attr
 
-from astuce import exceptions
+from astuce import exceptions, _lookup
 
 # TODO: remove once Python 3.7 support is dropped
 if sys.version_info < (3, 8):
@@ -26,8 +25,6 @@ from . import _typing, _astutils
 if TYPE_CHECKING:
     from .parser import Parser
     from ._context import OptionalInferenceContext
-
-_builtins_names = dir(builtins)
 
 @object.__new__
 class Uninferable:
@@ -528,110 +525,7 @@ class ASTNode:
             given name according to the scope node where it has been found.
         :returntype: tuple[ASTNode, List[_typing.LocalsAssignT]]
         """
-        if is_scoped_node(self):
-            return self._scope_lookup(self, name, offset=offset)
-        return self.scope._scope_lookup(self, name, offset=offset)
-
-    # TODO: Move the lookup logic into it's own module.
-    def _scope_lookup(self, node: 'ASTNode', name:str, offset:int=0) -> Tuple['_typing.ASTNode', List['_typing.ASTNode']]:
-        if isinstance(self, ast.Module):
-            return self._module_lookup(node, name, offset)
-        elif isinstance(self, (ast.FunctionDef, ast.AsyncFunctionDef)):
-            return self._function_lookup(node, name, offset)
-        elif isinstance(self, ast.ClassDef):
-            return self._class_lookup(node, name, offset)
-        else:
-            return self._base_scope_lookup(node, name, offset)
-    
-    def _module_lookup(self, node: 'ASTNode', name:str, offset:int=0) -> Tuple['_typing.ASTNode', List['_typing.ASTNode']]:
-        # TODO: Handle {"__name__", "__doc__", "__file__", "__path__", "__package__"}
-        """The names of module attributes available through the global scope."""
-
-        return self._base_scope_lookup(node, name, offset)
-
-    def _class_lookup(self, node: 'ASTNode', name:str, offset:int=0) -> Tuple['_typing.ASTNode', List['_typing.ASTNode']]:
-        # TODO: Handle __module__, __qualname__,
-        assert isinstance(self, ast.ClassDef)
-
-        # If the name looks like a builtin name, just try to look
-        # into the upper scope of this class. We might have a
-        # decorator that it's poorly named after a builtin object
-        # inside this class.
-        lookup_upper_frame = (
-            node.parent.locate_child(node)[0] == 'decorator_list'
-            and name in _builtins_names
-        )
-        if (
-            any(node == base or cast(ASTNode, base).parent_of(node) for base in self.bases)
-            or lookup_upper_frame
-        ):
-            # Handle the case where we have either a name
-            # in the bases of a class, which exists before
-            # the actual definition or the case where we have
-            # a Getattr node, with that name.
-            #
-            # name = ...
-            # class A(name):
-            #     def name(self): ...
-            #
-            # import name
-            # class A(name.Name):
-            #     def name(self): ...
-
-            frame:_typing.FrameNodeT = self.parent.frame
-            # line offset to avoid that class A(A) resolve the ancestor to
-            # the defined class
-            offset = -1
-        else:
-            frame = cast(_typing.ClassDef, self)
-        return frame._base_scope_lookup(node, name, offset)
-
-    def _function_lookup(self, node: 'ASTNode', name:str, offset:int=0) -> Tuple['_typing.ASTNode', List['_typing.ASTNode']]:
-        assert isinstance(self, (ast.FunctionDef, ast.AsyncFunctionDef))
-        
-        if name == "__class__":
-            # __class__ is an implicit closure reference created by the compiler
-            # if any methods in a class body refer to either __class__ or super.
-            # In our case, we want to be able to look it up in the current scope
-            # when `__class__` is being used.
-            frame = self.parent.frame
-            if isinstance(frame, ast.ClassDef):
-                return self, [frame] # type:ignore[return-value, list-item]
-
-        if node in self.args.defaults or node in self.args.kw_defaults:
-            frame = self.parent.frame
-            # line offset to avoid that def func(f=func) resolve the default
-            # value to the defined function
-            offset = -1
-        else:
-            # check this is not used in function decorators
-            frame = self # type:ignore
-        return frame._base_scope_lookup(node, name, offset)
-
-    def _base_scope_lookup(self, node: 'ASTNode', name:str, offset:int=0) -> Tuple['_typing.ASTNode', List['_typing.ASTNode']]:
-        """XXX method for interfacing the scope lookup"""
-
-        from .filter_statements import filter_stmts # workaround cyclic imports.
-
-        try:
-            stmts = filter_stmts(node, self.locals[name], self, offset)
-        except KeyError:
-            stmts = []
-        if stmts:
-            return self, stmts
-
-        # Handle nested scopes: since class names do not extend to nested
-        # scopes (e.g., methods), we find the next enclosing non-class scope
-        pscope = self.parent and self.parent.scope
-        while pscope is not None:
-            if not isinstance(pscope, ast.ClassDef):
-                return pscope._scope_lookup(node, name)
-            pscope = pscope.parent and pscope.parent.scope
-        
-        # self is at the top level of a module, and we couldn't find references to this name
-        return (node, []) #type:ignore[unreachable]
-        # NameInferenceError is raised by callers.
-        # raise LookupError(f"couldn't find references to {name!r}")
+        return _lookup.lookup(self, name, offset)
     
     def infer_name(self, name:str) -> Iterator['ASTNode']:
         # TODO

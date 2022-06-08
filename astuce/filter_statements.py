@@ -2,7 +2,10 @@ from __future__ import annotations
 
 import ast
 from typing import List, Optional, Tuple, Union
-from .nodes import ASTNode, is_assign_name, is_del_name
+from .nodes import ASTNode, is_assign_name, is_del_name 
+# TODO: we don't actaully need to import ASTNode here and is_assign_name, is_del_name should go into new module
+# This avoid to have import this module from within the function in _lookup.py.
+
 from ._typing import ASTstmt, LocalsAssignT, Module as ASTModuleT
 """
 This module contains the code adjusted from astroid to filter statements. 
