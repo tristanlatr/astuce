@@ -3,6 +3,7 @@ import ast
 
 from ._typing import ASTNode as ASTNodeT
 
+# TODO: move me to nodenav.py
 def nodes_of_class(
     self:ASTNodeT,
     klass: Union[Type[ast.AST], Tuple[Type[ast.AST], ...]],

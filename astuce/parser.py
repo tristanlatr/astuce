@@ -264,8 +264,7 @@ def parse(source:str, modname:str, is_package:bool=False, **kw:Any) -> _typing.M
     
     :see: `Parser.parse`
     
-    Attention, using this function alters some global state, use a `Parser` instance
+    Attention, using this function alters a global parser state, use a `Parser` instance
     to parse a set of modules in isolated environments.
-    
     """
     return _default_parser.parse(source, modname, is_package=is_package, **kw)
