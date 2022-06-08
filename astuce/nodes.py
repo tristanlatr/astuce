@@ -548,7 +548,7 @@ def is_scoped_node(node: 'ASTNode') -> bool:
                              ast.GeneratorExp, ast.DictComp, ast.SetComp, ast.ListComp, ast.Lambda))
 
 
-def get_module_package(node: _typing.Module) -> Optional[_typing.Module]:
+def get_module_parent(node: _typing.Module) -> Optional[_typing.Module]:
     """
     Returns the parent package of this module or `None` if not found. 
 
@@ -622,7 +622,7 @@ def relative_to_absolute(node: ast.ImportFrom) -> str:
         for _ in range(level):
             if parent is None:
                 break
-            parent = get_module_package(parent)
+            parent = get_module_parent(parent)
         if parent is None:
             cast(_typing.ASTNode, node)._report(
                 "relative import level (%d) too high" % node.level,
