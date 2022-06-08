@@ -533,7 +533,7 @@ class FirstInfenceTests(AstuceTestCase):
         bar = (5, 6, 7)
         foo = [999, 1000, 1001]
         [0, 1, 2, 3, 4, 5, 6, 7, 999, 42, 3.14]
-        [0, *var, 4, *[*bar, *foo], pi, bho]
+        [0, *var, 4, *[*bar, *foo], pi, bho] # each elements of the list is inferred when inferring a list
         [0, *var] #@
         [0, *var, 4] #@
         [0, *var, 4, *bar] #@

@@ -1,4 +1,8 @@
-"""This module contains utilities for extracting information from nodes."""
+"""
+This module contains utilities for extracting higher level information from expression nodes.
+
+This was initially part of `griffe <https://github.com/mkdocstrings/griffe>`_.
+"""
 
 # Definition of 'Looking-up':
 # Looking up is the action of determining where a given name is beeing referenced, exluding ignorable statements.
