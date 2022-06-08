@@ -21,8 +21,8 @@
   - Limitations: Will not proceed to inter-procedural analysis, this is not in the scope of this project.
   - Type hints will be considered as a source of information rather than a post-condition to check, this is not a type checker.
 - Implement unary operator inference
-- Remove ASTNode.infer_name(str) and create inference.infer_local(ctx, name)
-- Implement inference.infer_local
+- Remove ASTNode.infer_name(str) and create inference.infer_attr(ctx, name)
+- Implement inference.infer_attr
 - Implement _infer_alias for imports
 
 # Notes:
@@ -79,7 +79,7 @@ mod2 = parser.parse('''
 l = ('i', 'j')
 ''')
 
-inferred = list(inference.infer_local(mod2, 'l'))
+inferred = list(inference.infer_attr(mod2, 'l'))
 assert len(inferred) == 1
 assert inferred[0].literal_eval() == ['f', 'k', 'i', 'j']
 
