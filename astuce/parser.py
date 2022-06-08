@@ -201,30 +201,6 @@ class Parser:
         # TODO: Invalidate inference cache
         
         return mod
-    
-    def _report(self, node:ast.AST, descr: str, lineno_offset: int = 0) -> None:
-        """Log an error or warning about this node object."""
-
-        def description(node: ASTNode) -> str:
-            """A string describing our source location to the user.
-
-            If this module's code was read from a file, this returns
-            its file path. In other cases, such as during unit testing,
-            the full module name is returned.
-            """
-            source_path = node.root._filename
-            return node.root.qname if source_path is None else str(source_path)
-
-        linenumber: object
-        linenumber = node.lineno
-        if linenumber:
-            linenumber += lineno_offset
-        elif lineno_offset and cast(ASTNode, node).parent is None:
-            linenumber = lineno_offset
-        else:
-            linenumber = '???'
-
-        warnings.warn(f'{description(cast(ASTNode, node))}:{linenumber}: {descr}', category=exceptions.StaticAnalysisWarning)
 
     def _new_context(self) -> _context.InferenceContext:
         """

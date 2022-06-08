@@ -8,8 +8,11 @@ from typing import Any, Callable, Dict, Iterable, Iterator, Optional, Sequence, 
 import sys
 import ast
 from ast import AST
+import warnings
 
 import attr
+
+from astuce import exceptions
 
 # TODO: remove once Python 3.7 support is dropped
 if sys.version_info < (3, 8):
@@ -49,7 +52,8 @@ class Uninferable:
 
 
 class ASTNode:
-    """This class is dynamically added to the bases of each AST node class.
+    """
+    This class is dynamically added to the bases of each AST node class.
     
     :var lineno: 
         - Modules lineno -> 0
@@ -459,6 +463,30 @@ class ASTNode:
         while parent is not None:
             yield parent
             parent = parent.parent
+    
+    def _report(self, descr: str, lineno_offset: int = 0) -> None:
+        """Log an error or warning about this node object."""
+
+        def description(node: ASTNode) -> str:
+            """A string describing our source location to the user.
+
+            If this module's code was read from a file, this returns
+            its file path. In other cases, such as during unit testing,
+            the full module name is returned.
+            """
+            source_path = node.root._filename
+            return node.root.qname if source_path is None else str(source_path)
+
+        linenumber: object
+        linenumber = self.lineno
+        if linenumber:
+            linenumber += lineno_offset
+        elif lineno_offset and self.parent is None:
+            linenumber = lineno_offset
+        else:
+            linenumber = '???'
+
+        warnings.warn(f'{description(self)}:{linenumber}: {descr}', category=exceptions.StaticAnalysisWarning)
 
     def parent_of(self, node: 'ASTNode') -> bool:
         """Check if this node is the parent of the given node.

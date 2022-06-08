@@ -180,7 +180,7 @@ def _resolve_assignment_parts(parts:InferResult, assign_path: list[int], context
                     assigned, assign_path, context
                 )
             except exceptions.InferenceError as e:
-                assigned._parser._report(assigned, str(e))
+                assigned._report(str(e))
                 return
 
 def _raise_no_assigned_stmts_method(self:ASTNodeT, _:ASTNodeT, context: OptionalInferenceContext, __:Any,) -> Iterator[ASTNodeT]:
