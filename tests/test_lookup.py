@@ -1007,50 +1007,6 @@ class LookupControlFlowTest(AstuceTestCase):
         self.assertEqual(len(stmts), 1)
         self.assertEqual(stmts[0].lineno, 8)
 
-    def test_infer_local(self) -> None:
-    
-        code = """
-            test = ''
-            class Pouet:
-                __name__ = "pouet"
-                test += __name__
-            
-            class NoName: 
-                ann:int
-                stuff = Blob()
-                
-                field = stuff.f('desc')
-                test += '_NoName'
-
-                del stuff
-                
-        
-        """
-        astroid = self.parse(code)
-        
-        P = astroid.locals['Pouet'][0]
-        inferred = list(inference.infer_attr(P, "__name__"))
-        assert len(inferred) == 1
-        self.assertEqual(inferred[0].literal_eval(), "pouet")   
-
-        N = astroid.locals['NoName'][0]
-        self.assertRaises(exceptions.AttributeInferenceError, lambda:list(inference.get_attr(N, "notfound")))
-        self.assertRaises(exceptions.InferenceError, lambda:list(inference.infer_attr(N, "notfound")))
-        self.assertRaises(exceptions.AttributeInferenceError, lambda:list(inference.get_attr(N, "ann")))
-        self.assertRaises(exceptions.InferenceError, lambda:list(inference.infer_attr(N, "ann")))
-        self.assertRaises(exceptions.AttributeInferenceError, lambda:list(inference.get_attr(N, "stuff")))
-        self.assertRaises(exceptions.InferenceError, lambda:list(inference.infer_attr(N, "stuff")))
-
-        inferred = list(inference.infer_attr(astroid, "test"))
-        assert len(inferred) == 1
-        assert inferred[0].literal_eval() == ''
-        inferred = list(inference.infer_attr(P, "test"))
-        assert len(inferred) == 1
-        assert inferred[0].literal_eval() == 'pouet'
-        inferred = list(inference.infer_attr(N, "test"))
-        assert len(inferred) == 1
-        assert inferred[0].literal_eval() == '_NoName'
-
 # Licensed under the LGPL: https://www.gnu.org/licenses/old-licenses/lgpl-2.1.en.html
 # For details: https://github.com/PyCQA/astroid/blob/main/LICENSE
 # Copyright (c) https://github.com/PyCQA/astroid/blob/main/CONTRIBUTORS.txt

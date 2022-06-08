@@ -484,7 +484,7 @@ class FirstInfenceTests(AstuceTestCase):
             self.assertIsInstance(inferred, ast.Constant)
             self.assertEqual(inferred.value, expected)
 
-# Not in scope:
+# Not in scope yet:
 # def test_starred_in_mapping_inference_issues(self) -> None:
 #     code = """
 #     {0: 'a', **var} #@
