@@ -135,6 +135,71 @@ def recursively_infer(node:ASTNodeT, context:OptionalInferenceContext=None) -> I
 
     return dict(node=node, context=context)
 
+def get_submodule(pack:_typing.Module, name:str, context:OptionalInferenceContext=None) -> Optional[ASTNodeT]:
+    try:
+        return pack._parser.modules[f"{pack._modname}.{name}"]
+    except KeyError:
+        return None
+
+def get_attr(ctx: _typing.FrameNodeT, name:str, context:OptionalInferenceContext=None) -> List[ASTNodeT]:
+    """
+    Get local attributes definitions matching the name from this frame node.
+    """
+    # Adjusted from astroid NodeNG.getattr() method, with minimal support for packages.
+    
+    if not name:
+        raise exceptions.AttributeInferenceError(target=ctx, attribute=name, context=context)
+    
+    assert nodes.is_frame_node(ctx), "use get_attr() only on frame nodes"
+    
+    values = ctx.lookup(name)[1]
+
+    if not values and isinstance(ctx, ast.Module) and ctx._is_package:
+       # Support for sub-packages.
+       sub = get_submodule(ctx, name, context=context)
+       if sub:
+           return [sub]
+    
+    # filter Del statements
+    values = [n for n in values if not (isinstance(n, ast.Name) and nodes.is_del_name(n))]
+
+    # If an AnnAssign with None value gets here it means that the variable is potentially unbound. TODO: is this true?
+    
+    def empty_annassign(value: _typing.ASTNode) -> bool:
+        if isinstance(value, ast.Name) and nodes.is_assign_name(value):
+            stmt = value.statement
+            if isinstance(stmt, ast.AnnAssign) and stmt.value is None:
+                return True
+        return False
+    
+    # filter empty AnnAssigns statements, which are not attributes in the purest sense.
+    values = [n for n in values if not empty_annassign(n)]
+        
+    if values:
+        return values
+
+    raise exceptions.AttributeInferenceError(target=ctx, attribute=name, context=context)
+
+def infer_attr(ctx: ASTNodeT, name:str, context:OptionalInferenceContext=None) -> InferResult:
+    # Adjusted from astroid NodeNG.igetattr() method.
+    # But this function cannot infer instance attributes at this time.
+    """
+    Infer the possible values of the given variable.
+
+    :param name: The name of the variable to infer.
+    :type name: str
+
+    :returns: The inferred possible values.
+    """
+
+    context = copy_context(context) if context else ctx._parser._new_context()
+
+    try:
+        return _infer_stmts(get_attr(ctx, name, context), context, frame=ctx)
+    except exceptions.AttributeInferenceError as error:
+        raise exceptions.InferenceError(
+            str(error), target=ctx, attribute=name, context=context
+            ) from error
 
 #### Inference functions:
 

@@ -2,7 +2,7 @@ import ast
 import functools
 from typing import List
 
-from astuce import exceptions, nodes, helpers
+from astuce import exceptions, inference, nodes, helpers
 from astuce.filter_statements import are_exclusive
 from .test_nodes import CODE_IF_BRANCHES_STATEMENTS
 from . import AstuceTestCase, require_version
@@ -376,25 +376,6 @@ class LookupTest2(AstuceTestCase):
     #     self.assertIsInstance(gener.getattr("send")[0], nodes.FunctionDef)
     #     self.assertIsInstance(gener.getattr("throw")[0], nodes.FunctionDef)
     #     self.assertIsInstance(gener.getattr("close")[0], nodes.FunctionDef)
-
-    def test_explicit___name__(self) -> None:
-        return NotImplemented
-
-        code = """
-            class Pouet:
-                __name__ = "pouet"
-            
-            class NoName: 
-                pass
-        """
-        astroid = self.parse(code)
-        P = astroid.locals['Pouet'][0]
-        inferred = list(P.infer_name("__name__"))
-        assert len(inferred) == 1
-        self.assertEqual(inferred[0].literal_eval(), "pouet")   
-
-        N = astroid.locals['NoName'][0]
-        self.assertRaises(exceptions.AttributeInferenceError, lambda:list(N.infer_name("__name__")))
 
     # Not in scope right now.
     # def test_function_module_special(self) -> None:
@@ -1025,6 +1006,50 @@ class LookupControlFlowTest(AstuceTestCase):
         _, stmts = x_name.lookup("x")
         self.assertEqual(len(stmts), 1)
         self.assertEqual(stmts[0].lineno, 8)
+
+    def test_infer_local(self) -> None:
+    
+        code = """
+            test = ''
+            class Pouet:
+                __name__ = "pouet"
+                test += __name__
+            
+            class NoName: 
+                ann:int
+                stuff = Blob()
+                
+                field = stuff.f('desc')
+                test += '_NoName'
+
+                del stuff
+                
+        
+        """
+        astroid = self.parse(code)
+        
+        P = astroid.locals['Pouet'][0]
+        inferred = list(inference.infer_attr(P, "__name__"))
+        assert len(inferred) == 1
+        self.assertEqual(inferred[0].literal_eval(), "pouet")   
+
+        N = astroid.locals['NoName'][0]
+        self.assertRaises(exceptions.AttributeInferenceError, lambda:list(inference.get_attr(N, "notfound")))
+        self.assertRaises(exceptions.InferenceError, lambda:list(inference.infer_attr(N, "notfound")))
+        self.assertRaises(exceptions.AttributeInferenceError, lambda:list(inference.get_attr(N, "ann")))
+        self.assertRaises(exceptions.InferenceError, lambda:list(inference.infer_attr(N, "ann")))
+        self.assertRaises(exceptions.AttributeInferenceError, lambda:list(inference.get_attr(N, "stuff")))
+        self.assertRaises(exceptions.InferenceError, lambda:list(inference.infer_attr(N, "stuff")))
+
+        inferred = list(inference.infer_attr(astroid, "test"))
+        assert len(inferred) == 1
+        assert inferred[0].literal_eval() == ''
+        inferred = list(inference.infer_attr(P, "test"))
+        assert len(inferred) == 1
+        assert inferred[0].literal_eval() == 'pouet'
+        inferred = list(inference.infer_attr(N, "test"))
+        assert len(inferred) == 1
+        assert inferred[0].literal_eval() == '_NoName'
 
 # Licensed under the LGPL: https://www.gnu.org/licenses/old-licenses/lgpl-2.1.en.html
 # For details: https://github.com/PyCQA/astroid/blob/main/LICENSE
