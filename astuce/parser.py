@@ -70,7 +70,7 @@ def _set_local(self:'_typing.ASTNode', name:str, node:'ast.AST') -> None:
     assert not node in self.locals.get(name, ()), (self, node)
     self.locals.setdefault(name, []).append(node) # type:ignore[arg-type]
 
-class _AstuceModuleVisitor(ast.NodeVisitor):
+class _AstuceModuleVisitor(ast.NodeTransformer):
     """
     Obviously inspired by astroid rebuilder
     """
@@ -86,40 +86,35 @@ class _AstuceModuleVisitor(ast.NodeVisitor):
         super().__init__()
         self.parser = parser
     
-    def visit(self, node: ASTNode) -> None: # type:ignore[override]
+    def visit(self, node: ASTNode) -> Optional[_typing.ASTNode]:
 
         # Set the 'parent' and '_parser' attributes on all nodes.
         self.parser._init_new_node(node, self.parent)
 
         self.parent = node # push new parent
 
-        # Set '_locals' attribute on scoped nodes only
-        if is_scoped_node(node):
-            node._locals = {}
-        
-        # Init instance 'type_info' attribute
-        if isinstance(node, Instance):
-            node._init_type_info()
-        
-        super().visit(cast(ast.AST, node))
+        r = super().visit(cast(ast.AST, node))
 
         self.parent = node.parent # pop new parent
-        if self.parent == None:
+        
+        if self.parent is None:
             assert isinstance(node, ast.Module)
+        
+        return r
     
-    def visit_FunctionDef(self, node: _typing.FunctionDef) -> None:
+    def visit_FunctionDef(self, node: _typing.FunctionDef) -> _typing.FunctionDef:
         _set_local(node.parent, node.name, node)
-        self.generic_visit(node)
+        return self.generic_visit(node)
     
-    def visit_AsyncFunctionDef(self, node: _typing.AsyncFunctionDef) -> None:
+    def visit_AsyncFunctionDef(self, node: _typing.AsyncFunctionDef) -> _typing.AsyncFunctionDef:
         _set_local(node.parent, node.name, node)
-        self.generic_visit(node)
+        return self.generic_visit(node)
     
-    def visit_ClassDef(self, node: _typing.ClassDef) -> None:
+    def visit_ClassDef(self, node: _typing.ClassDef) -> _typing.ClassDef:
         _set_local(node.parent, node.name, node)
-        self.generic_visit(node)
+        return self.generic_visit(node)
     
-    def visit_Import(self, node: _typing.Import) -> None:
+    def visit_Import(self, node: _typing.Import) -> _typing.Import:
         # save import names in parent's locals:
         for a in node.names:
             
@@ -143,9 +138,9 @@ class _AstuceModuleVisitor(ast.NodeVisitor):
 
             name = a.asname or a.name 
             _set_local(node.parent, name.split(".")[0], a)
-        self.generic_visit(node)
+        return self.generic_visit(node)
 
-    def visit_ImportFrom(self, node: _typing.ImportFrom) -> None:
+    def visit_ImportFrom(self, node: _typing.ImportFrom) -> _typing.ImportFrom:
         if any(a.name=='*' for a in node.names):
             # store wildcard imports to be resolved after
             self.parser._wildcard_import.append(node)
@@ -153,25 +148,25 @@ class _AstuceModuleVisitor(ast.NodeVisitor):
             for a in node.names:
                 name = a.asname or a.name
                 _set_local(node.parent, name, a)
-        self.generic_visit(node)
+        return self.generic_visit(node)
     
-    def visit_arg(self, node: _typing.arg) -> None:
+    def visit_arg(self, node: _typing.arg) -> _typing.arg:
         _set_local(node.parent, node.arg, node)
-        self.generic_visit(node)
+        return self.generic_visit(node)
     
-    def visit_Name(self, node: _typing.Name) -> None:
+    def visit_Name(self, node: _typing.Name) -> _typing.Name:
         if is_assign_name(node) or is_del_name(node):
             _set_local(node.parent, node.id, node)
-        self.generic_visit(node)
+        return self.generic_visit(node)
     
-    def visit_Attribute(self, node: _typing.Attribute) -> None:
+    def visit_Attribute(self, node: _typing.Attribute) -> _typing.Attribute:
 
         if is_assign_name(node) and (not 
           # Prohibit a local save if we are in an ExceptHandler.
           any(isinstance(o, ast.ExceptHandler) for o in node.node_ancestors())):
             self.parser._assignattr.append(node)
 
-        self.generic_visit(node)
+        return self.generic_visit(node)
 
 class Parser:
     """
@@ -229,10 +224,9 @@ class Parser:
         except Exception as e:
             raise ValueError(f"can't unparse {node}") from e
 
-    @lru_cache
     def parse(self, source:str, modname:str, *, is_package:bool=False, **kw:Any) -> _typing.Module:
         """
-        Parse the python source string into a `ast.Module` instance.
+        Parse the python source string into a `ast.Module` instance, and make compatible with astuce inference system.
 
         :Parameters:
         source
@@ -240,14 +234,27 @@ class Parser:
         modname
             The full name of the module, required. 
             This additional argument is the only breaking changed compared to `ast.parse`.
+        is_package
+            Whether this module is package.
         kw
             Other arguments are passed to the `ast.parse` function directly.
             Including:
 
             - ``filename``: The filename where we can find the module source
-                (only used for ast error messages)
+                (only used for error messages)
         """
         mod = cast(_typing.Module, _parse(source, **kw))
+        return self.add(mod, modname, is_package=is_package, **kw)
+    
+    def add(self, mod:ast.Module, modname:str, *, is_package:bool=False, **kw:Any) -> _typing.Module:
+        """
+        Add a module to the parser and make compatible with astuce inference system.
+
+        This method will apply a set of harmless transformations::
+            
+            __all__.extend(a) -> __all__ += a
+            __all__.append(a) -> __all__ += [a]
+        """
         
         # Store whether this module is a package
         if is_package:
@@ -262,13 +269,11 @@ class Parser:
         mod._modname = modname
         self.modules[modname] = mod
 
-        # Build locals 
-        _AstuceModuleVisitor(self).visit(mod)
-
         # Invalidate inference cache
         self.invalidate_inference_cache()
-        
-        return mod
+
+        # Add attributes to AST nodes, build locals, apply transformations.
+        return _AstuceModuleVisitor(self).visit(mod)
 
     def _new_context(self) -> _context.InferenceContext:
         """
@@ -278,10 +283,21 @@ class Parser:
 
     def _init_new_node(self, node:'ASTNode', parent: 'ASTNode') -> None:
         """
-        A method that must be called for all nodes in the tree as well as inferred nodes.
+        A method that must be called for all nodes in the tree as well as inferred (created) nodes.
         """
         node.parent = parent
         node._parser = self
+
+        # Set '_locals' attribute on scoped nodes only
+        if is_scoped_node(node):
+            if getattr(node, '_locals', None) is None:
+                node._locals = {}
+        
+        # Init instance 'type_info' attribute
+        if isinstance(node, Instance):
+            if getattr(node, 'type_info', None) is None:
+                node._init_type_info()
+        
 
 _default_parser = Parser()
 def parse(source:str, modname:str, is_package:bool=False, **kw:Any) -> _typing.Module:
