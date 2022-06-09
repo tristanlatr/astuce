@@ -7,9 +7,51 @@ import pytest
 
 from astuce import nodes, inference, exceptions
 from astuce.exceptions import InferenceError
-from . import AstuceTestCase
+from . import AstuceTestCase, capture_output, fromtext
+
+class Warns(AstuceTestCase):
+    def test_some_warnings(self) -> None:
+        mod =  self.parse(
+            '''
+            import b
+            class A:...
+
+            [A()]
+            []
+            [] + [A()]
+            [] + b.a + ''
+            '''
+        )
+        # with capture_output() as lines:
+        #     list(mod.body[-2].infer())
+        # assert lines == []
+
+        with capture_output() as lines:
+            mod._report('test')
+        assert lines == ['test:???: test'], lines
+
+        with capture_output() as lines:
+            assert inference.safe_infer(mod.body[-3]).literal_eval() == []
+        assert lines == [], lines
+
+        with capture_output() as lines:
+            inference.safe_infer(mod.body[-4]) is None
+        assert lines == [], lines
+
+        with capture_output() as lines:
+            assert list(mod.body[-1].infer()) == [nodes.Uninferable]          
+        assert len(lines) == 4, lines
+        # TODO: Is warning like this good?
+        # assert all('Uninferable binary operation' in l for l in lines), lines
+
+        with capture_output() as lines:
+            assert list(mod.body[-2].infer()) == [nodes.Uninferable]          
+        assert len(lines) == 1, lines
+        assert "Uninferable operation" in lines[0], lines[0]
+
 
 class InferAttrTest(AstuceTestCase):
+
     def test_infer_local(self) -> None:
         
         code = """
@@ -37,11 +79,11 @@ class InferAttrTest(AstuceTestCase):
         self.assertEqual(inferred[0].literal_eval(), "pouet")   
 
         N = astroid.locals['NoName'][0]
-        self.assertRaises(exceptions.AttributeInferenceError, lambda:list(inference.get_attr(N, "notfound")))
+        self.assertRaises(exceptions.AttributeInferenceError, lambda:inference.get_attr(N, "notfound"))
         self.assertRaises(exceptions.InferenceError, lambda:list(inference.infer_attr(N, "notfound")))
-        self.assertRaises(exceptions.AttributeInferenceError, lambda:list(inference.get_attr(N, "ann")))
+        self.assertRaises(exceptions.AttributeInferenceError, lambda:inference.get_attr(N, "ann"))
         self.assertRaises(exceptions.InferenceError, lambda:list(inference.infer_attr(N, "ann")))
-        self.assertRaises(exceptions.AttributeInferenceError, lambda:list(inference.get_attr(N, "stuff")))
+        self.assertRaises(exceptions.AttributeInferenceError, lambda:inference.get_attr(N, "stuff"))
         self.assertRaises(exceptions.InferenceError, lambda:list(inference.infer_attr(N, "stuff")))
 
         inferred = list(inference.infer_attr(astroid, "test"))
@@ -56,7 +98,7 @@ class InferAttrTest(AstuceTestCase):
 
 class ImportsTests(AstuceTestCase):
     def test_import_simple(self):
-        return NotImplemented
+
         pack = self.parse('''
         def f():...
         ''', modname='pack', is_package=True)
@@ -67,13 +109,20 @@ class ImportsTests(AstuceTestCase):
         ''', modname='pack.subpack')
 
         mod1 = self.parse('''
-        import mod2 
-        import pack.subpack
+        import mod2
 
+        # Importing pack.subpack imports pack also, but not if we use an alias
+        import pack.subpack
+        import pack.subpack as a
+
+        pack
+        a
+        a.C
         mod2.k
         mod2.l
         mod2.m
         pack.subpack.C
+        pack.subpack
         pack.subpack.E
         pack.f
         
@@ -85,16 +134,48 @@ class ImportsTests(AstuceTestCase):
         m = range(10)
         ''', modname='mod2')
 
-        assert list(inference.recursively_infer(mod1.body[-1])) == []
-        assert list(inference.recursively_infer(mod1.body[-2])) == []
-        assert list(inference.recursively_infer(mod1.body[-3])) == []
-        assert list(inference.recursively_infer(mod1.body[-4])) == []
-        assert list(inference.recursively_infer(mod1.body[-5])) == []
-        assert list(inference.recursively_infer(mod1.body[-6])) == []
+        f = list(inference.infer(mod1.locals['pack'][0]))
+        assert f == [pack], f
+        assert nodes.get_origin_module(mod1.locals['a'][0]) == 'pack.subpack'
+        assert nodes.get_origin_module(mod1.locals['pack'][0]) == 'pack'
+
+        # pack.f
+        assert inference.safe_infer(mod1.body[-1])
+
+        # pack.subpack.E (externaly imported name)
+        assert inference.safe_infer(mod1.body[-2]) == None, inference.safe_infer(mod1.body[-2])
+        
+        # pack.subpack
+        with capture_output() as lines:
+            assert subpack == inference.get_attr(pack, 'subpack')[0] == inference.get_attr(pack, 'subpack', ignore_locals=True)[0]
+            assert inference.safe_infer(mod1.body[-3]) == subpack
+        assert lines == [], lines
+
+        # pack.subpack.C
+        assert inference.safe_infer(mod1.body[-4]) == inference.get_attr(subpack, 'C')[0], list(inference.infer(mod1.body[-3]))
+        # mod2.m, we can't infer calls for now.
+        assert list(inference.infer(mod1.body[-5])) == [nodes.Uninferable]
+        # mod2.l
+        assert inference.safe_infer(mod1.body[-6]) == next(inference.infer_attr(mod2, 'l'))
+        # mod2.k
+        assert inference.safe_infer(mod1.body[-7]) == next(inference.infer_attr(mod2, 'k'))
+
+        # a.C
+        with capture_output() as lines:
+            inference.safe_infer(mod1.body[-8]) 
+            #== inference.get_attr(subpack, 'C')[0], inference.safe_infer(mod1.body[-8])
+        assert lines == [], lines
+
+        # # a
+        assert inference.safe_infer(mod1.body[-9]) == subpack
+        
+        # # pack
+        assert inference.safe_infer(mod1.body[-10]) == pack
+        
 
 
     def test_import_from_simple(self):
-        return NotImplemented
+
         pack = self.parse('''
         from .subpack import C, E
         def f():...
@@ -124,15 +205,42 @@ class ImportsTests(AstuceTestCase):
         _m = range(10)
         ''', modname='mod2')
 
-        assert list(inference.recursively_infer(mod1.body[-1])) == []
-        assert list(inference.recursively_infer(mod1.body[-2])) == []
-        assert list(inference.recursively_infer(mod1.body[-3])) == []
-        assert list(inference.recursively_infer(mod1.body[-4])) == []
-        assert list(inference.recursively_infer(mod1.body[-5])) == []
-        assert list(inference.recursively_infer(mod1.body[-6])) == []
+        f = list(inference.infer(mod1.body[-1]))
+        assert f == [pack.body[-1]], f
+        # E
+        assert list(inference.infer(mod1.body[-2])) == [nodes.Uninferable]
+        # C
+        assert list(inference.infer(mod1.body[-3])) == [subpack.body[-1]]
+        
+        # m
+        m = list(inference.infer(mod1.body[-4]))
+        # We can't infer calls at this time.
+        assert m == [nodes.Uninferable], m
+        
+        # l
+        import_alias = mod1.locals['l'][0]
+        assert isinstance(import_alias, ast.alias)
+        assert nodes.get_full_import_name(import_alias) == 'mod2._l', nodes.get_full_import_name(import_alias)
+        assert nodes.get_origin_module(import_alias) == 'mod2', nodes.get_origin_module(import_alias)
+        
+        with capture_output() as lines:
+            inference.safe_infer(import_alias) is not None
+        assert lines == []
+
+        with capture_output() as lines:
+            l = inference.safe_infer(mod1.body[-5])
+        
+        assert lines == []
+        assert l.literal_eval() == ('i', 'j')
+
+        # k
+        assert inference.safe_infer(mod1.body[-6]).literal_eval() == 'fr'
 
     def test_import_cycles(self):
-        ...
+        # TODO
+        # The test is not implemented but the logic inference
+        # should stop and return Uninferable when detecting cycles.
+        return NotImplemented
 
 class SequenceInfenceTests(AstuceTestCase):
     
@@ -154,3 +262,23 @@ class SequenceInfenceTests(AstuceTestCase):
         inferred = list(mod1.body[-1].value.infer())
         assert len(inferred) == 1
         assert inferred[0].literal_eval() == ['f', 'k', 'i', 'j']
+
+class MoreInferenceTests(AstuceTestCase):
+
+    def test_is_BoundMethod(self) -> None:
+        return NotImplemented
+
+        node = self.parse(
+        """
+        class A:
+            def test(self):
+                a = yield
+                while True:
+                    print(a)
+                    yield a
+        a = A()
+        a.test
+        """
+        ).body[-1]
+        inferred = next(node.infer())
+        assert isinstance(inferred, nodes.Method)

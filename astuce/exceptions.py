@@ -1,5 +1,6 @@
 from typing import Any
 
+# TODO: Cleanup expections classes and clarify what is raised in what conditions.
 
 class StaticAnalysisException(Exception):
     """base exception class for all astuce related exceptions
@@ -92,11 +93,3 @@ class AttributeInferenceError(ResolveError):
     def __init__(self, message:str="{attribute!r} not found on {target!r}.", **kws:Any):
         super().__init__(message, **kws)
 
-
-class StaticAnalysisWarning(Warning):
-    ...
-
-class TooManyLevelsError(StaticAnalysisWarning):
-    """
-    Warning class which is used when a relative import was beyond the top-level.
-    """

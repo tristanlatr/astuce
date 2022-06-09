@@ -1,11 +1,12 @@
 
-import ast, sys
+import ast, sys, io
+import logging
 from typing import Any
 from textwrap import dedent
 
 import pytest, unittest
 
-from astuce import nodes, parser, _typing
+from astuce import setup_logger, nodes, parser, _typing
 
 require_version = lambda _v:pytest.mark.skipif(sys.version_info < _v, reason=f"requires python {'.'.join((str(v) for v in _v))}")
 
@@ -43,3 +44,20 @@ class AstuceTestCase(unittest.TestCase):
 
     def parse(self, source:str, modname:str='test', **kw:Any) -> _typing.Module:
         return self.parser.parse(dedent(source), modname, **kw)
+
+_logger = setup_logger(verbose=True)
+
+class capture_output(list):        
+    def __enter__(self):
+        self._stream = io.StringIO()
+        self.handler = logging.StreamHandler(self._stream)
+        self.handler.setLevel(logging.DEBUG)
+        self.handler.setFormatter(logging.Formatter("%(message)s"))
+        _logger.addHandler(self.handler)
+
+        return self
+
+    def __exit__(self, *args):
+        self._stream.flush()
+        self.extend(self._stream.getvalue().splitlines())
+        _logger.removeHandler(self.handler)

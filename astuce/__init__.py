@@ -4,13 +4,44 @@ Some `ast.AST` inference helpers.
 
 import ast
 import inspect
+import logging
+import sys
+from typing import TextIO
 
 from .nodes import ASTNode, Instance
 # from .expressions import Name, Expression
 # from .inference import (parse__all__, get_annotation, get_value, 
 #                         get_name, get_names, get_instance_names)
 
-##### Dynamically path the ast.AST classes.
+##### Logger setup
+
+def setup_logger(
+    *,
+    name: str = 'astuce',
+    verbose: bool = False,
+    quiet: bool = False,
+    stream: TextIO = sys.stdout,
+    format_string: str = "%(message)s",
+    ) -> logging.Logger:
+    """
+    Utility to (re)setup astuce's stream logger.
+    """
+    
+    if verbose: verb_level = logging.DEBUG
+    elif quiet: verb_level = logging.ERROR
+    else: verb_level = logging.INFO
+    
+    std = logging.StreamHandler(stream)
+    std.setLevel(verb_level)
+    std.setFormatter(logging.Formatter(format_string))
+    
+    log = logging.getLogger(name)
+    log.handlers = [std]
+    return log
+
+setup_logger(quiet=True)
+
+##### Dynamically patch the ast.AST classes.
 
 _patched = False
 

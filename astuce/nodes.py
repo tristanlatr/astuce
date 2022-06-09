@@ -2,6 +2,7 @@
 import enum
 from functools import lru_cache
 import functools
+import logging
 import re
 from typing import Any, Callable, Dict, Iterable, Iterator, Optional, Sequence, List, Tuple, Type, Union, cast, TYPE_CHECKING, overload
 import sys
@@ -19,7 +20,7 @@ if sys.version_info < (3, 8):
 else:
     from functools import cached_property  # noqa: WPS440
 
-from .exceptions import LastNodeError, RootNodeError
+from .exceptions import InferenceError, LastNodeError, RootNodeError
 from . import _typing, _astutils
 
 if TYPE_CHECKING:
@@ -387,10 +388,7 @@ class ASTNode:
 
         for assignment in assigns:
             if isinstance(assignment, ast.alias):
-                if isinstance(assignment.parent, ast.ImportFrom):
-                    import_name = get_full_import_name(assignment.parent, top_level_name)
-                else:
-                    import_name = resolve_import_alias(top_level_name, (assignment,))
+                import_name = get_full_import_name(assignment)
                 full_basename = basename.replace(top_level_name, import_name, 1)
                 break
             elif isinstance(assignment, ast.ClassDef):
@@ -427,6 +425,7 @@ class ASTNode:
             parent = parent.parent
     
     def _report(self, descr: str, lineno_offset: int = 0) -> None:
+        # A warning should be triggered only at one place in the code.
         """Log an error or warning about this node object."""
 
         def description(node: ASTNode) -> str:
@@ -448,7 +447,7 @@ class ASTNode:
         else:
             linenumber = '???'
 
-        warnings.warn(f'{description(self)}:{linenumber}: {descr}', category=exceptions.StaticAnalysisWarning)
+        logging.getLogger('astuce').warning(f'{description(self)}:{linenumber}: {descr}')
 
     def parent_of(self, node: 'ASTNode') -> bool:
         """Check if this node is the parent of the given node.
@@ -564,42 +563,75 @@ def get_module_parent(node: _typing.Module) -> Optional[_typing.Module]:
 # ==========================================================
 # relative imports
 
+def get_origin_module(alias:ast.alias) -> str:
+    """
+    Get the origin module fullname from an ast.alias. 
+    This string can be used to retreive the `ast.Module` 
+    instance from the `Parser.modules` dict.
+
+    Note that for static analysis, we don't currently need the submodule information.
+    So imports like::
+        
+        import c.abc
+
+    Will result in 'c' beeing returned.
+
+    But:: 
+    
+        import c.abc as cabc
+    
+    Will result in 'c.abc' beeing returned.
+
+    Import from like::
+
+        # in pack/__init__.py
+        from .x import y
+        # in pack/x.py
+        pass 
+        # if the file is not in the system, it will fail to resolve.
+    
+    Will result in 'pack.x' beeing returned.
+    """
+    if isinstance(alias.parent, ast.ImportFrom):
+        module_name = _get_full_origin_name(alias.parent)
+        return module_name
+    else:
+        if alias.asname is None:
+            return alias.name.split('.')[0]
+        else:
+            return alias.name
+
+def get_full_import_name(alias:ast.alias) -> str:
+    """
+    Get the full path of a name from a ``from .x import y`` or ``import y`` alias.
+
+    Note that for static analysis, we don't currently need the submodule information.
+    So imports like::
+        import c.abc
+
+    Will result in 'c' beeing returned.
+    """
+    origin_module = get_origin_module(alias)
+    if isinstance(alias.parent, ast.ImportFrom):
+        partial_basename = alias.name
+        return "{}.{}".format(origin_module, partial_basename)
+    else:
+        return origin_module
+
 # The MIT License (MIT)
 # Copyright (c) 2015 Read the Docs, Inc
-def get_full_import_name(import_from:ast.ImportFrom, name:str) -> str:
-    """Get the full path of a name from a ``from x import y`` statement.
-    :param import_from: The astroid node to resolve the name of.
-    :param name:
+def _get_full_origin_name(import_from: ast.ImportFrom) -> str:
+    """
+    Get the full path of a name from a ``from .x import y`` alias.
+
+    :param import_from: The node to resolve the name of.
+    :param alias: The alias node
     :returns: The full import path of the name.
     """
-    partial_basename = resolve_import_alias(name, import_from.names)
-
     module_name = import_from.module
     if import_from.level:
         module_name = relative_to_absolute(import_from)
-
-    return "{}.{}".format(module_name, partial_basename)
-
-# The MIT License (MIT)
-# Copyright (c) 2015 Read the Docs, Inc
-def resolve_import_alias(name:str, import_names:Iterable[ast.alias]) -> str:
-    """Resolve a name from an aliased import to its original name.
-    :param name: The potentially aliased name to resolve.
-    :param import_names: The pairs of original names and aliases
-        from the import.
-    :returns: The original name.
-    """
-    resolved_name = name
-
-    for importname in import_names:
-        import_name, imported_as = importname.name, importname.asname
-        if import_name == name:
-            break
-        if imported_as == name:
-            resolved_name = import_name
-            break
-
-    return resolved_name
+    return module_name
 
 def relative_to_absolute(node: ast.ImportFrom) -> str:
     """Convert a relative import path to an absolute one.
@@ -610,6 +642,10 @@ def relative_to_absolute(node: ast.ImportFrom) -> str:
 
     Returns:
         The absolute import path of the module this nodes imports from.
+    
+    Raises:
+        InferenceError: if the import is relative and the module could not 
+            be found in the system.
     """
     modname = node.module
     level = node.level
@@ -624,10 +660,9 @@ def relative_to_absolute(node: ast.ImportFrom) -> str:
                 break
             parent = get_module_parent(parent)
         if parent is None:
-            cast(_typing.ASTNode, node)._report(
-                "relative import level (%d) too high" % node.level,
+            raise InferenceError(
+                "Failed to resolve relative import: {node}", node=node,
                 )
-            return
         if modname is None:
             modname = parent.qname
         else:

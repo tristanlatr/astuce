@@ -39,10 +39,12 @@ def _infer_stmts(
             for inf in stmt.infer(context=context):
                 yield inf
                 inferred = True
-        except exceptions.NameInferenceError:
+        except exceptions.NameInferenceError as e:
             # TODO: Why are we ignoring the name errors here?
+            stmt._report(f"NameInferenceError in _infer_stmts: {e}")
             continue
-        except exceptions.InferenceError:
+        except exceptions.InferenceError as e:
+            stmt._report(f"InferenceError in _infer_stmts: {e}")
             yield nodes.Uninferable
             inferred = True
     if not inferred:
@@ -79,6 +81,7 @@ def infer(self:ASTNodeT, context: OptionalInferenceContext=None) -> InferResult:
     limit = self._parser.max_inferable_values
     for i, result in enumerate(generator):
         if i >= limit or (context.nodes_inferred > context.max_inferred):
+            self._report(f"Too many inference results")
             uninferable = nodes.Uninferable
             results.append(uninferable)
             yield uninferable
@@ -92,56 +95,67 @@ def infer(self:ASTNodeT, context: OptionalInferenceContext=None) -> InferResult:
     context.inferred[self] = tuple(results)
     return
 
-def safe_infer(node, context: OptionalInferenceContext=None) -> Optional[ASTNodeT]:
+def safe_infer(node: ASTNodeT, context: OptionalInferenceContext=None) -> Optional[ASTNodeT]:
     """Return the inferred value for the given node.
 
-    Return None if inference failed or if there is some ambiguity (more than
+    Return None if inference failed, it's Uninfereable or if there is some ambiguity (more than
     one node has been inferred).
     """
     try:
-        inferit = node.infer(context=context)
+        inferit = infer(node, context=context)
         value = next(inferit)
     except (exceptions.InferenceError, StopIteration):
         return None
     try:
         next(inferit)
+        node._report(f"Inference is not safe")
         return None  # None if there is ambiguity on the inferred node
-    except exceptions.InferenceError:
-        return None  # there is some kind of ambiguity
+    except exceptions.InferenceError as e:
+        # there is some kind of ambiguity and the second possible value failed to infer
+        node._report(f"Inference is not safe (and failed): {e}")
+        return None
     except StopIteration:
+        # Since each elements of the list is inferred when inferring a list
+        # uninferable value is inserted when we know there is a value but we can't
+        # figure out informations about it. But for the sake of safe_infer() we 
+        # filter these kind of sequences.
+        if isinstance(value, (ast.Set, ast.Tuple, ast.List)):
+            if any(ele is nodes.Uninferable for ele in value.elts):
+                return None
+        elif value is nodes.Uninferable:
+            return None
         return value
 
-@raise_if_nothing_inferred
-def recursively_infer(node:ASTNodeT, context:OptionalInferenceContext=None) -> InferResult:
-    # From the unpack_infer() function in astroid, except in our case we do not yield inferred elements when the node is a List or Tuple,
-    # we return the inferred list/tuple, which is the excepted behaviour imo. This is also why the function is
-    # named differently in astuce, because it's not designed the same way.
-    """
-    Recursively yield nodes inferred by the given node until the 
-    node infers to self or we reached the Uninferable result.
-    """
-    
-    # if inferred is a final node, return it and stop
-    inferred = next(node.infer(context), nodes.Uninferable)
-    if inferred is node:
-        yield inferred
-        return dict(node=node, context=context)
-    # else, infer recursively, except Uninferable object that should be returned as is
-    for inferred in node.infer(context):
-        if inferred is nodes.Uninferable:
-            yield inferred
-        else:
-            yield from recursively_infer(inferred, context)
+# TODO: Do we really need this? Since the name inference is recursive by default and we infer list elements.
+# @raise_if_nothing_inferred
+# def recursively_infer(node:ASTNodeT, context:OptionalInferenceContext=None) -> InferResult:
+#     # From the unpack_infer() function in astroid, except in our case we do not yield inferred elements when the node is a List or Tuple,
+#     # we return the inferred list/tuple, which is the excepted behaviour imo. This is also why the function is
+#     # named differently in astuce, because it's not designed the same way.
+#     """
+#     Recursively yield nodes inferred by the given node until the 
+#     node infers to self or we reached the Uninferable result.
+#     """
+#     # if inferred is a final node, return it and stop
+#     inferred = next(node.infer(context), nodes.Uninferable)
+#     if inferred is node:
+#         yield inferred
+#         return dict(node=node, context=context)
+#     # else, infer recursively, except Uninferable object that should be returned as is
+#     for inferred in node.infer(context):
+#         if inferred is nodes.Uninferable:
+#             yield inferred
+#         else:
+#             yield from recursively_infer(inferred, context)
+#     return dict(node=node, context=context)
 
-    return dict(node=node, context=context)
-
-def get_submodule(pack:_typing.Module, name:str, context:OptionalInferenceContext=None) -> Optional[ASTNodeT]:
+def get_submodule(pack:_typing.Module, name:str, *, context:OptionalInferenceContext=None) -> Optional[ASTNodeT]:
     try:
         return pack._parser.modules[f"{pack._modname}.{name}"]
     except KeyError:
         return None
 
-def get_attr(ctx: _typing.FrameNodeT, name:str, context:OptionalInferenceContext=None) -> List[ASTNodeT]:
+def get_attr(ctx: _typing.FrameNodeT, name:str, *, ignore_locals:bool=False, context:OptionalInferenceContext=None) -> List[ASTNodeT]:
     """
     Get local attributes definitions matching the name from this frame node.
     """
@@ -152,7 +166,7 @@ def get_attr(ctx: _typing.FrameNodeT, name:str, context:OptionalInferenceContext
     
     assert nodes.is_frame_node(ctx), "use get_attr() only on frame nodes"
     
-    values = ctx.lookup(name)[1]
+    values = ctx.lookup(name)[1] if not ignore_locals else []
 
     if not values and isinstance(ctx, ast.Module) and ctx._is_package:
        # Support for sub-packages.
@@ -180,7 +194,7 @@ def get_attr(ctx: _typing.FrameNodeT, name:str, context:OptionalInferenceContext
 
     raise exceptions.AttributeInferenceError(target=ctx, attribute=name, context=context)
 
-def infer_attr(ctx: ASTNodeT, name:str, context:OptionalInferenceContext=None) -> InferResult:
+def infer_attr(ctx: ASTNodeT, name:str, *, context:OptionalInferenceContext=None) -> InferResult:
     # Adjusted from astroid NodeNG.igetattr() method.
     # But this function cannot infer instance attributes at this time.
     """
@@ -195,7 +209,7 @@ def infer_attr(ctx: ASTNodeT, name:str, context:OptionalInferenceContext=None) -
     context = copy_context(context) if context else ctx._parser._new_context()
 
     try:
-        return _infer_stmts(get_attr(ctx, name, context), context, frame=ctx)
+        yield from _infer_stmts(get_attr(ctx, name, context=context), context, frame=ctx)
     except exceptions.AttributeInferenceError as error:
         raise exceptions.InferenceError(
             str(error), target=ctx, attribute=name, context=context
@@ -248,7 +262,7 @@ def _infer_name(self:ast.Name, context:OptionalInferenceContext=None) -> InferRe
 def _raise_no_infer_method(node:ASTNodeT, context: OptionalInferenceContext) -> InferResult:
     """we don't know how to resolve a statement by default"""
     raise exceptions.InferenceError(
-        "No inference function for node {nodetype!r}. Context: {context!r}", nodetype=node.__class__.__name__, context=context
+        "No inference function for node {nodetype!r}.", nodetype=node.__class__.__name__, context=context
     )
 
 _globals = globals()
@@ -294,17 +308,22 @@ def _infer_Name(node:ASTNodeT, context: OptionalInferenceContext) -> InferResult
 
 @path_wrapper
 @raise_if_nothing_inferred
-def _infer_Attribute(node:ASTNodeT, context: OptionalInferenceContext) -> InferResult:
-    yield nodes.Uninferable
-    # We dont't support attribute inference right now.
-    # if nodes.is_assign_name(node):
-    #     return
-    # elif nodes.is_del_name(node):
-    #     return
-    # else:
-    #     return #_infer_name(node, context)
+def _infer_Attribute(node:_typing.Attribute, context: OptionalInferenceContext) -> InferResult:
+
+    for owner in node.value.infer(context):
+        if owner is nodes.Uninferable:
+            node._report(f"Uninferable attribute left side: {node.value}")
+
+            yield owner
+            continue
+
+        context = copy_context(context, node._parser._inference_cache)
+        yield from infer_attr(owner, node.attr, context=context)
+        
+    return dict(node=node, context=context)
 
 # frame nodes infers to self, it's the end of the inference.
+_infer_Module = _infer_end
 _infer_ClassDef = _infer_end
 _infer_Lambda = _infer_end
 _infer_FunctionDef = _infer_end
@@ -380,9 +399,9 @@ def _infer_sequence_helper(node:Union[_typing.Tuple, _typing.List, _typing.Set],
             values.append(value)
         else:
             if infer_all_elements:
-                value = safe_infer(elt, context)
-                if not value:
-                    raise exceptions.InferenceError(node=node, context=context)
+                # This part might change is the future, astroid behaved differently for some reason
+                # TODO: Create an issue to gather more informations about this.
+                value = safe_infer(elt, context) or nodes.Uninferable
                 values.append(value)
             else:
                 values.append(elt)
@@ -466,6 +485,7 @@ def _invoke_binop_inference(left: ASTNodeT, opnode: Union[_typing.BinOp, _typing
         literal_right = right.literal_eval()
     except ValueError:
         # Unlike astroid, we can't infer binary operations on nodes that can't be evaluated as literals.
+        opnode._report(f"Uninferable operation: lhs={left}, rhs={right}")
         yield nodes.Uninferable
         return
     try:
@@ -500,6 +520,7 @@ def _infer_BinOp(self: _typing.BinOp, context: OptionalInferenceContext) -> Infe
     for lhs, rhs in itertools.product(lhs_iter, rhs_iter):
         if any(value is nodes.Uninferable for value in (rhs, lhs)):
             # Don't know how to process this.
+            self._report(f"Uninferable binary operation: lhs={lhs}, rhs={rhs}")
             yield nodes.Uninferable
             return
 
@@ -516,6 +537,7 @@ def _infer_lhs(node: ast.expr, context:InferenceContext) -> InferResult:
         yield from _infer_name(node, context)
     else:
         # TODO: we could support Attribute and Subscript nodes in the future
+        node._report(f"Uninferable left hand side: {node.__class__.__name__!r} nodes are supported at the moment")
         yield nodes.Uninferable
 
 @raise_if_nothing_inferred
@@ -527,14 +549,13 @@ def _infer_AugAssign(self:_typing.AugAssign, context: OptionalInferenceContext=N
     rhs_context = copy_context(context)
     lhs_iter = list(_infer_lhs(self.target, context=lhs_context))
     rhs_iter = list(self.value.infer(context=rhs_context)) # type:ignore[attr-defined]
-    # print(f'_infer_AugAssign left: {lhs_iter}, right: {rhs_iter}', file=sys.stderr)
 
     for lhs, rhs in itertools.product(lhs_iter, rhs_iter):
         if any(value is nodes.Uninferable for value in (rhs, lhs)):
             # Don't know how to process this.
+            self._report(f"Uninferable augmented assigment: lhs={lhs}, rhs={rhs}")
             yield nodes.Uninferable
             return
-        
 
         yield from _invoke_binop_inference(lhs, self, self.op, rhs, rhs_context)
         
@@ -542,8 +563,31 @@ def _infer_AugAssign(self:_typing.AugAssign, context: OptionalInferenceContext=N
 def _infer_Expr(self:_typing.Expr, context: OptionalInferenceContext=None) -> InferResult:
     return self.value.infer(context=context) # type:ignore[attr-defined, no-any-return]
 
+@raise_if_nothing_inferred
+@path_wrapper
 def _infer_alias(self:_typing.alias, context: OptionalInferenceContext=None) -> InferResult:
-    ...
+    modname = nodes.get_origin_module(self)
+    try:
+        ast_mod = self._parser.modules[modname]
+    except KeyError:
+        # we don't have this module in the system
+        self._report(f"No module named {modname!r} in the system")
+        yield nodes.Uninferable
+        return
+
+    if isinstance(self.parent, ast.ImportFrom):
+        asname = self.name
+        try:
+            context = copy_context(context, self._parser._inference_cache)
+            stmts = get_attr(ast_mod, asname, ignore_locals=ast_mod is self.root)
+            yield from _infer_stmts(stmts, context)
+        except exceptions.AttributeInferenceError as error:
+            raise exceptions.InferenceError(
+                str(error), target=self, attribute=asname, context=context
+            ) from error
+    else:
+        yield ast_mod
+
 
 # def _infer_Subscript(self:_typing.Subscript, context: OptionalInferenceContext=None) -> InferResult:
 #     yield

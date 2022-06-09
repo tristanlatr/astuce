@@ -122,8 +122,26 @@ class _AstuceModuleVisitor(ast.NodeVisitor):
     def visit_Import(self, node: _typing.Import) -> None:
         # save import names in parent's locals:
         for a in node.names:
-            name = a.asname or a.name
-            # TODO: Why the split() exactly?
+            
+            # When ``import x.y``, we don't need the `.y` part
+            # It's currently sufficient to track the information
+            # TODO: 
+            # by confusing ``x.y`` with ``x``,
+            # we might not be able to detect some AttributeError:
+            
+            # >>> import collections
+            # >>> collections.abc.Sized
+            # Traceback (most recent call last):
+            # File "<stdin>", line 1, in <module>
+            # File "/collections/__init__.py", line 55, in __getattr__
+            #     raise AttributeError(f'module {__name__!r} has no attribute {name!r}')
+            # AttributeError: module 'collections' has no attribute 'abc'
+            
+            # With the current design we 
+            # cannot track whether the abc module has been imported
+            # explicitely or only accessed like an attribute.
+
+            name = a.asname or a.name 
             _set_local(node.parent, name.split(".")[0], a)
         self.generic_visit(node)
 
@@ -181,13 +199,14 @@ class Parser:
 
         self._inference_cache: _context._InferenceCache = {}
         """
-        Inferred node contexts to their mapped results
+        Inferred node contexts to their mapped results.
 
-        Currently the key is ``(node, lookupname, callcontext, boundnode)``
-        and the value is tuple of the inferred results
+        The keys are nodes and the value is tuple of the inferred results.
 
         :see: `InferenceContext._cache`
         """
+        # Since astuce in not inter-procedural, like astroid, we don't have 
+        # to use the boundnode, callcontext, ect 
     
     @lru_cache
     def unparse(self, node: ast.AST) -> str:
