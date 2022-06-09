@@ -1,15 +1,18 @@
-import builtins
-import contextlib
+
 import enum
 from functools import lru_cache
 import functools
+import logging
 import re
 from typing import Any, Callable, Dict, Iterable, Iterator, Optional, Sequence, List, Tuple, Type, Union, cast, TYPE_CHECKING, overload
 import sys
 import ast
 from ast import AST
+import warnings
 
 import attr
+
+from astuce import exceptions, _lookup
 
 # TODO: remove once Python 3.7 support is dropped
 if sys.version_info < (3, 8):
@@ -17,14 +20,12 @@ if sys.version_info < (3, 8):
 else:
     from functools import cached_property  # noqa: WPS440
 
-from .exceptions import LastNodeError, RootNodeError
+from .exceptions import InferenceError, LastNodeError, RootNodeError
 from . import _typing, _astutils
 
 if TYPE_CHECKING:
     from .parser import Parser
     from ._context import OptionalInferenceContext
-
-_builtins_names = dir(builtins)
 
 @object.__new__
 class Uninferable:
@@ -49,7 +50,8 @@ class Uninferable:
 
 
 class ASTNode:
-    """This class is dynamically added to the bases of each AST node class.
+    """
+    This class is dynamically added to the bases of each AST node class.
     
     :var lineno: 
         - Modules lineno -> 0
@@ -106,37 +108,6 @@ class ASTNode:
         assert is_scoped_node(self), "use 'locals' only on scoped nodes"
         return self._locals
     
-    def _set_local(self, name:str, node:'ast.AST') -> None:
-        """Define that the given name is declared in the given statement node.
-
-        .. seealso:: `scope`
-
-        :param name: The name that is being defined.
-        :type name: str
-
-        :param node: The node that defines the given name (i.e ast.Name objects).
-        :type node: ASTNode
-        """
-        if isinstance(self, ast.NamedExpr):
-            return self.frame._set_local(name, node)
-        if not is_scoped_node(self):
-            return self.parent._set_local(name, node)
-
-        # nodes that can be stored in the locals dict
-        LOCALS_ASSIGN_NAME_NODES = (ast.ClassDef, 
-                                    ast.FunctionDef, 
-                                    ast.AsyncFunctionDef, 
-                                    ast.Name, 
-                                    ast.arg, 
-                                    ast.Import, 
-                                    ast.ImportFrom) 
-            # ast.Attribute not supported at the moment, 
-            # analysing assigments outside out the scope needs more work.
-        
-        assert isinstance(node, LOCALS_ASSIGN_NAME_NODES), f"cannot set {node} as local"
-        assert not node in self.locals.get(name, ()), (self, node)
-        self.locals.setdefault(name, []).append(node) # type:ignore[arg-type]
-
     # TODO: remove once Python 3.7 support is dropped
     if sys.version_info < (3, 8):  # noqa: WPS604
         end_lineno = property(lambda node: None)
@@ -413,18 +384,11 @@ class ASTNode:
 
         top_level_name = re.sub(r"\(.*\)", "", basename).split(".", 1)[0]
 
-        try:
-            assigns = self.lookup(top_level_name)[1]
-        except LookupError: # lookup() does not raise LookupError anymore, but maybe it should?
-            assigns = []
+        assigns = self.lookup(top_level_name)[1]
 
         for assignment in assigns:
-            if isinstance(assignment, ast.ImportFrom):
-                import_name = get_full_import_name(assignment, top_level_name)
-                full_basename = basename.replace(top_level_name, import_name, 1)
-                break
-            elif isinstance(assignment, ast.Import):
-                import_name = resolve_import_alias(top_level_name, assignment.names)
+            if isinstance(assignment, ast.alias):
+                import_name = get_full_import_name(assignment)
                 full_basename = basename.replace(top_level_name, import_name, 1)
                 break
             elif isinstance(assignment, ast.ClassDef):
@@ -459,6 +423,31 @@ class ASTNode:
         while parent is not None:
             yield parent
             parent = parent.parent
+    
+    def _report(self, descr: str, lineno_offset: int = 0) -> None:
+        # A warning should be triggered only at one place in the code.
+        """Log an error or warning about this node object."""
+
+        def description(node: ASTNode) -> str:
+            """A string describing our source location to the user.
+
+            If this module's code was read from a file, this returns
+            its file path. In other cases, such as during unit testing,
+            the full module name is returned.
+            """
+            source_path = node.root._filename
+            return node.root.qname if source_path is None else str(source_path)
+
+        linenumber: object
+        linenumber = self.lineno
+        if linenumber:
+            linenumber += lineno_offset
+        elif lineno_offset and self.parent is None:
+            linenumber = lineno_offset
+        else:
+            linenumber = '???'
+
+        logging.getLogger('astuce').warning(f'{description(self)}:{linenumber}: {descr}')
 
     def parent_of(self, node: 'ASTNode') -> bool:
         """Check if this node is the parent of the given node.
@@ -500,110 +489,7 @@ class ASTNode:
             given name according to the scope node where it has been found.
         :returntype: tuple[ASTNode, List[_typing.LocalsAssignT]]
         """
-        if is_scoped_node(self):
-            return self._scope_lookup(self, name, offset=offset)
-        return self.scope._scope_lookup(self, name, offset=offset)
-
-    # TODO: Move the lookup logic into it's own module.
-    def _scope_lookup(self, node: 'ASTNode', name:str, offset:int=0) -> Tuple['_typing.ASTNode', List['_typing.ASTNode']]:
-        if isinstance(self, ast.Module):
-            return self._module_lookup(node, name, offset)
-        elif isinstance(self, (ast.FunctionDef, ast.AsyncFunctionDef)):
-            return self._function_lookup(node, name, offset)
-        elif isinstance(self, ast.ClassDef):
-            return self._class_lookup(node, name, offset)
-        else:
-            return self._base_scope_lookup(node, name, offset)
-    
-    def _module_lookup(self, node: 'ASTNode', name:str, offset:int=0) -> Tuple['_typing.ASTNode', List['_typing.ASTNode']]:
-        # TODO: Handle {"__name__", "__doc__", "__file__", "__path__", "__package__"}
-        """The names of module attributes available through the global scope."""
-
-        return self._base_scope_lookup(node, name, offset)
-
-    def _class_lookup(self, node: 'ASTNode', name:str, offset:int=0) -> Tuple['_typing.ASTNode', List['_typing.ASTNode']]:
-        # TODO: Handle __module__, __qualname__,
-        assert isinstance(self, ast.ClassDef)
-
-        # If the name looks like a builtin name, just try to look
-        # into the upper scope of this class. We might have a
-        # decorator that it's poorly named after a builtin object
-        # inside this class.
-        lookup_upper_frame = (
-            node.parent.locate_child(node)[0] == 'decorator_list'
-            and name in _builtins_names
-        )
-        if (
-            any(node == base or cast(ASTNode, base).parent_of(node) for base in self.bases)
-            or lookup_upper_frame
-        ):
-            # Handle the case where we have either a name
-            # in the bases of a class, which exists before
-            # the actual definition or the case where we have
-            # a Getattr node, with that name.
-            #
-            # name = ...
-            # class A(name):
-            #     def name(self): ...
-            #
-            # import name
-            # class A(name.Name):
-            #     def name(self): ...
-
-            frame:_typing.FrameNodeT = self.parent.frame
-            # line offset to avoid that class A(A) resolve the ancestor to
-            # the defined class
-            offset = -1
-        else:
-            frame = cast(_typing.ClassDef, self)
-        return frame._base_scope_lookup(node, name, offset)
-
-    def _function_lookup(self, node: 'ASTNode', name:str, offset:int=0) -> Tuple['_typing.ASTNode', List['_typing.ASTNode']]:
-        assert isinstance(self, (ast.FunctionDef, ast.AsyncFunctionDef))
-        
-        if name == "__class__":
-            # __class__ is an implicit closure reference created by the compiler
-            # if any methods in a class body refer to either __class__ or super.
-            # In our case, we want to be able to look it up in the current scope
-            # when `__class__` is being used.
-            frame = self.parent.frame
-            if isinstance(frame, ast.ClassDef):
-                return self, [frame] # type:ignore[return-value, list-item]
-
-        if node in self.args.defaults or node in self.args.kw_defaults:
-            frame = self.parent.frame
-            # line offset to avoid that def func(f=func) resolve the default
-            # value to the defined function
-            offset = -1
-        else:
-            # check this is not used in function decorators
-            frame = self # type:ignore
-        return frame._base_scope_lookup(node, name, offset)
-
-    def _base_scope_lookup(self, node: 'ASTNode', name:str, offset:int=0) -> Tuple['_typing.ASTNode', List['_typing.ASTNode']]:
-        """XXX method for interfacing the scope lookup"""
-
-        from .filter_statements import filter_stmts # workaround cyclic imports.
-
-        try:
-            stmts = filter_stmts(node, self.locals[name], self, offset)
-        except KeyError:
-            stmts = []
-        if stmts:
-            return self, stmts
-
-        # Handle nested scopes: since class names do not extend to nested
-        # scopes (e.g., methods), we find the next enclosing non-class scope
-        pscope = self.parent and self.parent.scope
-        while pscope is not None:
-            if not isinstance(pscope, ast.ClassDef):
-                return pscope._scope_lookup(node, name)
-            pscope = pscope.parent and pscope.parent.scope
-        
-        # self is at the top level of a module, and we couldn't find references to this name
-        return (node, []) #type:ignore[unreachable]
-        # NameInferenceError is raised by callers.
-        # raise LookupError(f"couldn't find references to {name!r}")
+        return _lookup.lookup(self, name, offset)
     
     def infer_name(self, name:str) -> Iterator['ASTNode']:
         # TODO
@@ -661,7 +547,7 @@ def is_scoped_node(node: 'ASTNode') -> bool:
                              ast.GeneratorExp, ast.DictComp, ast.SetComp, ast.ListComp, ast.Lambda))
 
 
-def get_module_package(node: _typing.Module) -> Optional[_typing.Module]:
+def get_module_parent(node: _typing.Module) -> Optional[_typing.Module]:
     """
     Returns the parent package of this module or `None` if not found. 
 
@@ -677,42 +563,75 @@ def get_module_package(node: _typing.Module) -> Optional[_typing.Module]:
 # ==========================================================
 # relative imports
 
+def get_origin_module(alias:ast.alias) -> str:
+    """
+    Get the origin module fullname from an ast.alias. 
+    This string can be used to retreive the `ast.Module` 
+    instance from the `Parser.modules` dict.
+
+    Note that for static analysis, we don't currently need the submodule information.
+    So imports like::
+        
+        import c.abc
+
+    Will result in 'c' beeing returned.
+
+    But:: 
+    
+        import c.abc as cabc
+    
+    Will result in 'c.abc' beeing returned.
+
+    Import from like::
+
+        # in pack/__init__.py
+        from .x import y
+        # in pack/x.py
+        pass 
+        # if the file is not in the system, it will fail to resolve.
+    
+    Will result in 'pack.x' beeing returned.
+    """
+    if isinstance(alias.parent, ast.ImportFrom):
+        module_name = _get_full_origin_name(alias.parent)
+        return module_name
+    else:
+        if alias.asname is None:
+            return alias.name.split('.')[0]
+        else:
+            return alias.name
+
+def get_full_import_name(alias:ast.alias) -> str:
+    """
+    Get the full path of a name from a ``from .x import y`` or ``import y`` alias.
+
+    Note that for static analysis, we don't currently need the submodule information.
+    So imports like::
+        import c.abc
+
+    Will result in 'c' beeing returned.
+    """
+    origin_module = get_origin_module(alias)
+    if isinstance(alias.parent, ast.ImportFrom):
+        partial_basename = alias.name
+        return "{}.{}".format(origin_module, partial_basename)
+    else:
+        return origin_module
+
 # The MIT License (MIT)
 # Copyright (c) 2015 Read the Docs, Inc
-def get_full_import_name(import_from:ast.ImportFrom, name:str) -> str:
-    """Get the full path of a name from a ``from x import y`` statement.
-    :param import_from: The astroid node to resolve the name of.
-    :param name:
+def _get_full_origin_name(import_from: ast.ImportFrom) -> str:
+    """
+    Get the full path of a name from a ``from .x import y`` alias.
+
+    :param import_from: The node to resolve the name of.
+    :param alias: The alias node
     :returns: The full import path of the name.
     """
-    partial_basename = resolve_import_alias(name, import_from.names)
-
     module_name = import_from.module
     if import_from.level:
         module_name = relative_to_absolute(import_from)
-
-    return "{}.{}".format(module_name, partial_basename)
-
-# The MIT License (MIT)
-# Copyright (c) 2015 Read the Docs, Inc
-def resolve_import_alias(name:str, import_names:Iterable[ast.alias]) -> str:
-    """Resolve a name from an aliased import to its original name.
-    :param name: The potentially aliased name to resolve.
-    :param import_names: The pairs of original names and aliases
-        from the import.
-    :returns: The original name.
-    """
-    resolved_name = name
-
-    for importname in import_names:
-        import_name, imported_as = importname.name, importname.asname
-        if import_name == name:
-            break
-        if imported_as == name:
-            resolved_name = import_name
-            break
-
-    return resolved_name
+    return module_name
 
 def relative_to_absolute(node: ast.ImportFrom) -> str:
     """Convert a relative import path to an absolute one.
@@ -723,6 +642,10 @@ def relative_to_absolute(node: ast.ImportFrom) -> str:
 
     Returns:
         The absolute import path of the module this nodes imports from.
+    
+    Raises:
+        InferenceError: if the import is relative and the module could not 
+            be found in the system.
     """
     modname = node.module
     level = node.level
@@ -735,12 +658,11 @@ def relative_to_absolute(node: ast.ImportFrom) -> str:
         for _ in range(level):
             if parent is None:
                 break
-            parent = get_module_package(parent)
+            parent = get_module_parent(parent)
         if parent is None:
-            cast(_typing.ASTNode, node)._parser._report(node,
-                "relative import level (%d) too high" % node.level,
+            raise InferenceError(
+                "Failed to resolve relative import: {node}", node=node,
                 )
-            return
         if modname is None:
             modname = parent.qname
         else:
@@ -750,32 +672,6 @@ def relative_to_absolute(node: ast.ImportFrom) -> str:
         assert modname is not None
     
     return modname
-
-#   Copyright 2006-2008 Michael Hudson <mwh@python.net>
-#   Copyright 2006-2020 Pydoctor contributors
-
-@overload
-def node2dottedname(node: Union[ast.Attribute, ast.Name]) -> List[str]: ...
-@overload
-def node2dottedname(node: Optional[ast.expr], strict:bool=False) -> Optional[List[str]]:...
-def node2dottedname(node: Optional[ast.expr], strict:bool=False) -> Optional[List[str]]:
-    """
-    Resove expression composed by `ast.Attribute` and `ast.Name` nodes to a list of names. 
-    :note: Supports variants `AssignAttr` and `AssignName`.
-    :note: Strips the subscript slice, i.e. `Generic[T]` -> `Generic`, except if scrict=True.
-    """
-    parts = []
-    if isinstance(node, ast.Subscript) and not strict:
-        node = node.value
-    while isinstance(node, (ast.Attribute)):
-        parts.append(node.attr)
-        node = node.value
-    if isinstance(node, (ast.Name)):
-        parts.append(node.id)
-    else:
-        return None
-    parts.reverse()
-    return parts
 
 
 @attr.s(auto_attribs=True)

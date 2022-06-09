@@ -2,7 +2,10 @@ from __future__ import annotations
 
 import ast
 from typing import List, Optional, Tuple, Union
-from .nodes import ASTNode, is_assign_name, is_del_name
+from .nodes import ASTNode, is_assign_name, is_del_name 
+# TODO: we don't actaully need to import ASTNode here and is_assign_name, is_del_name should go into new module
+# This avoid to have import this module from within the function in _lookup.py.
+
 from ._typing import ASTstmt, LocalsAssignT, Module as ASTModuleT
 """
 This module contains the code adjusted from astroid to filter statements. 
@@ -43,7 +46,7 @@ ASSIGNMENT_NODES = ( ast.arguments, ast.Delete,
 # nodes that do not directly assigns a value to a name, but parent is maybe.
 # the following expression can appear in assignment context:
 PARENT_ASSIGNMENT_NODES = (ast.Name, ast.Attribute, ast.arg, ast.List, 
-                           ast.Tuple, ast.Set, ast.Starred)
+                           ast.Tuple, ast.Set, ast.Starred, ast.alias)
 
 # isinstance(self, ast.AssignAttr, ast.AssignName, ast.DelAttr, ast.DelName, ast.node_classes.BaseContainer, ast.Starred
         # , ast.AnnAssign, ast.Arguments, ast.Assign, ast.AugAssign, ast.Delete, ast.ExceptHandler, ast.For, ast.MatchAs, 
@@ -185,7 +188,7 @@ def _get_filtered_stmts(self: 'ASTNode', base_node: 'ASTNode', node: 'ASTNode', 
         return _comprehension_get_filtered_stmts(self, base_node, node, _stmts, mystmt)
     elif isinstance(self, ASSIGNMENT_NODES) or isinstance(self, PARENT_ASSIGNMENT_NODES):
         return _assign_type_get_filtered_stmts(self, base_node, node, _stmts, mystmt)
-    assert False, f"Can't use _get_filtered_stmts on {self.__class__.__name__}"
+    assert False, f"statement not supported: {self.__class__.__name__}"
 
 def _filter_statement_get_filtered_stmts(self: 'ASTNode', _:'ASTNode', node: 'ASTNode', _stmts:List['ASTNode'], mystmt:Optional['ASTNode']) -> Tuple[List['ASTNode'], bool]:
     # from astroid FilterStmtsMixin

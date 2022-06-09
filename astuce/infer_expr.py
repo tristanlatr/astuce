@@ -1,4 +1,8 @@
-"""This module contains utilities for extracting information from nodes."""
+"""
+This module contains utilities for extracting higher level information from expression nodes.
+
+This was initially part of `griffe <https://github.com/mkdocstrings/griffe>`_.
+"""
 
 # Definition of 'Looking-up':
 # Looking up is the action of determining where a given name is beeing referenced, exluding ignorable statements.
@@ -23,7 +27,7 @@ import ast
 from ast import AST
 
 from functools import partial
-from typing import Any, Callable, Type
+from typing import Any, Callable, Optional, Type
 
 logger = logging.getLogger(__name__)
 
@@ -38,78 +42,40 @@ def _join(sequence: list[str | Name| Expression], item:str) -> list[str | Name| 
         new_sequence.extend((item, element))
     return new_sequence
 
-
-def _parse__all__constant(node: ast.Constant) -> list[str]:
-    try:
-        return [node.value]
-    except AttributeError:
-        return [node.s]  # TODO: remove once Python 3.7 is dropped
-
-
-def _parse__all__name(node: ast.Name) -> list[Name]:
-    assert isinstance(node, ASTNode)
-    return [Name(node.id, partial(node.scope.resolve, node.id))]
-
-
-def _parse__all__starred(node: ast.Starred) -> list[str | Name]:
-    return _parse__all__(node.value)
-
-
-def _parse__all__sequence(node: ast.List | ast.Set | ast.Tuple,) -> list[str | Name]:
-    sequence = []
-    for elt in node.elts:
-        sequence.extend(_parse__all__(elt))
-    return sequence
-
-
-def _parse__all__binop(node: ast.BinOp) -> list[str | Name]:
-    left = _parse__all__(node.left)
-    right = _parse__all__(node.right)
-    return left + right
-
-
-_node__all__map: dict[Type[Any], Callable[[Any], list[str | Name]]] = {  # noqa: WPS234
-    ast.Constant: _parse__all__constant,  # type: ignore[dict-item]
-    ast.Name: _parse__all__name,  # type: ignore[dict-item]
-    ast.Starred: _parse__all__starred,
-    ast.List: _parse__all__sequence,
-    ast.Set: _parse__all__sequence,
-    ast.Tuple: _parse__all__sequence,
-    ast.BinOp: _parse__all__binop,
-}
-
-# TODO: remove once Python 3.7 support is dropped
-if sys.version_info < (3, 8):
-
-    def _parse__all__nameconstant(node: ast.NameConstant) -> list[Name]:
-        return [node.value]
-
-    def _parse__all__str(node: ast.Str) -> list[str]:
-        return [node.s]
-
-    _node__all__map[ast.NameConstant] = _parse__all__nameconstant
-    _node__all__map[ast.Str] = _parse__all__str 
-
-
-def _parse__all__(node: AST) -> list[str | Name]:
-    return _node__all__map[type(node)](node)
-
-
-def parse__all__(node: ast.Assign | ast.AugAssign) -> list[str | Name]:  # noqa: WPS120,WPS440
-    """Get the values declared in `__all__`.
-
-    Parameters:
-        node: The assignment node.
-
-    Returns:
-        A set of names.
+# This function is probably a dirty hack...
+def _full(expr: str | Name| Expression, 
+          parent:Optional[str | Name| Expression]=None, 
+          new_parent:Optional[str | Name| Expression]=None) -> Optional[str | Name| Expression]:
     """
-    try:
-        return _parse__all__(node.value)
-    except KeyError as error:
-        logger.debug(f"Cannot parse __all__ assignment: {node.value.unparse()} ({error})") # type:ignore[attr-defined]
-        return []
-
+    Convert this expression such that all names are using their full version. Keeps the leaf names only.
+    """
+    if isinstance(expr, str):
+        if expr=='.' and isinstance(new_parent, Expression):
+            try:
+                if not isinstance(new_parent[-1], Name):
+                    return None # ignore 
+            except IndexError:
+                return None # ignore 
+        return expr
+    elif isinstance(expr, Name):
+        if isinstance(parent, Expression):
+            index = parent.index(expr) # could raise error?
+            try:
+                dot = parent[index+1] # The '.' counts as an element
+                attr = parent[index+2]
+            except IndexError:
+                pass
+            else:
+                if dot=='.' and isinstance(attr, Name):
+                    return None # ignore the current name 'expr' since it will resolved by it's attribute.
+        return Name(expr.full, expr.full)
+    elif isinstance(expr, Expression):
+        new_expr = Expression()
+        for e in expr:
+            fuller_expr = _full(e, expr, new_parent=new_expr)
+            if fuller_expr:
+                new_expr.append(fuller_expr)
+        return new_expr
 
 # ==========================================================
 # annotations
@@ -186,7 +152,7 @@ def _get_list_annotation(node: ast.List) -> Expression:
 
 def _get_name_annotation(node: ast.Name) -> Name:
     assert isinstance(node, ASTNode)
-    return Name(node.id, partial(node.scope.resolve, node.id))
+    return Name(node.id, partial(node.resolve, node.id))
 
 
 def _get_subscript_annotation(node: ast.Subscript) -> Expression:

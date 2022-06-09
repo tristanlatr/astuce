@@ -6,18 +6,19 @@ from textwrap import dedent
 from typing import Iterator, Tuple
 import pytest
 
-from astuce import parser, nodes
+from astuce import expressions, parser, nodes, infer_expr
 from . import AstuceTestCase, fromtext
 
 @pytest.mark.parametrize(
         ("source", "expected"), 
-        [("var: typing.Generic[T]", "typing.Generic -> typing.Generic"), 
-        ("var: typing.Generic[T, _KV]", "typing.Generic -> typing.Generic"),
-        ("from typing import Generic\nvar: Generic[T]", "Generic -> typing.Generic"),
-        ("from pydocspec import _model as m\nvar: m.TreeRoot[T]", "m.TreeRoot -> pydocspec._model.TreeRoot"),
-        ("var: dict[str, str]", "dict -> dict"),]
+        [("import typing as t;var: t.Generic", "t.Generic -> typing.Generic"), 
+         ("from typing import Generic as G;var: G", "G -> typing.Generic"),
+        ("from typing import Generic\nvar: Generic[T]", "Generic[T] -> typing.Generic[T]"),
+        ("from pydocspec import _model as m\nvar: m.TreeRoot[T]", "m.TreeRoot[T] -> pydocspec._model.TreeRoot[T]"),
+        ("var: dict[str, str]", "dict[str, str] -> dict[str, str]"),
+        ]
     )
-def test_node2fullname_nodes(source:str, expected:str) -> None:
+def test_infer_expr(source:str, expected:str) -> None:
 
     mod = fromtext(source)
     var = mod.locals['var'][0]
@@ -25,9 +26,11 @@ def test_node2fullname_nodes(source:str, expected:str) -> None:
     annassing = var.parent
     assert isinstance(annassing, ast.AnnAssign)
     ann = annassing.annotation
-    dottedname = '.'.join(nodes.node2dottedname(ann))
+    expr = infer_expr.get_annotation(ann)
 
-    assert f"{dottedname} -> {ann.resolve(dottedname)}" == expected
+    assert isinstance(expr, (expressions.Name, expressions.Expression))
+    assert f"{ann.unparse()} -> {infer_expr._full(expr)}" == expected
+    
 
 class ResolveTest(AstuceTestCase):
 

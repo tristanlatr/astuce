@@ -2,7 +2,8 @@ import ast
 import functools
 from typing import List
 
-from astuce import exceptions, nodes, helpers
+from astuce import exceptions, inference, nodes, helpers
+from astuce.filter_statements import are_exclusive
 from .test_nodes import CODE_IF_BRANCHES_STATEMENTS
 from . import AstuceTestCase, require_version
 from astuce._typing import ASTNode as ASTNodeT
@@ -12,7 +13,7 @@ class LookupTest(AstuceTestCase):
 
         mod = self.parse(CODE_IF_BRANCHES_STATEMENTS)
         
-        assert mod.lookup('List') == (mod, [mod.body[0]])
+        assert mod.lookup('List') == (mod, [mod.body[0].names[0]])
         
         assert mod.lookup('var_maybe_unbound') == (mod, [mod.body[1].body[1].targets[0]])
         
@@ -375,25 +376,6 @@ class LookupTest2(AstuceTestCase):
     #     self.assertIsInstance(gener.getattr("send")[0], nodes.FunctionDef)
     #     self.assertIsInstance(gener.getattr("throw")[0], nodes.FunctionDef)
     #     self.assertIsInstance(gener.getattr("close")[0], nodes.FunctionDef)
-
-    def test_explicit___name__(self) -> None:
-        return NotImplemented
-
-        code = """
-            class Pouet:
-                __name__ = "pouet"
-            
-            class NoName: 
-                pass
-        """
-        astroid = self.parse(code)
-        P = astroid.locals['Pouet'][0]
-        inferred = list(P.infer_name("__name__"))
-        assert len(inferred) == 1
-        self.assertEqual(inferred[0].literal_eval(), "pouet")   
-
-        N = astroid.locals['NoName'][0]
-        self.assertRaises(exceptions.AttributeInferenceError, lambda:list(N.infer_name("__name__")))
 
     # Not in scope right now.
     # def test_function_module_special(self) -> None:
@@ -1024,3 +1006,86 @@ class LookupControlFlowTest(AstuceTestCase):
         _, stmts = x_name.lookup("x")
         self.assertEqual(len(stmts), 1)
         self.assertEqual(stmts[0].lineno, 8)
+
+# Licensed under the LGPL: https://www.gnu.org/licenses/old-licenses/lgpl-2.1.en.html
+# For details: https://github.com/PyCQA/astroid/blob/main/LICENSE
+# Copyright (c) https://github.com/PyCQA/astroid/blob/main/CONTRIBUTORS.txt
+
+class TestAreExclusive(AstuceTestCase):
+    def test_not_exclusive(self) -> None:
+        module = self.parse(
+            """
+        x = 10
+        for x in range(5):
+            print (x)
+
+        if x > 0:
+            print ('#' * x)
+        """)
+        xass1 = module.locals["x"][0]
+        assert xass1.lineno == 2
+        xnames = get_load_names(module, "x")
+        assert len(xnames) == 3
+        assert xnames[1].lineno == 6
+        self.assertEqual(are_exclusive(xass1, xnames[1]), False)
+        self.assertEqual(are_exclusive(xass1, xnames[2]), False)
+
+    def test_if(self) -> None:
+        module = self.parse(
+            """
+        if 1:
+            a = 1
+            a = 2
+        elif 2:
+            a = 12
+            a = 13
+        else:
+            a = 3
+            a = 4
+        """
+        )
+        a1 = module.locals["a"][0]
+        a2 = module.locals["a"][1]
+        a3 = module.locals["a"][2]
+        a4 = module.locals["a"][3]
+        a5 = module.locals["a"][4]
+        a6 = module.locals["a"][5]
+        self.assertEqual(are_exclusive(a1, a2), False)
+        self.assertEqual(are_exclusive(a1, a3), True)
+        self.assertEqual(are_exclusive(a1, a5), True)
+        self.assertEqual(are_exclusive(a3, a5), True)
+        self.assertEqual(are_exclusive(a3, a4), False)
+        self.assertEqual(are_exclusive(a5, a6), False)
+
+    def test_try_except(self) -> None:
+        return NotImplemented
+        module = self.parse(
+            """
+        try:
+            def exclusive_func2():
+                "docstring"
+        except TypeError:
+            def exclusive_func2():
+                "docstring"
+        except:
+            def exclusive_func2():
+                "docstring"
+        else:
+            def exclusive_func2():
+                "this one redefine the one defined line 42"
+        """
+        )
+        f1 = module.locals["exclusive_func2"][0]
+        f2 = module.locals["exclusive_func2"][1]
+        f3 = module.locals["exclusive_func2"][2]
+        f4 = module.locals["exclusive_func2"][3]
+        self.assertEqual(are_exclusive(f1, f2), True)
+        self.assertEqual(are_exclusive(f1, f3), True)
+        self.assertEqual(are_exclusive(f1, f4), False)
+        self.assertEqual(are_exclusive(f2, f4), True)
+        self.assertEqual(are_exclusive(f3, f4), True)
+        self.assertEqual(are_exclusive(f3, f2), True)
+
+        self.assertEqual(are_exclusive(f2, f1), True)
+        self.assertEqual(are_exclusive(f4, f1), False)
+        self.assertEqual(are_exclusive(f4, f2), True)
