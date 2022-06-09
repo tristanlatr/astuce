@@ -208,6 +208,12 @@ class Parser:
         # Since astuce in not inter-procedural, like astroid, we don't have 
         # to use the boundnode, callcontext, ect 
     
+    def invalidate_inference_cache(self) -> None:
+        """
+        Clears the inference cache.
+        """
+        self._inference_cache.clear()
+
     @lru_cache
     def unparse(self, node: ast.AST) -> str:
         """
@@ -259,7 +265,8 @@ class Parser:
         # Build locals 
         _AstuceModuleVisitor(self).visit(mod)
 
-        # TODO: Invalidate inference cache
+        # Invalidate inference cache
+        self.invalidate_inference_cache()
         
         return mod
 

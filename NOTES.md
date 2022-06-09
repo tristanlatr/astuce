@@ -1,12 +1,6 @@
 
 # TODO list:
 
-- [DONE] Finish code in _assigned_statements.py 
-- [DONE] and plug it in with _infer_assign_name. 
-- [DONE] Infer imports for modules in the system.
-- Improve the documentation of _infer_assign_name to link to the astroid name of this method.
-- [PROPOSED] Clarify API that is going to be used to access class/module level variables.
-- Invalidate the inference cache everytime a new module is parsed.
 - Adjust _infer_Call to return an 'Instance' of the annotated type if the function uses type annotation.
 - Adjust _infer_Call to return an inferred node if we're talking about builtins (and all parties are inferable)
 - First apply set of transformations, as described in [Scalpel 2.1 Code Rewriter.](https://arxiv.org/pdf/2202.11840.pdf)
