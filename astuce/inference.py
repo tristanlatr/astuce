@@ -448,6 +448,7 @@ _OPPERATORS = {
       ast.Sub    : lambda a, b: a - b,
       ast.Mult   : lambda a, b: a * b,
       ast.Div    : lambda a, b: a / b,
+      ast.FloorDiv: lambda a, b: a // b,
       ast.Mod    : lambda a, b: a % b,
       ast.Pow    : lambda a, b: a**b,
       ast.LShift : lambda a, b: a << b,
@@ -455,6 +456,7 @@ _OPPERATORS = {
       ast.BitOr  : lambda a, b: a | b,
       ast.BitAnd : lambda a, b: a & b,
       ast.BitXor : lambda a, b: a ^ b,
+      ast.MatMult: lambda a, b: a @ b,
       
       # Compare operators
       ast.Eq     : lambda a, b: a == b,
@@ -469,6 +471,23 @@ _OPPERATORS = {
       ast.Is     : lambda i,j: i is j,
     }
 
+import operator as operatorlib
+_AUGMENTED_OPERATORS = {
+    ast.Add    : lambda a, b: operatorlib.iadd(a,b),
+    ast.Sub    : lambda a, b: operatorlib.isub(a,b),
+    ast.Mult   : lambda a, b: operatorlib.imul(a,b),
+    ast.Div    : lambda a, b: operatorlib.itruediv(a,b),
+    ast.FloorDiv: lambda a, b: operatorlib.ifloordiv(a,b),
+    ast.Mod    : lambda a, b: operatorlib.imod(a,b),
+    ast.Pow    : lambda a, b: operatorlib.ipow(a,b),
+    ast.LShift : lambda a, b: operatorlib.ilshift(a,b),
+    ast.RShift : lambda a, b: operatorlib.irshift(a,b),
+    ast.BitOr  : lambda a, b: operatorlib.ior(a,b),
+    ast.BitAnd : lambda a, b: operatorlib.iand(a,b),
+    ast.BitXor : lambda a, b: operatorlib.ixor(a,b),
+    ast.MatMult: lambda a, b: operatorlib.imatmul(a,b),
+}
+
 def _invoke_binop_inference(left: ASTNodeT, opnode: Union[_typing.BinOp, _typing.AugAssign], op:ast.operator, right: ASTNodeT, context: OptionalInferenceContext) -> InferResult:
     """
     Infer a binary operation between a left operand and a right operand.
@@ -478,8 +497,18 @@ def _invoke_binop_inference(left: ASTNodeT, opnode: Union[_typing.BinOp, _typing
 
     :note: left and right are inferred nodes.
     """
+    # This implementation only support litreral types
+    # see https://github.com/PyCQA/astroid/blob/58f470b993e368a82f545376c51a3beda83b5f74/astroid/inference.py#L715
+    # for a more generic implementation.
 
-    operator_meth = _OPPERATORS[type(op)]
+    operators = _AUGMENTED_OPERATORS if isinstance(opnode, ast.AugAssign) else _OPPERATORS
+
+    try:
+        operator_meth = operators[type(op)]
+    except KeyError:
+        opnode._report(f"Unsupported operation: op={op}")
+        yield nodes.Uninferable
+        return
     try:
         literal_left = left.literal_eval()
         literal_right = right.literal_eval()
@@ -490,8 +519,9 @@ def _invoke_binop_inference(left: ASTNodeT, opnode: Union[_typing.BinOp, _typing
         return
     try:
         inferred_literal = operator_meth(literal_left, literal_right)
-    except Exception:
+    except Exception as e:
         # wrong types
+        opnode._report(f"Operation failed ({e.__class__.__name__}): {e}; lhs={left}, rhs={right}")
         raise exceptions.InferenceError(node=opnode)
 
     yield fix_ast(literal_to_ast(inferred_literal), parent=opnode.parent)
