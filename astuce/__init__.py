@@ -22,8 +22,9 @@ Why?
 I needed a inference library that supports the standard AST nodes such that,
 it can be used in `pydoctor <https://github.com/twisted/pydoctor>`_. 
 
-If can help:
- - Infer what's the value of complex ``__all__`` variables and other literal types.
+This library can help:
+ - Infer what's the value of complex ``__all__`` 
+   variables and other literal constants across different modules. 
  - Trace back where a name was assigned, filtering ignorable statements.
  - Navigating in the tree with handy functions.
 
