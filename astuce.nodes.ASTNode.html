@@ -1,0 +1,1899 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+          "DTD/xhtml1-strict.dtd">
+<html>
+  
+
+  <head>
+    
+    <title>astuce.nodes.ASTNode</title>
+    <meta name="generator" content="pydoctor 22.5.1"> 
+        
+    </meta>
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1 maximum-scale=1" />
+    <link rel="stylesheet" type="text/css" href="apidocs.css" />
+    <link rel="stylesheet" type="text/css" href="readthedocstheme.css" />
+    <link rel="stylesheet" type="text/css" href="extra.css" />
+</head>
+
+  <body>
+
+    
+
+    <nav class="navbar navbar-default mainnavbar">
+      
+  
+  <div class="container-fluid">
+
+
+    <div class="navbar-header">
+      
+      <div class="navlinks">
+        <span class="navbar-brand">
+          <a href="https://github.com/tristanlatr/astuce/" class="projecthome">astuce</a> <a href="index.html">API Documentation</a>
+        </span>
+
+        <a href="moduleIndex.html">
+          Modules
+        </a>
+
+        <a href="classIndex.html">
+          Classes
+        </a>
+
+        <a href="nameIndex.html">
+          Names
+        </a>
+
+        <div id="search-box-container">
+          <div class="input-group">
+            <input id="search-box" type="search" name="search-query" placeholder="Search..." aria-label="Search" minlength="2" class="form-control" autocomplete="off" />
+            
+            <span class="input-group-btn">
+              <a style="display: none;" class="btn btn-default" id="search-clear-button" title="Clear" onclick="clearSearch()"><img src="fonts/x-circle.svg" alt="Clear" /></a>
+              <a class="btn btn-default" id="search-help-button" title="Help" onclick="toggleSearchHelpText()"><img src="fonts/info.svg" alt="Help" /></a>
+            </span>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+    
+        <!-- Side navigation -->
+      <div class="sidebarcontainer">
+        <nav class="sidebar">
+  
+
+  <div>
+
+      <div class="thingTitle">
+        <span>Class</span>
+        <code class="thisobject"><a href="astuce.nodes.ASTNode.html" class="internal-link" title="This class"><wbr></wbr>ASTNode</a></code> 
+      </div>
+      
+      <div>
+        
+
+        
+         
+
+        
+        
+
+        <div class="childrenKindTitle">Methods</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#has_base" class="internal-link" title="astuce.nodes.ASTNode.has_base">has<wbr></wbr>_base</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#infer" class="internal-link" title="astuce.nodes.ASTNode.infer">infer</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#infer_name" class="internal-link" title="astuce.nodes.ASTNode.infer_name">infer<wbr></wbr>_name</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#literal_eval" class="internal-link" title="astuce.nodes.ASTNode.literal_eval">literal<wbr></wbr>_eval</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#locate_child" class="internal-link" title="astuce.nodes.ASTNode.locate_child">locate<wbr></wbr>_child</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#lookup" class="internal-link" title="astuce.nodes.ASTNode.lookup">lookup</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#node_ancestors" class="internal-link" title="astuce.nodes.ASTNode.node_ancestors">node<wbr></wbr>_ancestors</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#parent_of" class="internal-link" title="astuce.nodes.ASTNode.parent_of">parent<wbr></wbr>_of</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#resolve" class="internal-link" title="astuce.nodes.ASTNode.resolve">resolve</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#unparse" class="internal-link" title="astuce.nodes.ASTNode.unparse">unparse</a></code>
+            </div>
+        
+
+    </li><li class="private">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_report" class="internal-link" title="astuce.nodes.ASTNode._report">_report</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#end_lineno" class="internal-link" title="astuce.nodes.ASTNode.end_lineno">end<wbr></wbr>_lineno</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#parent" class="internal-link" title="astuce.nodes.ASTNode.parent">parent</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#children" class="internal-link" title="astuce.nodes.ASTNode.children">children</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#first_child" class="internal-link" title="astuce.nodes.ASTNode.first_child">first<wbr></wbr>_child</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#frame" class="internal-link" title="astuce.nodes.ASTNode.frame">frame</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#kind" class="internal-link" title="astuce.nodes.ASTNode.kind">kind</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#last_child" class="internal-link" title="astuce.nodes.ASTNode.last_child">last<wbr></wbr>_child</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#lineno" class="internal-link" title="astuce.nodes.ASTNode.lineno">lineno</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#locals" class="internal-link" title="astuce.nodes.ASTNode.locals">locals</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#next" class="internal-link" title="astuce.nodes.ASTNode.next">next</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#next_siblings" class="internal-link" title="astuce.nodes.ASTNode.next_siblings">next<wbr></wbr>_siblings</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#position" class="internal-link" title="astuce.nodes.ASTNode.position">position</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#previous" class="internal-link" title="astuce.nodes.ASTNode.previous">previous</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#previous_siblings" class="internal-link" title="astuce.nodes.ASTNode.previous_siblings">previous<wbr></wbr>_siblings</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#qname" class="internal-link" title="astuce.nodes.ASTNode.qname">qname</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#root" class="internal-link" title="astuce.nodes.ASTNode.root">root</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#scope" class="internal-link" title="astuce.nodes.ASTNode.scope">scope</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#siblings" class="internal-link" title="astuce.nodes.ASTNode.siblings">siblings</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#statement" class="internal-link" title="astuce.nodes.ASTNode.statement">statement</a></code>
+            </div>
+        
+
+    </li><li class="private">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_filename" class="internal-link" title="astuce.nodes.ASTNode._filename">_filename</a></code>
+            </div>
+        
+
+    </li><li class="private">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_is_package" class="internal-link" title="astuce.nodes.ASTNode._is_package">_is<wbr></wbr>_package</a></code>
+            </div>
+        
+
+    </li><li class="private">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_locals" class="internal-link" title="astuce.nodes.ASTNode._locals">_locals</a></code>
+            </div>
+        
+
+    </li><li class="private">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_modname" class="internal-link" title="astuce.nodes.ASTNode._modname">_modname</a></code>
+            </div>
+        
+
+    </li><li class="private">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_parser" class="internal-link" title="astuce.nodes.ASTNode._parser">_parser</a></code>
+            </div>
+        
+
+    </li><li class="private">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_is_from_decorator" class="internal-link" title="astuce.nodes.ASTNode._is_from_decorator">_is<wbr></wbr>_from<wbr></wbr>_decorator</a></code>
+            </div>
+        
+
+    </li><li class="private">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_is_statement" class="internal-link" title="astuce.nodes.ASTNode._is_statement">_is<wbr></wbr>_statement</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+  </div><div>
+
+      <div class="thingTitle">
+        <span>Module</span>
+        <code><a href="astuce.nodes.html" class="internal-link" title="The parent of this class">nodes</a></code> 
+      </div>
+      
+      <div>
+        
+
+        
+         
+
+        <div class="childrenKindTitle">Classes</div>
+        <ul>
+    
+    <li class=" thisobject">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="astuce.nodes.ASTNode.html" class="internal-link" title="astuce.nodes.ASTNode"><wbr></wbr>ASTNode</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="astuce.nodes.Context.html" class="internal-link" title="astuce.nodes.Context"><wbr></wbr>Context</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="astuce.nodes.Instance.html" class="internal-link" title="astuce.nodes.Instance"><wbr></wbr>Instance</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="astuce.nodes.TypeInfo.html" class="internal-link" title="astuce.nodes.TypeInfo"><wbr></wbr>Type<wbr></wbr>Info</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="astuce.nodes.Uninferable.html" class="internal-link" title="astuce.nodes.Uninferable"><wbr></wbr>Uninferable</a></code>
+            </div>
+        
+
+    </li>
+</ul>
+
+        <div class="childrenKindTitle">Functions</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="astuce.nodes.html#get_context" class="internal-link" title="astuce.nodes.get_context">get<wbr></wbr>_context</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="astuce.nodes.html#get_full_import_name" class="internal-link" title="astuce.nodes.get_full_import_name">get<wbr></wbr>_full<wbr></wbr>_import<wbr></wbr>_name</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="astuce.nodes.html#get_module_parent" class="internal-link" title="astuce.nodes.get_module_parent">get<wbr></wbr>_module<wbr></wbr>_parent</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="astuce.nodes.html#get_origin_module" class="internal-link" title="astuce.nodes.get_origin_module">get<wbr></wbr>_origin<wbr></wbr>_module</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="astuce.nodes.html#is_assign_name" class="internal-link" title="astuce.nodes.is_assign_name">is<wbr></wbr>_assign<wbr></wbr>_name</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="astuce.nodes.html#is_del_name" class="internal-link" title="astuce.nodes.is_del_name">is<wbr></wbr>_del<wbr></wbr>_name</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="astuce.nodes.html#is_frame_node" class="internal-link" title="astuce.nodes.is_frame_node">is<wbr></wbr>_frame<wbr></wbr>_node</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="astuce.nodes.html#is_scoped_node" class="internal-link" title="astuce.nodes.is_scoped_node">is<wbr></wbr>_scoped<wbr></wbr>_node</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="astuce.nodes.html#relative_to_absolute" class="internal-link" title="astuce.nodes.relative_to_absolute">relative<wbr></wbr>_to<wbr></wbr>_absolute</a></code>
+            </div>
+        
+
+    </li><li class="private">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="astuce.nodes.html#_get_full_origin_name" class="internal-link" title="astuce.nodes._get_full_origin_name">_get<wbr></wbr>_full<wbr></wbr>_origin<wbr></wbr>_name</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        <div class="childrenKindTitle">Variables</div>
+        <ul>
+    
+    <li class="private">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="astuce.nodes.html#_CONTEXT_MAP" class="internal-link" title="astuce.nodes._CONTEXT_MAP">_CONTEXT<wbr></wbr>_MAP</a></code>
+            </div>
+        
+
+    </li><li class="private">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="astuce.nodes.html#_END_OF_FRAME_SENTINEL_CONSTANT" class="internal-link" title="astuce.nodes._END_OF_FRAME_SENTINEL_CONSTANT">_END<wbr></wbr>_OF<wbr></wbr>_FRAME<wbr></wbr>_SENTINEL<wbr></wbr>_CONSTANT</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+  </div>
+
+</nav>
+        <!-- No sidebar toggle for read the docs theme, the sidebar is always
+          visible when the screen is width enough.
+        -->
+      </div>
+
+    </nav>
+    
+    <div class="container-fluid">
+
+      <div id="main" class="">
+        
+
+        
+
+        <div id="search-results-container" style="display: none;">
+        
+          <div id="search-buttons">
+            <span class="label label-default" id="search-docstrings-button">
+            <label class="checkbox-inline">
+              <input type="checkbox" id="toggle-search-in-docstrings-checkbox" value="false" onclick="toggleSearchInDocstrings()">
+                search in docstrings
+              </input>
+            </label>
+            </span>
+            
+          </div>
+          
+          <noscript>
+              <h1>Cannot search: JavaScript is not supported/enabled in your browser.</h1>
+          </noscript>
+  
+          <div class="hint" id="search-help-box">
+            <p class="rst-last">
+        
+              Search bar offers the following options:
+              <ul>   
+                  <li>
+                    <strong>Term presence.</strong> The below example searches for documents that 
+                      must contain “foo”, might contain “bar” and must not contain “baz”: <code>+foo bar -baz</code>
+                  </li> 
+  
+                  <li>
+                    <strong>Wildcards.</strong> The below example searches for documents with words beginning with “foo”: <code>foo*</code>
+                  </li> 
+  
+                  <li>
+                    <strong>Search in specific fields.</strong> The following search matches all objects 
+                    in "twisted.mail" that matches “search”: <code>+qname:twisted.mail.* +search</code>
+  
+                    <p>
+                      Possible fields: 'name', 'qname' (fully qualified name), 'docstring', and 'kind'.
+                      Last two fields are only applicable if "search in docstrings" is enabled.
+                    </p>
+                  </li>
+  
+                  <li>
+                    <strong>Fuzzy matches.</strong> The following search matches all documents 
+                    that have a word within 1 edit distance of “foo”: <code>foo~1</code>
+                  </li>
+              </ul>
+  
+            </p>
+          </div>
+  
+          <div id="search-status"> </div>
+  
+          <div class="warning" id="search-warn-box" style="display: none;">
+            <p class="rst-last"><span id="search-warn"></span></p>
+          </div>
+  
+          <table id="search-results">
+            <!-- Filled dynamically by JS -->
+          </table>
+          
+          <div style="margin-top: 8px;">
+            <p>Results provided by <a href="https://lunrjs.com">Lunr.js</a></p>
+          </div>
+        </div>
+
+        <div class="page-header">
+          <h1 class="class"><code><code><a href="index.html" class="internal-link">astuce</a></code><wbr></wbr>.<code><a href="astuce.nodes.html" class="internal-link" title="astuce.nodes">nodes</a></code><wbr></wbr>.<code><a href="astuce.nodes.ASTNode.html" class="internal-link" title="astuce.nodes.ASTNode">ASTNode</a></code></code></h1>
+          <div id="showPrivate">
+            <button class="btn btn-link" onclick="togglePrivate()">Toggle Private API</button>
+          </div>
+        </div>
+
+        <div class="categoryHeader">
+          class documentation
+        </div>
+
+        <div class="extrasDocstring">
+          <p><code><span class="py-keyword">class</span> <span class="py-defname">ASTNode</span>: <a href="https://github.com/tristanlatr/astuce/tree/main/astuce/nodes.py#L54" class="sourceLink">(source)</a></code></p>
+          <p><a href="classIndex.html#astuce.nodes.ASTNode">View In Hierarchy</a></p>
+        </div>
+
+        <div class="moduleDocstring">
+          <div><p>This class is dynamically added to the bases of each AST node class.</p>
+</div>
+        </div>
+
+        <div id="splitTables">
+          <table class="children sortable" id="id38">
+  
+  
+  <tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#has_base" class="internal-link" title="astuce.nodes.ASTNode.has_base">has<wbr></wbr>_base</a></code></td>
+    <td>Check if this <code><a href="https://docs.python.org/3/library/ast.html#ast.ClassDef" class="intersphinx-link">ast.ClassDef</a></code> node inherits from the given type.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#infer" class="internal-link" title="astuce.nodes.ASTNode.infer">infer</a></code></td>
+    <td><span class="undocumented">Undocumented</span></td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#infer_name" class="internal-link" title="astuce.nodes.ASTNode.infer_name">infer<wbr></wbr>_name</a></code></td>
+    <td><span class="undocumented">Undocumented</span></td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#literal_eval" class="internal-link" title="astuce.nodes.ASTNode.literal_eval">literal<wbr></wbr>_eval</a></code></td>
+    <td><span class="undocumented">Undocumented</span></td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#locate_child" class="internal-link" title="astuce.nodes.ASTNode.locate_child">locate<wbr></wbr>_child</a></code></td>
+    <td>Find the field of this node that contains the given child. :param child: The child node to search fields for. :param recurse: Whether to recurse in all nested children to find the node. :type child: ASTNode :returns: A tuple of the name of the field that contains the child,...</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#lookup" class="internal-link" title="astuce.nodes.ASTNode.lookup">lookup</a></code></td>
+    <td>Lookup where the given variable is assigned.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#node_ancestors" class="internal-link" title="astuce.nodes.ASTNode.node_ancestors">node<wbr></wbr>_ancestors</a></code></td>
+    <td>Yield parent, grandparent, etc until there are no more.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#parent_of" class="internal-link" title="astuce.nodes.ASTNode.parent_of">parent<wbr></wbr>_of</a></code></td>
+    <td>Check if this node is the parent of the given node. :param node: The node to check if it is the child. :type node: ASTNode :returns: True if this node is the parent of the given node,</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#resolve" class="internal-link" title="astuce.nodes.ASTNode.resolve">resolve</a></code></td>
+    <td>Resolve a basename to get its fully qualified name in the context of self.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#unparse" class="internal-link" title="astuce.nodes.ASTNode.unparse">unparse</a></code></td>
+    <td><span class="undocumented">Undocumented</span></td>
+  </tr><tr class="classvariable">
+    
+    <td>Class Variable</td>
+    <td><code><a href="#end_lineno" class="internal-link" title="astuce.nodes.ASTNode.end_lineno">end<wbr></wbr>_lineno</a></code></td>
+    <td><span class="undocumented">Undocumented</span></td>
+  </tr><tr class="classvariable">
+    
+    <td>Class Variable</td>
+    <td><code><a href="#parent" class="internal-link" title="astuce.nodes.ASTNode.parent">parent</a></code></td>
+    <td><code><a href="https://docs.python.org/3/library/constants.html#None" class="intersphinx-link">None</a></code> for Modules.</td>
+  </tr><tr class="property">
+    
+    <td>Property</td>
+    <td><code><a href="#children" class="internal-link" title="astuce.nodes.ASTNode.children">children</a></code></td>
+    <td>Build and return the children of this node.</td>
+  </tr><tr class="property">
+    
+    <td>Property</td>
+    <td><code><a href="#first_child" class="internal-link" title="astuce.nodes.ASTNode.first_child">first<wbr></wbr>_child</a></code></td>
+    <td>Return the first child of this node.</td>
+  </tr><tr class="property">
+    
+    <td>Property</td>
+    <td><code><a href="#frame" class="internal-link" title="astuce.nodes.ASTNode.frame">frame</a></code></td>
+    <td>Returns the first parent <code><a href="https://docs.python.org/3/library/ast.html#ast.Lambda" class="intersphinx-link">ast.Lambda</a></code>, <code><a href="https://docs.python.org/3/library/ast.html#ast.FunctionDef" class="intersphinx-link">ast.FunctionDef</a></code>, <code><a href="https://docs.python.org/3/library/ast.html#ast.AsyncFunctionDef" class="intersphinx-link">ast.AsyncFunctionDef</a></code>,`ast.ClassDef` or <code>ast.Module</code>.</td>
+  </tr><tr class="property">
+    
+    <td>Property</td>
+    <td><code><a href="#kind" class="internal-link" title="astuce.nodes.ASTNode.kind">kind</a></code></td>
+    <td>Return the kind of this node.</td>
+  </tr><tr class="property">
+    
+    <td>Property</td>
+    <td><code><a href="#last_child" class="internal-link" title="astuce.nodes.ASTNode.last_child">last<wbr></wbr>_child</a></code></td>
+    <td>Return the lasts child of this node.</td>
+  </tr><tr class="property">
+    
+    <td>Property</td>
+    <td><code><a href="#lineno" class="internal-link" title="astuce.nodes.ASTNode.lineno">lineno</a></code></td>
+    <td><span class="undocumented">Undocumented</span></td>
+  </tr><tr class="property">
+    
+    <td>Property</td>
+    <td><code><a href="#locals" class="internal-link" title="astuce.nodes.ASTNode.locals">locals</a></code></td>
+    <td><span class="undocumented">Undocumented</span></td>
+  </tr><tr class="property">
+    
+    <td>Property</td>
+    <td><code><a href="#next" class="internal-link" title="astuce.nodes.ASTNode.next">next</a></code></td>
+    <td>Return the next sibling of this node.</td>
+  </tr><tr class="property">
+    
+    <td>Property</td>
+    <td><code><a href="#next_siblings" class="internal-link" title="astuce.nodes.ASTNode.next_siblings">next<wbr></wbr>_siblings</a></code></td>
+    <td>Return the next siblings of this node, starting from the closest.</td>
+  </tr><tr class="property">
+    
+    <td>Property</td>
+    <td><code><a href="#position" class="internal-link" title="astuce.nodes.ASTNode.position">position</a></code></td>
+    <td>Tell the position of this node amongst its siblings.</td>
+  </tr><tr class="property">
+    
+    <td>Property</td>
+    <td><code><a href="#previous" class="internal-link" title="astuce.nodes.ASTNode.previous">previous</a></code></td>
+    <td>Return the previous sibling of this node.</td>
+  </tr><tr class="property">
+    
+    <td>Property</td>
+    <td><code><a href="#previous_siblings" class="internal-link" title="astuce.nodes.ASTNode.previous_siblings">previous<wbr></wbr>_siblings</a></code></td>
+    <td>Return the previous siblings of this node, starting from the closest.</td>
+  </tr><tr class="property">
+    
+    <td>Property</td>
+    <td><code><a href="#qname" class="internal-link" title="astuce.nodes.ASTNode.qname">qname</a></code></td>
+    <td>Get the 'qualified' name of the node.</td>
+  </tr><tr class="property">
+    
+    <td>Property</td>
+    <td><code><a href="#root" class="internal-link" title="astuce.nodes.ASTNode.root">root</a></code></td>
+    <td>Return the root node of the syntax tree.</td>
+  </tr><tr class="property">
+    
+    <td>Property</td>
+    <td><code><a href="#scope" class="internal-link" title="astuce.nodes.ASTNode.scope">scope</a></code></td>
+    <td>The scope is which this expression can be resolved. This is generally equal to the frame, expect for nodes defined in decorators, in this case the scope is the upper scope.</td>
+  </tr><tr class="property">
+    
+    <td>Property</td>
+    <td><code><a href="#siblings" class="internal-link" title="astuce.nodes.ASTNode.siblings">siblings</a></code></td>
+    <td>Return the siblings of this node.</td>
+  </tr><tr class="property">
+    
+    <td>Property</td>
+    <td><code><a href="#statement" class="internal-link" title="astuce.nodes.ASTNode.statement">statement</a></code></td>
+    <td>The first parent node, including self, marked as statement node. When called on a <code><a href="astuce._typing.Module.html" class="internal-link" title="astuce._typing.Module">Module</a></code> this returns self.</td>
+  </tr><tr class="method private">
+    
+    <td>Method</td>
+    <td><code><a href="#_report" class="internal-link" title="astuce.nodes.ASTNode._report">_report</a></code></td>
+    <td>Log an error or warning about this node object.</td>
+  </tr><tr class="classvariable private">
+    
+    <td>Class Variable</td>
+    <td><code><a href="#_filename" class="internal-link" title="astuce.nodes.ASTNode._filename">_filename</a></code></td>
+    <td><span class="undocumented">Undocumented</span></td>
+  </tr><tr class="classvariable private">
+    
+    <td>Class Variable</td>
+    <td><code><a href="#_is_package" class="internal-link" title="astuce.nodes.ASTNode._is_package">_is<wbr></wbr>_package</a></code></td>
+    <td><span class="undocumented">Undocumented</span></td>
+  </tr><tr class="classvariable private">
+    
+    <td>Class Variable</td>
+    <td><code><a href="#_locals" class="internal-link" title="astuce.nodes.ASTNode._locals">_locals</a></code></td>
+    <td><span class="undocumented">Undocumented</span></td>
+  </tr><tr class="classvariable private">
+    
+    <td>Class Variable</td>
+    <td><code><a href="#_modname" class="internal-link" title="astuce.nodes.ASTNode._modname">_modname</a></code></td>
+    <td><span class="undocumented">Undocumented</span></td>
+  </tr><tr class="classvariable private">
+    
+    <td>Class Variable</td>
+    <td><code><a href="#_parser" class="internal-link" title="astuce.nodes.ASTNode._parser">_parser</a></code></td>
+    <td><span class="undocumented">Undocumented</span></td>
+  </tr><tr class="property private">
+    
+    <td>Property</td>
+    <td><code><a href="#_is_from_decorator" class="internal-link" title="astuce.nodes.ASTNode._is_from_decorator">_is<wbr></wbr>_from<wbr></wbr>_decorator</a></code></td>
+    <td>Return True if the node is the child of a decorator</td>
+  </tr><tr class="property private">
+    
+    <td>Property</td>
+    <td><code><a href="#_is_statement" class="internal-link" title="astuce.nodes.ASTNode._is_statement">_is<wbr></wbr>_statement</a></code></td>
+    <td><span class="undocumented">Undocumented</span></td>
+  </tr>
+</table>
+          
+
+            
+        </div>
+
+        <div id="childList">
+          <div class="basemethod">
+  
+  
+  <a name="astuce.nodes.ASTNode.has_base">
+    
+  </a>
+  <a name="has_base">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-keyword">def</span> <span class="py-defname">has_base</span>(self, node):
+    <a class="sourceLink" href="https://github.com/tristanlatr/astuce/tree/main/astuce/nodes.py#L318">
+      
+      (source)
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    
+    <div><p>Check if this <code><a href="https://docs.python.org/3/library/ast.html#ast.ClassDef" class="intersphinx-link">ast.ClassDef</a></code> node inherits from the given type.</p>
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">node:</span><code><a href="astuce.nodes.ASTNode.html" class="internal-link" title="astuce.nodes.ASTNode">ASTNode</a></code></td><td class="fieldArgDesc">The node defining the base to look for.
+Usually this is a <code>Name</code> node.</td></tr><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc"><span class="undocumented">Undocumented</span></td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="astuce.nodes.ASTNode.infer">
+    
+  </a>
+  <a name="infer">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-keyword">def</span> <span class="py-defname">infer</span>(self, context=<a href="https://docs.python.org/3/library/constants.html#None" class="intersphinx-link">None</a>):
+    <a class="sourceLink" href="https://github.com/tristanlatr/astuce/tree/main/astuce/nodes.py#L366">
+      
+      (source)
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    
+    <div><p class="undocumented">Undocumented</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">context:</span><code><a href="astuce._context.html#OptionalInferenceContext" class="internal-link" title="astuce._context.OptionalInferenceContext">OptionalInferenceContext</a></code></td><td class="fieldArgDesc"><span class="undocumented">Undocumented</span></td></tr><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/typing.html#typing.Iterator" class="intersphinx-link">Iterator</a>[<wbr></wbr><a href="astuce._typing.ASTNode.html" class="internal-link" title="astuce._typing.ASTNode">_typing.ASTNode</a>]</code></td><td class="fieldArgDesc"><span class="undocumented">Undocumented</span></td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="astuce.nodes.ASTNode.infer_name">
+    
+  </a>
+  <a name="infer_name">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-keyword">def</span> <span class="py-defname">infer_name</span>(self, name):
+    <a class="sourceLink" href="https://github.com/tristanlatr/astuce/tree/main/astuce/nodes.py#L497">
+      
+      (source)
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    
+    <div><p class="undocumented">Undocumented</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">name:</span><code><a href="https://docs.python.org/3/library/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc"><span class="undocumented">Undocumented</span></td></tr><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/typing.html#typing.Iterator" class="intersphinx-link">Iterator</a>[<wbr></wbr><a href="astuce.nodes.ASTNode.html" class="internal-link" title="astuce.nodes.ASTNode">ASTNode</a>]</code></td><td class="fieldArgDesc"><span class="undocumented">Undocumented</span></td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="astuce.nodes.ASTNode.literal_eval">
+    
+  </a>
+  <a name="literal_eval">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-keyword">def</span> <span class="py-defname">literal_eval</span>(self):
+    <a class="sourceLink" href="https://github.com/tristanlatr/astuce/tree/main/astuce/nodes.py#L373">
+      
+      (source)
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    
+    <div><p class="undocumented">Undocumented</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a></code></td><td class="fieldArgDesc"><span class="undocumented">Undocumented</span></td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="astuce.nodes.ASTNode.locate_child">
+    
+  </a>
+  <a name="locate_child">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-keyword">def</span> <span class="py-defname">locate_child</span>(self, child, recurse=<a href="https://docs.python.org/3/library/constants.html#False" class="intersphinx-link">False</a>):
+    <a class="sourceLink" href="https://github.com/tristanlatr/astuce/tree/main/astuce/nodes.py#L330">
+      
+      (source)
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    
+    <div><p>Find the field of this node that contains the given child.
+:param child: The child node to search fields for.
+:param recurse: Whether to recurse in all nested children to find the node.
+:type child: ASTNode
+:returns: A tuple of the name of the field that contains the child,</p>
+<blockquote>
+and the sequence or node that contains the child node.</blockquote>
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">child:</span><code><a href="astuce.nodes.ASTNode.html" class="internal-link" title="astuce.nodes.ASTNode">ASTNode</a></code></td><td class="fieldArgDesc"><span class="undocumented">Undocumented</span></td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">recurse:</span><code><a href="https://docs.python.org/3/library/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc"><span class="undocumented">Undocumented</span></td></tr><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/stdtypes.html#tuple" class="intersphinx-link">tuple</a>(<a href="https://docs.python.org/3/library/stdtypes.html#str" class="intersphinx-link">str</a></code>, <code>iterable(<a href="astuce.nodes.ASTNode.html" class="internal-link" title="astuce.nodes.ASTNode">ASTNode</a>)</code> or <code><a href="astuce.nodes.ASTNode.html" class="internal-link" title="astuce.nodes.ASTNode">ASTNode</a>)</code></td><td class="fieldArgDesc"><span class="undocumented">Undocumented</span></td></tr><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/exceptions.html#ValueError" class="intersphinx-link">ValueError</a></code></td><td>If no field could be found that contains
+the given child.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="astuce.nodes.ASTNode.lookup">
+    
+  </a>
+  <a name="lookup">
+    
+  </a>
+  <div class="functionHeader">
+    @<a href="https://docs.python.org/3/library/functools.html#functools.lru_cache" class="intersphinx-link">lru_cache</a>()<br />
+    <span class="py-keyword">def</span> <span class="py-defname">lookup</span>(self, name, offset=0):
+    <a class="sourceLink" href="https://github.com/tristanlatr/astuce/tree/main/astuce/nodes.py#L480">
+      
+      (source)
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    
+    <div><p>Lookup where the given variable is assigned.</p>
+<p>The lookup starts from self's scope. If self is not a frame itself
+and the name is found in the inner frame locals, statements will be
+filtered to remove ignorable statements according to self's location.</p>
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">name:</span><code><a href="https://docs.python.org/3/library/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">The name of the variable to find assignments for.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">offset:</span><code><a href="https://docs.python.org/3/library/functions.html#int" class="intersphinx-link">int</a></code></td><td class="fieldArgDesc">The line offset to filter statements up to.</td></tr><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<a href="astuce.nodes.ASTNode.html" class="internal-link" title="astuce.nodes.ASTNode">ASTNode</a></code>, <code><a href="https://docs.python.org/3/library/typing.html#typing.List" class="intersphinx-link">List</a>[<a href="astuce._typing.html#LocalsAssignT" class="internal-link" title="astuce._typing.LocalsAssignT">_typing.LocalsAssignT</a>]]</code></td><td class="fieldArgDesc">The scope node and the list of assignments associated to the
+given name according to the scope node where it has been found.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="astuce.nodes.ASTNode.node_ancestors">
+    
+  </a>
+  <a name="node_ancestors">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-keyword">def</span> <span class="py-defname">node_ancestors</span>(self):
+    <a class="sourceLink" href="https://github.com/tristanlatr/astuce/tree/main/astuce/nodes.py#L423">
+      
+      (source)
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    
+    <div><p>Yield parent, grandparent, etc until there are no more.</p>
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/typing.html#typing.Iterator" class="intersphinx-link">Iterator</a>[<wbr></wbr><a href="astuce._typing.ASTNode.html" class="internal-link" title="astuce._typing.ASTNode">_typing.ASTNode</a>]</code></td><td class="fieldArgDesc"><span class="undocumented">Undocumented</span></td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="astuce.nodes.ASTNode.parent_of">
+    
+  </a>
+  <a name="parent_of">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-keyword">def</span> <span class="py-defname">parent_of</span>(self, node):
+    <a class="sourceLink" href="https://github.com/tristanlatr/astuce/tree/main/astuce/nodes.py#L455">
+      
+      (source)
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    
+    <div><p>Check if this node is the parent of the given node.
+:param node: The node to check if it is the child.
+:type node: ASTNode
+:returns: True if this node is the parent of the given node,</p>
+<blockquote>
+False otherwise.</blockquote>
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">node:</span><code><a href="astuce.nodes.ASTNode.html" class="internal-link" title="astuce.nodes.ASTNode">ASTNode</a></code></td><td class="fieldArgDesc"><span class="undocumented">Undocumented</span></td></tr><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc"><span class="undocumented">Undocumented</span></td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="astuce.nodes.ASTNode.resolve">
+    
+  </a>
+  <a name="resolve">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-keyword">def</span> <span class="py-defname">resolve</span>(self, basename):
+    <a class="sourceLink" href="https://github.com/tristanlatr/astuce/tree/main/astuce/nodes.py#L378">
+      
+      (source)
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    
+    <div><p>Resolve a basename to get its fully qualified name in the context of self.</p>
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">self</span></td><td class="fieldArgDesc">The node representing the context in which to resolve the base name.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">basename:</span><code><a href="https://docs.python.org/3/library/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">The partial base name to resolve.</td></tr><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">The fully resolved base name.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="astuce.nodes.ASTNode.unparse">
+    
+  </a>
+  <a name="unparse">
+    
+  </a>
+  <div class="functionHeader">
+    @<a href="https://docs.python.org/3/library/functools.html#functools.lru_cache" class="intersphinx-link">lru_cache</a>()<br />
+    <span class="py-keyword">def</span> <span class="py-defname">unparse</span>(self):
+    <a class="sourceLink" href="https://github.com/tristanlatr/astuce/tree/main/astuce/nodes.py#L476">
+      
+      (source)
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    
+    <div><p class="undocumented">Undocumented</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc"><span class="undocumented">Undocumented</span></td></tr></table></div>
+  </div>
+</div><div class="baseclassvariable">
+  
+  
+  <a name="astuce.nodes.ASTNode.end_lineno">
+    
+  </a>
+  <a name="end_lineno">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">end_lineno</span> =
+    <a class="sourceLink" href="https://github.com/tristanlatr/astuce/tree/main/astuce/nodes.py#L115">
+      
+      (source)
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseclassvariable">
+  
+  
+  <a name="astuce.nodes.ASTNode.parent">
+    
+  </a>
+  <a name="parent">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">parent</span>: <code><a href="astuce._typing.ASTNode.html" class="internal-link" title="astuce._typing.ASTNode">_typing.ASTNode</a></code> =
+    <a class="sourceLink" href="https://github.com/tristanlatr/astuce/tree/main/astuce/nodes.py#L64">
+      
+      (source)
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    
+    <div><p><code><a href="https://docs.python.org/3/library/constants.html#None" class="intersphinx-link">None</a></code> for Modules.</p>
+</div>
+    
+  </div>
+</div><div class="baseproperty">
+  
+  
+  <a name="astuce.nodes.ASTNode.children">
+    
+  </a>
+  <a name="children">
+    
+  </a>
+  <div class="functionHeader">
+    @cached_property<br />
+    <span class="py-defname">children</span>: <code><a href="https://docs.python.org/3/library/typing.html#typing.Sequence" class="intersphinx-link">Sequence</a>[<wbr></wbr><a href="astuce._typing.ASTNode.html" class="internal-link" title="astuce._typing.ASTNode">_typing.ASTNode</a>]</code> =
+    <a class="sourceLink" href="https://github.com/tristanlatr/astuce/tree/main/astuce/nodes.py#L126">
+      
+      (source)
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    
+    <div><p>Build and return the children of this node.</p>
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td colspan="2">A list of children.</td></tr></table></div>
+    
+  </div>
+</div><div class="baseproperty">
+  
+  
+  <a name="astuce.nodes.ASTNode.first_child">
+    
+  </a>
+  <a name="first_child">
+    
+  </a>
+  <div class="functionHeader">
+    @cached_property<br />
+    <span class="py-defname">first_child</span>: <code><a href="astuce._typing.ASTNode.html" class="internal-link" title="astuce._typing.ASTNode">_typing.ASTNode</a></code> =
+    <a class="sourceLink" href="https://github.com/tristanlatr/astuce/tree/main/astuce/nodes.py#L211">
+      
+      (source)
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    
+    <div><p>Return the first child of this node.</p>
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td colspan="2">The child.</td></tr><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="astuce.exceptions.LastNodeError.html" class="internal-link" title="astuce.exceptions.LastNodeError">LastNodeError</a></code></td><td>When the node does not have children.</td></tr></table></div>
+    
+  </div>
+</div><div class="baseproperty">
+  
+  
+  <a name="astuce.nodes.ASTNode.frame">
+    
+  </a>
+  <a name="frame">
+    
+  </a>
+  <div class="functionHeader">
+    @cached_property<br />
+    <span class="py-defname">frame</span>: <code><a href="astuce._typing.html#FrameNodeT" class="internal-link" title="astuce._typing.FrameNodeT">_typing.FrameNodeT</a></code> =
+    <a class="sourceLink" href="https://github.com/tristanlatr/astuce/tree/main/astuce/nodes.py#L274">
+      
+      (source)
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    
+    <div><p>Returns the first parent <code><a href="https://docs.python.org/3/library/ast.html#ast.Lambda" class="intersphinx-link">ast.Lambda</a></code>, <code><a href="https://docs.python.org/3/library/ast.html#ast.FunctionDef" class="intersphinx-link">ast.FunctionDef</a></code>, <code><a href="https://docs.python.org/3/library/ast.html#ast.AsyncFunctionDef" class="intersphinx-link">ast.AsyncFunctionDef</a></code>,`ast.ClassDef` or <code>ast.Module</code>.</p>
+<p>The parent of a frame is always another frame.</p>
+<p>Lambda frame is special because we can't define further locals except the one defined in the arguments.</p>
+<p>When called on a <code><a href="astuce._typing.Module.html" class="internal-link" title="astuce._typing.Module">Module</a></code> this returns self.</p>
+</div>
+    
+  </div>
+</div><div class="baseproperty">
+  
+  
+  <a name="astuce.nodes.ASTNode.kind">
+    
+  </a>
+  <a name="kind">
+    
+  </a>
+  <div class="functionHeader">
+    @cached_property<br />
+    <span class="py-defname">kind</span>: <code><a href="https://docs.python.org/3/library/stdtypes.html#str" class="intersphinx-link">str</a></code> =
+    <a class="sourceLink" href="https://github.com/tristanlatr/astuce/tree/main/astuce/nodes.py#L117">
+      
+      (source)
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    
+    <div><p>Return the kind of this node.</p>
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td colspan="2">The node kind.</td></tr></table></div>
+    
+  </div>
+</div><div class="baseproperty">
+  
+  
+  <a name="astuce.nodes.ASTNode.last_child">
+    
+  </a>
+  <a name="last_child">
+    
+  </a>
+  <div class="functionHeader">
+    @cached_property<br />
+    <span class="py-defname">last_child</span>: <code><a href="astuce._typing.ASTNode.html" class="internal-link" title="astuce._typing.ASTNode">_typing.ASTNode</a></code> =
+    <a class="sourceLink" href="https://github.com/tristanlatr/astuce/tree/main/astuce/nodes.py#L226">
+      
+      (source)
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    
+    <div><p>Return the lasts child of this node.</p>
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td colspan="2">The child.</td></tr><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="astuce.exceptions.LastNodeError.html" class="internal-link" title="astuce.exceptions.LastNodeError">LastNodeError</a></code></td><td>When the node does not have children.</td></tr></table></div>
+    
+  </div>
+</div><div class="baseproperty">
+  
+  
+  <a name="astuce.nodes.ASTNode.lineno">
+    
+  </a>
+  <a name="lineno">
+    
+  </a>
+  <div class="functionHeader">
+    @cached_property<br />
+    <span class="py-defname">lineno</span>: <code><a href="https://docs.python.org/3/library/functions.html#int" class="intersphinx-link">int</a></code> =
+    <a class="sourceLink" href="https://github.com/tristanlatr/astuce/tree/main/astuce/nodes.py#L87">
+      
+      (source)
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseproperty">
+  
+  
+  <a name="astuce.nodes.ASTNode.locals">
+    
+  </a>
+  <a name="locals">
+    
+  </a>
+  <div class="functionHeader">
+    @cached_property<br />
+    <span class="py-defname">locals</span>: <code><a href="https://docs.python.org/3/library/typing.html#typing.Dict" class="intersphinx-link">Dict</a>[<wbr></wbr><a href="https://docs.python.org/3/library/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="https://docs.python.org/3/library/typing.html#typing.List" class="intersphinx-link">List</a>[<wbr></wbr><a href="astuce._typing.html#LocalsAssignT" class="internal-link" title="astuce._typing.LocalsAssignT">_typing.LocalsAssignT</a>]]</code> =
+    <a class="sourceLink" href="https://github.com/tristanlatr/astuce/tree/main/astuce/nodes.py#L108">
+      
+      (source)
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseproperty">
+  
+  
+  <a name="astuce.nodes.ASTNode.next">
+    
+  </a>
+  <a name="next">
+    
+  </a>
+  <div class="functionHeader">
+    @cached_property<br />
+    <span class="py-defname">next</span>: <code><a href="astuce._typing.ASTNode.html" class="internal-link" title="astuce._typing.ASTNode">_typing.ASTNode</a></code> =
+    <a class="sourceLink" href="https://github.com/tristanlatr/astuce/tree/main/astuce/nodes.py#L196">
+      
+      (source)
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    
+    <div><p>Return the next sibling of this node.</p>
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td colspan="2">The sibling.</td></tr><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="astuce.exceptions.LastNodeError.html" class="internal-link" title="astuce.exceptions.LastNodeError">LastNodeError</a></code></td><td>When the node does not have next siblings.</td></tr></table></div>
+    
+  </div>
+</div><div class="baseproperty">
+  
+  
+  <a name="astuce.nodes.ASTNode.next_siblings">
+    
+  </a>
+  <a name="next_siblings">
+    
+  </a>
+  <div class="functionHeader">
+    @cached_property<br />
+    <span class="py-defname">next_siblings</span>: <code><a href="https://docs.python.org/3/library/typing.html#typing.Sequence" class="intersphinx-link">Sequence</a>[<wbr></wbr><a href="astuce._typing.ASTNode.html" class="internal-link" title="astuce._typing.ASTNode">_typing.ASTNode</a>]</code> =
+    <a class="sourceLink" href="https://github.com/tristanlatr/astuce/tree/main/astuce/nodes.py#L161">
+      
+      (source)
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    
+    <div><p>Return the next siblings of this node, starting from the closest.</p>
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td colspan="2">The next siblings.</td></tr></table></div>
+    
+  </div>
+</div><div class="baseproperty">
+  
+  
+  <a name="astuce.nodes.ASTNode.position">
+    
+  </a>
+  <a name="position">
+    
+  </a>
+  <div class="functionHeader">
+    @cached_property<br />
+    <span class="py-defname">position</span>: <code><a href="https://docs.python.org/3/library/functions.html#int" class="intersphinx-link">int</a></code> =
+    <a class="sourceLink" href="https://github.com/tristanlatr/astuce/tree/main/astuce/nodes.py#L135">
+      
+      (source)
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    
+    <div><p>Tell the position of this node amongst its siblings.</p>
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td colspan="2">The node position amongst its siblings.</td></tr><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="astuce.exceptions.RootNodeError.html" class="internal-link" title="astuce.exceptions.RootNodeError">RootNodeError</a></code></td><td>When the node doesn't have a parent.</td></tr></table></div>
+    
+  </div>
+</div><div class="baseproperty">
+  
+  
+  <a name="astuce.nodes.ASTNode.previous">
+    
+  </a>
+  <a name="previous">
+    
+  </a>
+  <div class="functionHeader">
+    @cached_property<br />
+    <span class="py-defname">previous</span>: <code><a href="astuce._typing.ASTNode.html" class="internal-link" title="astuce._typing.ASTNode">_typing.ASTNode</a></code> =
+    <a class="sourceLink" href="https://github.com/tristanlatr/astuce/tree/main/astuce/nodes.py#L181">
+      
+      (source)
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    
+    <div><p>Return the previous sibling of this node.</p>
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td colspan="2">The sibling.</td></tr><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="astuce.exceptions.LastNodeError.html" class="internal-link" title="astuce.exceptions.LastNodeError">LastNodeError</a></code></td><td>When the node does not have previous siblings.</td></tr></table></div>
+    
+  </div>
+</div><div class="baseproperty">
+  
+  
+  <a name="astuce.nodes.ASTNode.previous_siblings">
+    
+  </a>
+  <a name="previous_siblings">
+    
+  </a>
+  <div class="functionHeader">
+    @cached_property<br />
+    <span class="py-defname">previous_siblings</span>: <code><a href="https://docs.python.org/3/library/typing.html#typing.Sequence" class="intersphinx-link">Sequence</a>[<wbr></wbr><a href="astuce._typing.ASTNode.html" class="internal-link" title="astuce._typing.ASTNode">_typing.ASTNode</a>]</code> =
+    <a class="sourceLink" href="https://github.com/tristanlatr/astuce/tree/main/astuce/nodes.py#L150">
+      
+      (source)
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    
+    <div><p>Return the previous siblings of this node, starting from the closest.</p>
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td colspan="2">The previous siblings.</td></tr></table></div>
+    
+  </div>
+</div><div class="baseproperty">
+  
+  
+  <a name="astuce.nodes.ASTNode.qname">
+    
+  </a>
+  <a name="qname">
+    
+  </a>
+  <div class="functionHeader">
+    @<a href="https://docs.python.org/3/library/functions.html#property" class="intersphinx-link">property</a><br />
+    <span class="py-defname">qname</span>: <code><a href="https://docs.python.org/3/library/stdtypes.html#str" class="intersphinx-link">str</a></code> =
+    <a class="sourceLink" href="https://github.com/tristanlatr/astuce/tree/main/astuce/nodes.py#L93">
+      
+      (source)
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    
+    <div><p>Get the 'qualified' name of the node.</p>
+<p>For example: module.name, module.class.name ...</p>
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td colspan="2">The qualified name.</td></tr></table></div>
+    
+  </div>
+</div><div class="baseproperty">
+  
+  
+  <a name="astuce.nodes.ASTNode.root">
+    
+  </a>
+  <a name="root">
+    
+  </a>
+  <div class="functionHeader">
+    @cached_property<br />
+    <span class="py-defname">root</span>: <code><a href="astuce._typing.Module.html" class="internal-link" title="astuce._typing.Module">Module</a></code> =
+    <a class="sourceLink" href="https://github.com/tristanlatr/astuce/tree/main/astuce/nodes.py#L75">
+      
+      (source)
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    
+    <div><p>Return the root node of the syntax tree.</p>
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td colspan="2">The root node.</td></tr></table></div>
+    
+  </div>
+</div><div class="baseproperty">
+  
+  
+  <a name="astuce.nodes.ASTNode.scope">
+    
+  </a>
+  <a name="scope">
+    
+  </a>
+  <div class="functionHeader">
+    @cached_property<br />
+    <span class="py-defname">scope</span>: <code><a href="astuce._typing.html#ScopedNodeT" class="internal-link" title="astuce._typing.ScopedNodeT">_typing.ScopedNodeT</a></code> =
+    <a class="sourceLink" href="https://github.com/tristanlatr/astuce/tree/main/astuce/nodes.py#L241">
+      
+      (source)
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    
+    <div><p>The scope is which this expression can be resolved. This is generally equal to the frame,
+expect for nodes defined in decorators, in this case the scope is the upper scope.</p>
+<p>Returns the first parent frame or generator/comprehension.</p>
+<p>When called on a <code><a href="astuce._typing.Module.html" class="internal-link" title="astuce._typing.Module">Module</a></code> this returns self.</p>
+</div>
+    
+  </div>
+</div><div class="baseproperty">
+  
+  
+  <a name="astuce.nodes.ASTNode.siblings">
+    
+  </a>
+  <a name="siblings">
+    
+  </a>
+  <div class="functionHeader">
+    @cached_property<br />
+    <span class="py-defname">siblings</span>: <code><a href="https://docs.python.org/3/library/typing.html#typing.Sequence" class="intersphinx-link">Sequence</a>[<wbr></wbr><a href="astuce._typing.ASTNode.html" class="internal-link" title="astuce._typing.ASTNode">_typing.ASTNode</a>]</code> =
+    <a class="sourceLink" href="https://github.com/tristanlatr/astuce/tree/main/astuce/nodes.py#L172">
+      
+      (source)
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    
+    <div><p>Return the siblings of this node.</p>
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td colspan="2">The siblings.</td></tr></table></div>
+    
+  </div>
+</div><div class="baseproperty">
+  
+  
+  <a name="astuce.nodes.ASTNode.statement">
+    
+  </a>
+  <a name="statement">
+    
+  </a>
+  <div class="functionHeader">
+    @cached_property<br />
+    <span class="py-defname">statement</span>: <code><a href="https://docs.python.org/3/library/typing.html#typing.Union" class="intersphinx-link">Union</a>[<wbr></wbr><a href="astuce._typing.ASTstmt.html" class="internal-link" title="astuce._typing.ASTstmt">_typing.ASTstmt</a>, <wbr></wbr><a href="astuce._typing.Module.html" class="internal-link" title="astuce._typing.Module">_typing.Module</a>]</code> =
+    <a class="sourceLink" href="https://github.com/tristanlatr/astuce/tree/main/astuce/nodes.py#L302">
+      
+      (source)
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    
+    <div><p>The first parent node, including self, marked as statement node.
+When called on a <code><a href="astuce._typing.Module.html" class="internal-link" title="astuce._typing.Module">Module</a></code> this returns self.</p>
+</div>
+    
+  </div>
+</div><div class="basemethod private">
+  
+  
+  <a name="astuce.nodes.ASTNode._report">
+    
+  </a>
+  <a name="_report">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-keyword">def</span> <span class="py-defname">_report</span>(self, descr, lineno_offset=0):
+    <a class="sourceLink" href="https://github.com/tristanlatr/astuce/tree/main/astuce/nodes.py#L430">
+      
+      (source)
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    
+    <div><p>Log an error or warning about this node object.</p>
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">descr:</span><code><a href="https://docs.python.org/3/library/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc"><span class="undocumented">Undocumented</span></td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">lineno<wbr></wbr>_offset:</span><code><a href="https://docs.python.org/3/library/functions.html#int" class="intersphinx-link">int</a></code></td><td class="fieldArgDesc"><span class="undocumented">Undocumented</span></td></tr></table></div>
+  </div>
+</div><div class="baseclassvariable private">
+  
+  
+  <a name="astuce.nodes.ASTNode._filename">
+    
+  </a>
+  <a name="_filename">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">_filename</span>: <code><a href="https://docs.python.org/3/library/typing.html#typing.Optional" class="intersphinx-link">Optional</a>[<wbr></wbr><a href="https://docs.python.org/3/library/stdtypes.html#str" class="intersphinx-link">str</a>]</code> =
+    <a class="sourceLink" href="https://github.com/tristanlatr/astuce/tree/main/astuce/nodes.py#L73">
+      
+      (source)
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseclassvariable private">
+  
+  
+  <a name="astuce.nodes.ASTNode._is_package">
+    
+  </a>
+  <a name="_is_package">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">_is_package</span>: <code><a href="https://docs.python.org/3/library/functions.html#bool" class="intersphinx-link">bool</a></code> =
+    <a class="sourceLink" href="https://github.com/tristanlatr/astuce/tree/main/astuce/nodes.py#L72">
+      
+      (source)
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseclassvariable private">
+  
+  
+  <a name="astuce.nodes.ASTNode._locals">
+    
+  </a>
+  <a name="_locals">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">_locals</span>: <code><a href="https://docs.python.org/3/library/typing.html#typing.Dict" class="intersphinx-link">Dict</a>[<wbr></wbr><a href="https://docs.python.org/3/library/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="https://docs.python.org/3/library/typing.html#typing.List" class="intersphinx-link">List</a>[<wbr></wbr><a href="astuce._typing.html#LocalsAssignT" class="internal-link" title="astuce._typing.LocalsAssignT">_typing.LocalsAssignT</a>]]</code> =
+    <a class="sourceLink" href="https://github.com/tristanlatr/astuce/tree/main/astuce/nodes.py#L69">
+      
+      (source)
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseclassvariable private">
+  
+  
+  <a name="astuce.nodes.ASTNode._modname">
+    
+  </a>
+  <a name="_modname">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">_modname</span>: <code><a href="https://docs.python.org/3/library/typing.html#typing.Optional" class="intersphinx-link">Optional</a>[<wbr></wbr><a href="https://docs.python.org/3/library/stdtypes.html#str" class="intersphinx-link">str</a>]</code> =
+    <a class="sourceLink" href="https://github.com/tristanlatr/astuce/tree/main/astuce/nodes.py#L71">
+      
+      (source)
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseclassvariable private">
+  
+  
+  <a name="astuce.nodes.ASTNode._parser">
+    
+  </a>
+  <a name="_parser">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">_parser</span>: <code><a href="astuce.parser.Parser.html" class="internal-link" title="astuce.parser.Parser">Parser</a></code> =
+    <a class="sourceLink" href="https://github.com/tristanlatr/astuce/tree/main/astuce/nodes.py#L70">
+      
+      (source)
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="baseproperty private">
+  
+  
+  <a name="astuce.nodes.ASTNode._is_from_decorator">
+    
+  </a>
+  <a name="_is_from_decorator">
+    
+  </a>
+  <div class="functionHeader">
+    @cached_property<br />
+    <span class="py-defname">_is_from_decorator</span>: <code><a href="https://docs.python.org/3/library/functions.html#bool" class="intersphinx-link">bool</a></code> =
+    <a class="sourceLink" href="https://github.com/tristanlatr/astuce/tree/main/astuce/nodes.py#L465">
+      
+      (source)
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    
+    <div><p>Return True if the node is the child of a decorator</p>
+</div>
+    
+  </div>
+</div><div class="baseproperty private">
+  
+  
+  <a name="astuce.nodes.ASTNode._is_statement">
+    
+  </a>
+  <a name="_is_statement">
+    
+  </a>
+  <div class="functionHeader">
+    @cached_property<br />
+    <span class="py-defname">_is_statement</span>: <code><a href="https://docs.python.org/3/library/functions.html#bool" class="intersphinx-link">bool</a></code> =
+    <a class="sourceLink" href="https://github.com/tristanlatr/astuce/tree/main/astuce/nodes.py#L314">
+      
+      (source)
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div>
+        </div>
+      
+      </div>
+    </div>
+
+    <footer class="navbar navbar-default">
+    <hr />
+    
+    
+    <div class="container">
+      <a href="index.html">API Documentation</a> for <a href="https://github.com/tristanlatr/astuce/" class="projecthome">astuce</a>,
+    generated by <a href="https://github.com/twisted/pydoctor/">pydoctor</a>
+      22.5.1 at 2022-06-11 05:48:02.
+    </div>
+    
+    <script src="ajax.js" type="text/javascript"></script>
+    <script src="searchlib.js" type="text/javascript"></script>
+    <script src="search.js" type="text/javascript"></script>
+  
+  </footer>
+  
+    <script src="pydoctor.js" type="text/javascript"></script>
+
+  </body>
+</html>

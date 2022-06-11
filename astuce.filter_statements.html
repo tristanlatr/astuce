@@ -1,0 +1,1152 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+          "DTD/xhtml1-strict.dtd">
+<html>
+  
+
+  <head>
+    
+    <title>astuce.filter_statements</title>
+    <meta name="generator" content="pydoctor 22.5.1"> 
+        
+    </meta>
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1 maximum-scale=1" />
+    <link rel="stylesheet" type="text/css" href="apidocs.css" />
+    <link rel="stylesheet" type="text/css" href="readthedocstheme.css" />
+    <link rel="stylesheet" type="text/css" href="extra.css" />
+</head>
+
+  <body>
+
+    
+
+    <nav class="navbar navbar-default mainnavbar">
+      
+  
+  <div class="container-fluid">
+
+
+    <div class="navbar-header">
+      
+      <div class="navlinks">
+        <span class="navbar-brand">
+          <a href="https://github.com/tristanlatr/astuce/" class="projecthome">astuce</a> <a href="index.html">API Documentation</a>
+        </span>
+
+        <a href="moduleIndex.html">
+          Modules
+        </a>
+
+        <a href="classIndex.html">
+          Classes
+        </a>
+
+        <a href="nameIndex.html">
+          Names
+        </a>
+
+        <div id="search-box-container">
+          <div class="input-group">
+            <input id="search-box" type="search" name="search-query" placeholder="Search..." aria-label="Search" minlength="2" class="form-control" autocomplete="off" />
+            
+            <span class="input-group-btn">
+              <a style="display: none;" class="btn btn-default" id="search-clear-button" title="Clear" onclick="clearSearch()"><img src="fonts/x-circle.svg" alt="Clear" /></a>
+              <a class="btn btn-default" id="search-help-button" title="Help" onclick="toggleSearchHelpText()"><img src="fonts/info.svg" alt="Help" /></a>
+            </span>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+    
+        <!-- Side navigation -->
+      <div class="sidebarcontainer">
+        <nav class="sidebar">
+  
+
+  <div>
+
+      <div class="thingTitle">
+        <span>Module</span>
+        <code class="thisobject"><a href="astuce.filter_statements.html" class="internal-link" title="This module">filter<wbr></wbr>_statements</a></code> 
+      </div>
+      
+      <div>
+        
+
+        
+         
+
+        
+        
+
+        <div class="childrenKindTitle">Functions</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#are_exclusive" class="internal-link" title="astuce.filter_statements.are_exclusive">are<wbr></wbr>_exclusive</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#filter_stmts" class="internal-link" title="astuce.filter_statements.filter_stmts">filter<wbr></wbr>_stmts</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#get_assign_type" class="internal-link" title="astuce.filter_statements.get_assign_type">get<wbr></wbr>_assign<wbr></wbr>_type</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#optionally_assigns" class="internal-link" title="astuce.filter_statements.optionally_assigns">optionally<wbr></wbr>_assigns</a></code>
+            </div>
+        
+
+    </li><li class="private">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_assign_type_get_filtered_stmts" class="internal-link" title="astuce.filter_statements._assign_type_get_filtered_stmts">_assign<wbr></wbr>_type<wbr></wbr>_get<wbr></wbr>_filtered<wbr></wbr>_stmts</a></code>
+            </div>
+        
+
+    </li><li class="private">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_comprehension_get_filtered_stmts" class="internal-link" title="astuce.filter_statements._comprehension_get_filtered_stmts">_comprehension<wbr></wbr>_get<wbr></wbr>_filtered<wbr></wbr>_stmts</a></code>
+            </div>
+        
+
+    </li><li class="private">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_filter_statement_get_filtered_stmts" class="internal-link" title="astuce.filter_statements._filter_statement_get_filtered_stmts">_filter<wbr></wbr>_statement<wbr></wbr>_get<wbr></wbr>_filtered<wbr></wbr>_stmts</a></code>
+            </div>
+        
+
+    </li><li class="private">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_get_filtered_node_statements" class="internal-link" title="astuce.filter_statements._get_filtered_node_statements">_get<wbr></wbr>_filtered<wbr></wbr>_node<wbr></wbr>_statements</a></code>
+            </div>
+        
+
+    </li><li class="private">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_get_filtered_stmts" class="internal-link" title="astuce.filter_statements._get_filtered_stmts">_get<wbr></wbr>_filtered<wbr></wbr>_stmts</a></code>
+            </div>
+        
+
+    </li><li class="private">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_get_if_statement_ancestor" class="internal-link" title="astuce.filter_statements._get_if_statement_ancestor">_get<wbr></wbr>_if<wbr></wbr>_statement<wbr></wbr>_ancestor</a></code>
+            </div>
+        
+
+    </li><li class="private">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_is_orelse" class="internal-link" title="astuce.filter_statements._is_orelse">_is<wbr></wbr>_orelse</a></code>
+            </div>
+        
+
+    </li><li class="private">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_should_use_parent_assign_type" class="internal-link" title="astuce.filter_statements._should_use_parent_assign_type">_should<wbr></wbr>_use<wbr></wbr>_parent<wbr></wbr>_assign<wbr></wbr>_type</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        <div class="childrenKindTitle">Variables</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#ASSIGNMENT_NODES" class="internal-link" title="astuce.filter_statements.ASSIGNMENT_NODES">ASSIGNMENT<wbr></wbr>_NODES</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#CONTAINER_NODES" class="internal-link" title="astuce.filter_statements.CONTAINER_NODES">CONTAINER<wbr></wbr>_NODES</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#FILTER_STATEMENTS_NODES" class="internal-link" title="astuce.filter_statements.FILTER_STATEMENTS_NODES">FILTER<wbr></wbr>_STATEMENTS<wbr></wbr>_NODES</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#OPTIONAL_ASSIGN_NODES" class="internal-link" title="astuce.filter_statements.OPTIONAL_ASSIGN_NODES">OPTIONAL<wbr></wbr>_ASSIGN<wbr></wbr>_NODES</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#PARENT_ASSIGNMENT_NODES" class="internal-link" title="astuce.filter_statements.PARENT_ASSIGNMENT_NODES">PARENT<wbr></wbr>_ASSIGNMENT<wbr></wbr>_NODES</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+  </div><div>
+
+      <div class="thingTitle">
+        <span>Package</span>
+        <code><a href="index.html" class="internal-link" title="The parent of this module">astuce</a></code> 
+      </div>
+      
+      <div>
+        
+
+        <div class="childrenKindTitle">Modules</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="astuce.exceptions.html" class="internal-link" title="astuce.exceptions">exceptions</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="astuce.expressions.html" class="internal-link" title="astuce.expressions">expressions</a></code>
+            </div>
+        
+
+    </li><li class=" thisobject">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="astuce.filter_statements.html" class="internal-link" title="astuce.filter_statements">filter<wbr></wbr>_statements</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="astuce.helpers.html" class="internal-link" title="astuce.helpers">helpers</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="astuce.infer_expr.html" class="internal-link" title="astuce.infer_expr">infer<wbr></wbr>_expr</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="astuce.inference.html" class="internal-link" title="astuce.inference">inference</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="astuce.nodes.html" class="internal-link" title="astuce.nodes">nodes</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="astuce.parser.html" class="internal-link" title="astuce.parser">parser</a></code>
+            </div>
+        
+
+    </li><li class="private">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="astuce._assigned_statements.html" class="internal-link" title="astuce._assigned_statements">_assigned<wbr></wbr>_statements</a></code>
+            </div>
+        
+
+    </li><li class="private">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="astuce._astunparse.html" class="internal-link" title="astuce._astunparse">_astunparse</a></code>
+            </div>
+        
+
+    </li><li class="private">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="astuce._astutils.html" class="internal-link" title="astuce._astutils">_astutils</a></code>
+            </div>
+        
+
+    </li><li class="private">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="astuce._context.html" class="internal-link" title="astuce._context">_context</a></code>
+            </div>
+        
+
+    </li><li class="private">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="astuce._decorators.html" class="internal-link" title="astuce._decorators">_decorators</a></code>
+            </div>
+        
+
+    </li><li class="private">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="astuce._inference_decorators.html" class="internal-link" title="astuce._inference_decorators">_inference<wbr></wbr>_decorators</a></code>
+            </div>
+        
+
+    </li><li class="private">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="astuce._lookup.html" class="internal-link" title="astuce._lookup">_lookup</a></code>
+            </div>
+        
+
+    </li><li class="private">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="astuce._typing.html" class="internal-link" title="astuce._typing">_typing</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+        
+
+        <div class="childrenKindTitle">Functions</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="index.html#setup_logger" class="internal-link" title="astuce.setup_logger">setup<wbr></wbr>_logger</a></code>
+            </div>
+        
+
+    </li><li class="private">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="index.html#_patch_ast" class="internal-link" title="astuce._patch_ast">_patch<wbr></wbr>_ast</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        <div class="childrenKindTitle">Variables</div>
+        <ul>
+    
+    <li class="private">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="index.html#_patched" class="internal-link" title="astuce._patched">_patched</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+  </div>
+
+</nav>
+        <!-- No sidebar toggle for read the docs theme, the sidebar is always
+          visible when the screen is width enough.
+        -->
+      </div>
+
+    </nav>
+    
+    <div class="container-fluid">
+
+      <div id="main" class="">
+        
+
+        
+
+        <div id="search-results-container" style="display: none;">
+        
+          <div id="search-buttons">
+            <span class="label label-default" id="search-docstrings-button">
+            <label class="checkbox-inline">
+              <input type="checkbox" id="toggle-search-in-docstrings-checkbox" value="false" onclick="toggleSearchInDocstrings()">
+                search in docstrings
+              </input>
+            </label>
+            </span>
+            
+          </div>
+          
+          <noscript>
+              <h1>Cannot search: JavaScript is not supported/enabled in your browser.</h1>
+          </noscript>
+  
+          <div class="hint" id="search-help-box">
+            <p class="rst-last">
+        
+              Search bar offers the following options:
+              <ul>   
+                  <li>
+                    <strong>Term presence.</strong> The below example searches for documents that 
+                      must contain “foo”, might contain “bar” and must not contain “baz”: <code>+foo bar -baz</code>
+                  </li> 
+  
+                  <li>
+                    <strong>Wildcards.</strong> The below example searches for documents with words beginning with “foo”: <code>foo*</code>
+                  </li> 
+  
+                  <li>
+                    <strong>Search in specific fields.</strong> The following search matches all objects 
+                    in "twisted.mail" that matches “search”: <code>+qname:twisted.mail.* +search</code>
+  
+                    <p>
+                      Possible fields: 'name', 'qname' (fully qualified name), 'docstring', and 'kind'.
+                      Last two fields are only applicable if "search in docstrings" is enabled.
+                    </p>
+                  </li>
+  
+                  <li>
+                    <strong>Fuzzy matches.</strong> The following search matches all documents 
+                    that have a word within 1 edit distance of “foo”: <code>foo~1</code>
+                  </li>
+              </ul>
+  
+            </p>
+          </div>
+  
+          <div id="search-status"> </div>
+  
+          <div class="warning" id="search-warn-box" style="display: none;">
+            <p class="rst-last"><span id="search-warn"></span></p>
+          </div>
+  
+          <table id="search-results">
+            <!-- Filled dynamically by JS -->
+          </table>
+          
+          <div style="margin-top: 8px;">
+            <p>Results provided by <a href="https://lunrjs.com">Lunr.js</a></p>
+          </div>
+        </div>
+
+        <div class="page-header">
+          <h1 class="module"><code><code><a href="index.html" class="internal-link">astuce</a></code><wbr></wbr>.<code><a href="astuce.filter_statements.html" class="internal-link" title="astuce.filter_statements">filter_statements</a></code></code></h1>
+          <div id="showPrivate">
+            <button class="btn btn-link" onclick="togglePrivate()">Toggle Private API</button>
+          </div>
+        </div>
+
+        <div class="categoryHeader">
+          module documentation
+        </div>
+
+        <div class="extrasDocstring">
+          <a href="https://github.com/tristanlatr/astuce/tree/main/astuce/filter_statements.py" class="sourceLink">(source)</a>
+          <p></p>
+        </div>
+
+        <div class="moduleDocstring">
+          <div><p class="undocumented">Undocumented</p></div>
+        </div>
+
+        <div id="splitTables">
+          <table class="children sortable" id="id32">
+  
+  
+  <tr class="function">
+    
+    <td>Function</td>
+    <td><code><a href="#are_exclusive" class="internal-link" title="astuce.filter_statements.are_exclusive">are<wbr></wbr>_exclusive</a></code></td>
+    <td>return true if the two given statements are mutually exclusive</td>
+  </tr><tr class="function">
+    
+    <td>Function</td>
+    <td><code><a href="#filter_stmts" class="internal-link" title="astuce.filter_statements.filter_stmts">filter<wbr></wbr>_stmts</a></code></td>
+    <td>Filter the given list of statements to remove ignorable statements. If base_node is not a frame itself and the name is found in the inner frame locals, statements will be filtered to remove ignorable statements according to base_node's location.</td>
+  </tr><tr class="function">
+    
+    <td>Function</td>
+    <td><code><a href="#get_assign_type" class="internal-link" title="astuce.filter_statements.get_assign_type">get<wbr></wbr>_assign<wbr></wbr>_type</a></code></td>
+    <td>The type of assignment that this node performs. For a <code><a href="https://docs.python.org/3/library/ast.html#ast.Name" class="intersphinx-link">ast.Name</a></code>, return the parent <code><a href="https://docs.python.org/3/library/ast.html#ast.Assign" class="intersphinx-link">ast.Assign</a></code> node that define the name.</td>
+  </tr><tr class="function">
+    
+    <td>Function</td>
+    <td><code><a href="#optionally_assigns" class="internal-link" title="astuce.filter_statements.optionally_assigns">optionally<wbr></wbr>_assigns</a></code></td>
+    <td>Whether this node optionally assigns a variable.</td>
+  </tr><tr class="constant">
+    
+    <td>Constant</td>
+    <td><code><a href="#ASSIGNMENT_NODES" class="internal-link" title="astuce.filter_statements.ASSIGNMENT_NODES">ASSIGNMENT<wbr></wbr>_NODES</a></code></td>
+    <td><span class="undocumented">Undocumented</span></td>
+  </tr><tr class="constant">
+    
+    <td>Constant</td>
+    <td><code><a href="#CONTAINER_NODES" class="internal-link" title="astuce.filter_statements.CONTAINER_NODES">CONTAINER<wbr></wbr>_NODES</a></code></td>
+    <td><span class="undocumented">Undocumented</span></td>
+  </tr><tr class="constant">
+    
+    <td>Constant</td>
+    <td><code><a href="#FILTER_STATEMENTS_NODES" class="internal-link" title="astuce.filter_statements.FILTER_STATEMENTS_NODES">FILTER<wbr></wbr>_STATEMENTS<wbr></wbr>_NODES</a></code></td>
+    <td><span class="undocumented">Undocumented</span></td>
+  </tr><tr class="constant">
+    
+    <td>Constant</td>
+    <td><code><a href="#OPTIONAL_ASSIGN_NODES" class="internal-link" title="astuce.filter_statements.OPTIONAL_ASSIGN_NODES">OPTIONAL<wbr></wbr>_ASSIGN<wbr></wbr>_NODES</a></code></td>
+    <td><span class="undocumented">Undocumented</span></td>
+  </tr><tr class="constant">
+    
+    <td>Constant</td>
+    <td><code><a href="#PARENT_ASSIGNMENT_NODES" class="internal-link" title="astuce.filter_statements.PARENT_ASSIGNMENT_NODES">PARENT<wbr></wbr>_ASSIGNMENT<wbr></wbr>_NODES</a></code></td>
+    <td><span class="undocumented">Undocumented</span></td>
+  </tr><tr class="function private">
+    
+    <td>Function</td>
+    <td><code><a href="#_assign_type_get_filtered_stmts" class="internal-link" title="astuce.filter_statements._assign_type_get_filtered_stmts">_assign<wbr></wbr>_type<wbr></wbr>_get<wbr></wbr>_filtered<wbr></wbr>_stmts</a></code></td>
+    <td>method used in filter_stmts</td>
+  </tr><tr class="function private">
+    
+    <td>Function</td>
+    <td><code><a href="#_comprehension_get_filtered_stmts" class="internal-link" title="astuce.filter_statements._comprehension_get_filtered_stmts">_comprehension<wbr></wbr>_get<wbr></wbr>_filtered<wbr></wbr>_stmts</a></code></td>
+    <td>method used in filter_stmts</td>
+  </tr><tr class="function private">
+    
+    <td>Function</td>
+    <td><code><a href="#_filter_statement_get_filtered_stmts" class="internal-link" title="astuce.filter_statements._filter_statement_get_filtered_stmts">_filter<wbr></wbr>_statement<wbr></wbr>_get<wbr></wbr>_filtered<wbr></wbr>_stmts</a></code></td>
+    <td>method used in _filter_stmts to get statements and trigger break</td>
+  </tr><tr class="function private">
+    
+    <td>Function</td>
+    <td><code><a href="#_get_filtered_node_statements" class="internal-link" title="astuce.filter_statements._get_filtered_node_statements">_get<wbr></wbr>_filtered<wbr></wbr>_node<wbr></wbr>_statements</a></code></td>
+    <td>Returns the list of tuples (node, node.statement) for all stmt_nodes.</td>
+  </tr><tr class="function private">
+    
+    <td>Function</td>
+    <td><code><a href="#_get_filtered_stmts" class="internal-link" title="astuce.filter_statements._get_filtered_stmts">_get<wbr></wbr>_filtered<wbr></wbr>_stmts</a></code></td>
+    <td><span class="undocumented">No summary</span></td>
+  </tr><tr class="function private">
+    
+    <td>Function</td>
+    <td><code><a href="#_get_if_statement_ancestor" class="internal-link" title="astuce.filter_statements._get_if_statement_ancestor">_get<wbr></wbr>_if<wbr></wbr>_statement<wbr></wbr>_ancestor</a></code></td>
+    <td>Return the first parent node that is an If node (or None)</td>
+  </tr><tr class="function private">
+    
+    <td>Function</td>
+    <td><code><a href="#_is_orelse" class="internal-link" title="astuce.filter_statements._is_orelse">_is<wbr></wbr>_orelse</a></code></td>
+    <td><span class="undocumented">Undocumented</span></td>
+  </tr><tr class="function private">
+    
+    <td>Function</td>
+    <td><code><a href="#_should_use_parent_assign_type" class="internal-link" title="astuce.filter_statements._should_use_parent_assign_type">_should<wbr></wbr>_use<wbr></wbr>_parent<wbr></wbr>_assign<wbr></wbr>_type</a></code></td>
+    <td><span class="undocumented">Undocumented</span></td>
+  </tr>
+</table>
+          
+
+            
+        </div>
+
+        <div id="childList">
+          <div class="basefunction">
+  
+  
+  <a name="astuce.filter_statements.are_exclusive">
+    
+  </a>
+  <a name="are_exclusive">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-keyword">def</span> <span class="py-defname">are_exclusive</span>(stmt1, stmt2):
+    <a class="sourceLink" href="https://github.com/tristanlatr/astuce/tree/main/astuce/filter_statements.py#L91">
+      
+      (source)
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    
+    <div><p>return true if the two given statements are mutually exclusive</p>
+<p>algorithm :
+1) index stmt1's parents
+2) climb among stmt2's parents until we find a common parent
+3) if the common parent is a If or Try statement, look if nodes are</p>
+<blockquote>
+in exclusive branches</blockquote>
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">stmt1:</span><code><a href="astuce.nodes.ASTNode.html" class="internal-link" title="astuce.nodes.ASTNode">ASTNode</a></code></td><td class="fieldArgDesc"><span class="undocumented">Undocumented</span></td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">stmt2:</span><code><a href="astuce.nodes.ASTNode.html" class="internal-link" title="astuce.nodes.ASTNode">ASTNode</a></code></td><td class="fieldArgDesc"><span class="undocumented">Undocumented</span></td></tr><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc"><span class="undocumented">Undocumented</span></td></tr></table></div>
+  </div>
+</div><div class="basefunction">
+  
+  
+  <a name="astuce.filter_statements.filter_stmts">
+    
+  </a>
+  <a name="filter_stmts">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-keyword">def</span> <span class="py-defname">filter_stmts</span>(base_node, stmts, frame, offset):
+    <a class="sourceLink" href="https://github.com/tristanlatr/astuce/tree/main/astuce/filter_statements.py#L230">
+      
+      (source)
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    
+    <div><p>Filter the given list of statements to remove ignorable statements.
+If base_node is not a frame itself and the name is found in the inner
+frame locals, statements will be filtered to remove ignorable
+statements according to base_node's location.</p>
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">base<wbr></wbr>_node:</span><code><a href="astuce.nodes.ASTNode.html" class="internal-link" title="astuce.nodes.ASTNode">ASTNode</a></code></td><td class="fieldArgDesc"><span class="undocumented">Undocumented</span></td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">stmts:</span><code><a href="https://docs.python.org/3/library/stdtypes.html#list" class="intersphinx-link">list</a>(<a href="astuce.nodes.ASTNode.html" class="internal-link" title="astuce.nodes.ASTNode">ASTNode</a>)</code></td><td class="fieldArgDesc">The statements to filter.
+This list generally comes from the ASTNode.locals atribute that
+maps strings to <code><a href="https://docs.python.org/3/library/ast.html#ast.Name" class="intersphinx-link">ast.Name</a></code> or <code><a href="https://docs.python.org/3/library/ast.html#ast.Attribute" class="intersphinx-link">ast.Attribute</a></code></td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">frame:</span><code><a href="astuce.nodes.ASTNode.html" class="internal-link" title="astuce.nodes.ASTNode">ASTNode</a></code></td><td class="fieldArgDesc">The frame that all of the given statements belong to.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">offset:</span><code><a href="https://docs.python.org/3/library/functions.html#int" class="intersphinx-link">int</a></code></td><td class="fieldArgDesc">The line offset to filter statements up to.</td></tr><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/stdtypes.html#list" class="intersphinx-link">list</a>(<a href="astuce.nodes.ASTNode.html" class="internal-link" title="astuce.nodes.ASTNode">ASTNode</a>)</code></td><td class="fieldArgDesc">The filtered statements.</td></tr></table></div>
+  </div>
+</div><div class="basefunction">
+  
+  
+  <a name="astuce.filter_statements.get_assign_type">
+    
+  </a>
+  <a name="get_assign_type">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-keyword">def</span> <span class="py-defname">get_assign_type</span>(node):
+    <a class="sourceLink" href="https://github.com/tristanlatr/astuce/tree/main/astuce/filter_statements.py#L57">
+      
+      (source)
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    
+    <div><p>The type of assignment that this node performs.
+For a <code><a href="https://docs.python.org/3/library/ast.html#ast.Name" class="intersphinx-link">ast.Name</a></code>, return the parent <code><a href="https://docs.python.org/3/library/ast.html#ast.Assign" class="intersphinx-link">ast.Assign</a></code> node that define the name.</p>
+<p>This will generally return the statement it self.</p>
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">node:</span><code><a href="astuce.nodes.ASTNode.html" class="internal-link" title="astuce.nodes.ASTNode">ASTNode</a></code></td><td class="fieldArgDesc"><span class="undocumented">Undocumented</span></td></tr><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="astuce.nodes.ASTNode.html" class="internal-link" title="astuce.nodes.ASTNode">ASTNode</a></code></td><td class="fieldArgDesc"><span class="undocumented">Undocumented</span></td></tr></table></div>
+  </div>
+</div><div class="basefunction">
+  
+  
+  <a name="astuce.filter_statements.optionally_assigns">
+    
+  </a>
+  <a name="optionally_assigns">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-keyword">def</span> <span class="py-defname">optionally_assigns</span>(self):
+    <a class="sourceLink" href="https://github.com/tristanlatr/astuce/tree/main/astuce/filter_statements.py#L78">
+      
+      (source)
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    
+    <div><p>Whether this node optionally assigns a variable.</p>
+<p>This is for loop assignments because loop won't necessarily perform an
+assignment if the loop has no iterations.</p>
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc"><span class="undocumented">Undocumented</span></td></tr></table></div>
+  </div>
+</div><div class="baseconstant">
+  
+  
+  <a name="astuce.filter_statements.ASSIGNMENT_NODES">
+    
+  </a>
+  <a name="ASSIGNMENT_NODES">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">ASSIGNMENT_NODES</span> =
+    <a class="sourceLink" href="https://github.com/tristanlatr/astuce/tree/main/astuce/filter_statements.py#L40">
+      
+      (source)
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code>(<wbr></wbr><a href="https://docs.python.org/3/library/ast.html#ast.arguments" class="intersphinx-link">ast.arguments</a>,
+ <wbr></wbr><a href="https://docs.python.org/3/library/ast.html#ast.Delete" class="intersphinx-link">ast.Delete</a>,
+ <wbr></wbr><a href="https://docs.python.org/3/library/ast.html#ast.AnnAssign" class="intersphinx-link">ast.AnnAssign</a>,
+ <wbr></wbr><a href="https://docs.python.org/3/library/ast.html#ast.Assign" class="intersphinx-link">ast.Assign</a>,
+ <wbr></wbr><a href="https://docs.python.org/3/library/ast.html#ast.AugAssign" class="intersphinx-link">ast.AugAssign</a>,
+ <wbr></wbr><a href="https://docs.python.org/3/library/ast.html#ast.Import" class="intersphinx-link">ast.Import</a>,
+ <wbr></wbr><a href="https://docs.python.org/3/library/ast.html#ast.ImportFrom" class="intersphinx-link">ast.ImportFrom</a>,
+<span class="rst-variable-ellipsis">...</span></code></pre></td></tr></table>
+  </div>
+</div><div class="baseconstant">
+  
+  
+  <a name="astuce.filter_statements.CONTAINER_NODES">
+    
+  </a>
+  <a name="CONTAINER_NODES">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">CONTAINER_NODES</span> =
+    <a class="sourceLink" href="https://github.com/tristanlatr/astuce/tree/main/astuce/filter_statements.py#L55">
+      
+      (source)
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code>(<wbr></wbr><a href="https://docs.python.org/3/library/ast.html#ast.List" class="intersphinx-link">ast.List</a>, <wbr></wbr><a href="https://docs.python.org/3/library/ast.html#ast.Set" class="intersphinx-link">ast.Set</a>, <wbr></wbr><a href="https://docs.python.org/3/library/ast.html#ast.Tuple" class="intersphinx-link">ast.Tuple</a>)</code></pre></td></tr></table>
+  </div>
+</div><div class="baseconstant">
+  
+  
+  <a name="astuce.filter_statements.FILTER_STATEMENTS_NODES">
+    
+  </a>
+  <a name="FILTER_STATEMENTS_NODES">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">FILTER_STATEMENTS_NODES</span> =
+    <a class="sourceLink" href="https://github.com/tristanlatr/astuce/tree/main/astuce/filter_statements.py#L26">
+      
+      (source)
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code>(<wbr></wbr><a href="https://docs.python.org/3/library/ast.html#ast.ImportFrom" class="intersphinx-link">ast.ImportFrom</a>,
+ <wbr></wbr><a href="https://docs.python.org/3/library/ast.html#ast.Import" class="intersphinx-link">ast.Import</a>,
+ <wbr></wbr><a href="https://docs.python.org/3/library/ast.html#ast.ClassDef" class="intersphinx-link">ast.ClassDef</a>,
+ <wbr></wbr><a href="https://docs.python.org/3/library/ast.html#ast.Lambda" class="intersphinx-link">ast.Lambda</a>,
+ <wbr></wbr><a href="https://docs.python.org/3/library/ast.html#ast.FunctionDef" class="intersphinx-link">ast.FunctionDef</a>,
+ <wbr></wbr><a href="https://docs.python.org/3/library/ast.html#ast.AsyncFunctionDef" class="intersphinx-link">ast.AsyncFunctionDef</a>)</code></pre></td></tr></table>
+  </div>
+</div><div class="baseconstant">
+  
+  
+  <a name="astuce.filter_statements.OPTIONAL_ASSIGN_NODES">
+    
+  </a>
+  <a name="OPTIONAL_ASSIGN_NODES">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">OPTIONAL_ASSIGN_NODES</span> =
+    <a class="sourceLink" href="https://github.com/tristanlatr/astuce/tree/main/astuce/filter_statements.py#L23">
+      
+      (source)
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code>(<wbr></wbr><a href="https://docs.python.org/3/library/ast.html#ast.NamedExpr" class="intersphinx-link">ast.NamedExpr</a>, <wbr></wbr><a href="https://docs.python.org/3/library/ast.html#ast.comprehension" class="intersphinx-link">ast.comprehension</a>, <wbr></wbr><a href="https://docs.python.org/3/library/ast.html#ast.For" class="intersphinx-link">ast.For</a>, <wbr></wbr><a href="https://docs.python.org/3/library/ast.html#ast.AsyncFor" class="intersphinx-link">ast.AsyncFor</a>)</code></pre></td></tr></table>
+  </div>
+</div><div class="baseconstant">
+  
+  
+  <a name="astuce.filter_statements.PARENT_ASSIGNMENT_NODES">
+    
+  </a>
+  <a name="PARENT_ASSIGNMENT_NODES">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">PARENT_ASSIGNMENT_NODES</span> =
+    <a class="sourceLink" href="https://github.com/tristanlatr/astuce/tree/main/astuce/filter_statements.py#L48">
+      
+      (source)
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code>(<wbr></wbr><a href="https://docs.python.org/3/library/ast.html#ast.Name" class="intersphinx-link">ast.Name</a>,
+ <wbr></wbr><a href="https://docs.python.org/3/library/ast.html#ast.Attribute" class="intersphinx-link">ast.Attribute</a>,
+ <wbr></wbr><a href="https://docs.python.org/3/library/ast.html#ast.arg" class="intersphinx-link">ast.arg</a>,
+ <wbr></wbr><a href="https://docs.python.org/3/library/ast.html#ast.List" class="intersphinx-link">ast.List</a>,
+ <wbr></wbr><a href="https://docs.python.org/3/library/ast.html#ast.Tuple" class="intersphinx-link">ast.Tuple</a>,
+ <wbr></wbr><a href="https://docs.python.org/3/library/ast.html#ast.Set" class="intersphinx-link">ast.Set</a>,
+ <wbr></wbr><a href="https://docs.python.org/3/library/ast.html#ast.Starred" class="intersphinx-link">ast.Starred</a>,
+<span class="rst-variable-ellipsis">...</span></code></pre></td></tr></table>
+  </div>
+</div><div class="basefunction private">
+  
+  
+  <a name="astuce.filter_statements._assign_type_get_filtered_stmts">
+    
+  </a>
+  <a name="_assign_type_get_filtered_stmts">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-keyword">def</span> <span class="py-defname">_assign_type_get_filtered_stmts</span>(self, lookup_node, node, _stmts, mystmt):
+    <a class="sourceLink" href="https://github.com/tristanlatr/astuce/tree/main/astuce/filter_statements.py#L202">
+      
+      (source)
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    
+    <div><p>method used in filter_stmts</p>
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">lookup<wbr></wbr>_node:</span><code><a href="astuce.nodes.ASTNode.html" class="internal-link" title="astuce.nodes.ASTNode">ASTNode</a></code></td><td class="fieldArgDesc"><span class="undocumented">Undocumented</span></td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">node:</span><code><a href="astuce.nodes.ASTNode.html" class="internal-link" title="astuce.nodes.ASTNode">ASTNode</a></code></td><td class="fieldArgDesc"><span class="undocumented">Undocumented</span></td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">_stmts:</span><code><a href="https://docs.python.org/3/library/typing.html#typing.List" class="intersphinx-link">List</a>[<wbr></wbr><a href="astuce.nodes.ASTNode.html" class="internal-link" title="astuce.nodes.ASTNode">ASTNode</a>]</code></td><td class="fieldArgDesc"><span class="undocumented">Undocumented</span></td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">mystmt:</span><code><a href="https://docs.python.org/3/library/typing.html#typing.Optional" class="intersphinx-link">Optional</a>[<wbr></wbr><a href="astuce.nodes.ASTNode.html" class="internal-link" title="astuce.nodes.ASTNode">ASTNode</a>]</code></td><td class="fieldArgDesc"><span class="undocumented">Undocumented</span></td></tr><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/typing.html#typing.Tuple" class="intersphinx-link">Tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/library/typing.html#typing.List" class="intersphinx-link">List</a>[<wbr></wbr><a href="astuce.nodes.ASTNode.html" class="internal-link" title="astuce.nodes.ASTNode">ASTNode</a>], <wbr></wbr><a href="https://docs.python.org/3/library/functions.html#bool" class="intersphinx-link">bool</a>]</code></td><td class="fieldArgDesc"><span class="undocumented">Undocumented</span></td></tr></table></div>
+  </div>
+</div><div class="basefunction private">
+  
+  
+  <a name="astuce.filter_statements._comprehension_get_filtered_stmts">
+    
+  </a>
+  <a name="_comprehension_get_filtered_stmts">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-keyword">def</span> <span class="py-defname">_comprehension_get_filtered_stmts</span>(self, lookup_node, node, stmts, mystmt):
+    <a class="sourceLink" href="https://github.com/tristanlatr/astuce/tree/main/astuce/filter_statements.py#L215">
+      
+      (source)
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    
+    <div><p>method used in filter_stmts</p>
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">lookup<wbr></wbr>_node:</span><code><a href="astuce.nodes.ASTNode.html" class="internal-link" title="astuce.nodes.ASTNode">ASTNode</a></code></td><td class="fieldArgDesc"><span class="undocumented">Undocumented</span></td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">node:</span><code><a href="astuce.nodes.ASTNode.html" class="internal-link" title="astuce.nodes.ASTNode">ASTNode</a></code></td><td class="fieldArgDesc"><span class="undocumented">Undocumented</span></td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">stmts:</span><code><a href="https://docs.python.org/3/library/typing.html#typing.List" class="intersphinx-link">List</a>[<wbr></wbr><a href="astuce.nodes.ASTNode.html" class="internal-link" title="astuce.nodes.ASTNode">ASTNode</a>]</code></td><td class="fieldArgDesc"><span class="undocumented">Undocumented</span></td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">mystmt:</span><code><a href="https://docs.python.org/3/library/typing.html#typing.Optional" class="intersphinx-link">Optional</a>[<wbr></wbr><a href="astuce.nodes.ASTNode.html" class="internal-link" title="astuce.nodes.ASTNode">ASTNode</a>]</code></td><td class="fieldArgDesc"><span class="undocumented">Undocumented</span></td></tr><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/typing.html#typing.Tuple" class="intersphinx-link">Tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/library/typing.html#typing.List" class="intersphinx-link">List</a>[<wbr></wbr><a href="astuce.nodes.ASTNode.html" class="internal-link" title="astuce.nodes.ASTNode">ASTNode</a>], <wbr></wbr><a href="https://docs.python.org/3/library/functions.html#bool" class="intersphinx-link">bool</a>]</code></td><td class="fieldArgDesc"><span class="undocumented">Undocumented</span></td></tr></table></div>
+  </div>
+</div><div class="basefunction private">
+  
+  
+  <a name="astuce.filter_statements._filter_statement_get_filtered_stmts">
+    
+  </a>
+  <a name="_filter_statement_get_filtered_stmts">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-keyword">def</span> <span class="py-defname">_filter_statement_get_filtered_stmts</span>(self, _, node, _stmts, mystmt):
+    <a class="sourceLink" href="https://github.com/tristanlatr/astuce/tree/main/astuce/filter_statements.py#L193">
+      
+      (source)
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    
+    <div><p>method used in _filter_stmts to get statements and trigger break</p>
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">_:</span><code><a href="astuce.nodes.ASTNode.html" class="internal-link" title="astuce.nodes.ASTNode">ASTNode</a></code></td><td class="fieldArgDesc"><span class="undocumented">Undocumented</span></td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">node:</span><code><a href="astuce.nodes.ASTNode.html" class="internal-link" title="astuce.nodes.ASTNode">ASTNode</a></code></td><td class="fieldArgDesc"><span class="undocumented">Undocumented</span></td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">_stmts:</span><code><a href="https://docs.python.org/3/library/typing.html#typing.List" class="intersphinx-link">List</a>[<wbr></wbr><a href="astuce.nodes.ASTNode.html" class="internal-link" title="astuce.nodes.ASTNode">ASTNode</a>]</code></td><td class="fieldArgDesc"><span class="undocumented">Undocumented</span></td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">mystmt:</span><code><a href="https://docs.python.org/3/library/typing.html#typing.Optional" class="intersphinx-link">Optional</a>[<wbr></wbr><a href="astuce.nodes.ASTNode.html" class="internal-link" title="astuce.nodes.ASTNode">ASTNode</a>]</code></td><td class="fieldArgDesc"><span class="undocumented">Undocumented</span></td></tr><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/typing.html#typing.Tuple" class="intersphinx-link">Tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/library/typing.html#typing.List" class="intersphinx-link">List</a>[<wbr></wbr><a href="astuce.nodes.ASTNode.html" class="internal-link" title="astuce.nodes.ASTNode">ASTNode</a>], <wbr></wbr><a href="https://docs.python.org/3/library/functions.html#bool" class="intersphinx-link">bool</a>]</code></td><td class="fieldArgDesc"><span class="undocumented">Undocumented</span></td></tr></table></div>
+  </div>
+</div><div class="basefunction private">
+  
+  
+  <a name="astuce.filter_statements._get_filtered_node_statements">
+    
+  </a>
+  <a name="_get_filtered_node_statements">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-keyword">def</span> <span class="py-defname">_get_filtered_node_statements</span>(base_node, stmt_nodes):
+    <a class="sourceLink" href="https://github.com/tristanlatr/astuce/tree/main/astuce/filter_statements.py#L150">
+      
+      (source)
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    
+    <div><p>Returns the list of tuples (node, node.statement) for all stmt_nodes.</p>
+<p>Special handling for ExceptHandlers, see code comments.</p>
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">base<wbr></wbr>_node:</span><code><a href="astuce.nodes.ASTNode.html" class="internal-link" title="astuce.nodes.ASTNode">ASTNode</a></code></td><td class="fieldArgDesc"><span class="undocumented">Undocumented</span></td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">stmt<wbr></wbr>_nodes:</span><code><a href="https://docs.python.org/3/library/typing.html#typing.List" class="intersphinx-link">List</a>[<wbr></wbr><a href="astuce._typing.html#LocalsAssignT" class="internal-link" title="astuce._typing.LocalsAssignT">LocalsAssignT</a>]</code></td><td class="fieldArgDesc"><span class="undocumented">Undocumented</span></td></tr><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/typing.html#typing.List" class="intersphinx-link">List</a>[<wbr></wbr><a href="https://docs.python.org/3/library/typing.html#typing.Tuple" class="intersphinx-link">Tuple</a>[<wbr></wbr><a href="astuce._typing.html#LocalsAssignT" class="internal-link" title="astuce._typing.LocalsAssignT">LocalsAssignT</a>, <wbr></wbr><a href="https://docs.python.org/3/library/typing.html#typing.Union" class="intersphinx-link">Union</a>[<wbr></wbr><a href="astuce._typing.ASTstmt.html" class="internal-link" title="astuce._typing.ASTstmt">ASTstmt</a>, <wbr></wbr><a href="astuce._typing.Module.html" class="internal-link" title="astuce._typing.Module">ASTModuleT</a>]]]</code></td><td class="fieldArgDesc"><span class="undocumented">Undocumented</span></td></tr></table></div>
+  </div>
+</div><div class="basefunction private">
+  
+  
+  <a name="astuce.filter_statements._get_filtered_stmts">
+    
+  </a>
+  <a name="_get_filtered_stmts">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-keyword">def</span> <span class="py-defname">_get_filtered_stmts</span>(self, base_node, node, _stmts, mystmt):
+    <a class="sourceLink" href="https://github.com/tristanlatr/astuce/tree/main/astuce/filter_statements.py#L176">
+      
+      (source)
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    
+    <div><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">self:</span><code><a href="astuce.nodes.ASTNode.html" class="internal-link" title="astuce.nodes.ASTNode">ASTNode</a></code></td><td class="fieldArgDesc">the assign_type.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">base<wbr></wbr>_node:</span><code><a href="astuce.nodes.ASTNode.html" class="internal-link" title="astuce.nodes.ASTNode">ASTNode</a></code></td><td class="fieldArgDesc">the lookup context node in which the filtering happends.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">node:</span><code><a href="astuce.nodes.ASTNode.html" class="internal-link" title="astuce.nodes.ASTNode">ASTNode</a></code></td><td class="fieldArgDesc">the LocalsAssignT node where the node to filter was assigned.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">_stmts:</span><code><a href="https://docs.python.org/3/library/typing.html#typing.List" class="intersphinx-link">List</a>[<wbr></wbr><a href="astuce.nodes.ASTNode.html" class="internal-link" title="astuce.nodes.ASTNode">ASTNode</a>]</code></td><td class="fieldArgDesc">the already filtered statements (empty list on the first iteration)</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">mystmt:</span><code><a href="https://docs.python.org/3/library/typing.html#typing.Optional" class="intersphinx-link">Optional</a>[<wbr></wbr><a href="astuce.nodes.ASTNode.html" class="internal-link" title="astuce.nodes.ASTNode">ASTNode</a>]</code></td><td class="fieldArgDesc">the statement of the base node.</td></tr><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/typing.html#typing.Tuple" class="intersphinx-link">Tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/library/typing.html#typing.List" class="intersphinx-link">List</a>[<wbr></wbr><a href="astuce.nodes.ASTNode.html" class="internal-link" title="astuce.nodes.ASTNode">ASTNode</a>], <wbr></wbr><a href="https://docs.python.org/3/library/functions.html#bool" class="intersphinx-link">bool</a>]</code></td><td class="fieldArgDesc"><span class="undocumented">Undocumented</span></td></tr></table></div>
+  </div>
+</div><div class="basefunction private">
+  
+  
+  <a name="astuce.filter_statements._get_if_statement_ancestor">
+    
+  </a>
+  <a name="_get_if_statement_ancestor">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-keyword">def</span> <span class="py-defname">_get_if_statement_ancestor</span>(node):
+    <a class="sourceLink" href="https://github.com/tristanlatr/astuce/tree/main/astuce/filter_statements.py#L169">
+      
+      (source)
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    
+    <div><p>Return the first parent node that is an If node (or None)</p>
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">node:</span><code><a href="astuce.nodes.ASTNode.html" class="internal-link" title="astuce.nodes.ASTNode">ASTNode</a></code></td><td class="fieldArgDesc"><span class="undocumented">Undocumented</span></td></tr><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/typing.html#typing.Optional" class="intersphinx-link">Optional</a>[<wbr></wbr><a href="astuce.nodes.ASTNode.html" class="internal-link" title="astuce.nodes.ASTNode">ASTNode</a>]</code></td><td class="fieldArgDesc"><span class="undocumented">Undocumented</span></td></tr></table></div>
+  </div>
+</div><div class="basefunction private">
+  
+  
+  <a name="astuce.filter_statements._is_orelse">
+    
+  </a>
+  <a name="_is_orelse">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-keyword">def</span> <span class="py-defname">_is_orelse</span>(node):
+    <a class="sourceLink" href="https://github.com/tristanlatr/astuce/tree/main/astuce/filter_statements.py#L442">
+      
+      (source)
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    
+    <div><p class="undocumented">Undocumented</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">node:</span><code><a href="astuce.nodes.ASTNode.html" class="internal-link" title="astuce.nodes.ASTNode">ASTNode</a></code></td><td class="fieldArgDesc"><span class="undocumented">Undocumented</span></td></tr><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc"><span class="undocumented">Undocumented</span></td></tr></table></div>
+  </div>
+</div><div class="basefunction private">
+  
+  
+  <a name="astuce.filter_statements._should_use_parent_assign_type">
+    
+  </a>
+  <a name="_should_use_parent_assign_type">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-keyword">def</span> <span class="py-defname">_should_use_parent_assign_type</span>(node):
+    <a class="sourceLink" href="https://github.com/tristanlatr/astuce/tree/main/astuce/filter_statements.py#L69">
+      
+      (source)
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    
+    <div><p class="undocumented">Undocumented</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">node:</span><code><a href="astuce.nodes.ASTNode.html" class="internal-link" title="astuce.nodes.ASTNode">ASTNode</a></code></td><td class="fieldArgDesc"><span class="undocumented">Undocumented</span></td></tr><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc"><span class="undocumented">Undocumented</span></td></tr></table></div>
+  </div>
+</div>
+        </div>
+      
+      </div>
+    </div>
+
+    <footer class="navbar navbar-default">
+    <hr />
+    
+    
+    <div class="container">
+      <a href="index.html">API Documentation</a> for <a href="https://github.com/tristanlatr/astuce/" class="projecthome">astuce</a>,
+    generated by <a href="https://github.com/twisted/pydoctor/">pydoctor</a>
+      22.5.1 at 2022-06-11 05:48:02.
+    </div>
+    
+    <script src="ajax.js" type="text/javascript"></script>
+    <script src="searchlib.js" type="text/javascript"></script>
+    <script src="search.js" type="text/javascript"></script>
+  
+  </footer>
+  
+    <script src="pydoctor.js" type="text/javascript"></script>
+
+  </body>
+</html>
