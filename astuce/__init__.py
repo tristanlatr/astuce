@@ -15,11 +15,11 @@ Example usage:
     from mod2 import __all__ as _l
     __all__ = ['f', 'k']
     __all__.extend(_l)
-    ''')
+    ''', modname='mod1')
 
     mod2 = p.parse('''
     __all__ = ('i', 'j')
-    ''')
+    ''', modname='mod2')
 
     inferred = list(inference.infer_attr(mod2, '__all__'))
     assert len(inferred) == 1
