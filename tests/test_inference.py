@@ -5,9 +5,9 @@ from typing import Any
 
 import pytest
 
-from astuce import nodes
-from astuce.exceptions import InferenceError
-from . import AstuceTestCase
+from astuce import inference, nodes
+from astuce.exceptions import InferenceError, NameInferenceError
+from . import AstuceTestCase, get_exprs, get_load_names
 
 class Parse__all__Test(AstuceTestCase):
 
@@ -365,7 +365,7 @@ class FirstInfenceTests(AstuceTestCase):
         a = b + b
         a
         """
-        variable_a = self.parse(code).body[-1]
+        variable_a = get_load_names(self.parse(code), 'a')[0]
         self.assertEqual(next(variable_a.infer()).value, 2)
 
 # Not in scope for the moment
@@ -386,6 +386,7 @@ class FirstInfenceTests(AstuceTestCase):
             code = """
                 a = 1
                 a += 2
+                # a += 1
                 a
             """
             mod = self.parse(code)
@@ -400,7 +401,7 @@ class FirstInfenceTests(AstuceTestCase):
             
             # 'a' from the locals
             augassign_name = mod.locals['a'][-1]
-            assert augassign_name.lookup('a')[1][0] == _first_name, augassign_name.lookup('a')
+            assert augassign_name.lookup('a')[1][0] == _first_name, ast.dump(augassign_name.lookup('a')[1][0].parent)
             
             inferred = list(augassign_name.infer())
             self.assertEqual(len(inferred), 1)
@@ -408,13 +409,41 @@ class FirstInfenceTests(AstuceTestCase):
             self.assertEqual(inferred[0].value, 3)
 
             # 'a' expr name load
-            _last_name = mod.body[-1].value
+            _last_name = mod.body[2].value
             assert isinstance(_last_name, ast.Name)
             inferred = list(_last_name.infer())
 
             self.assertEqual(len(inferred), 1)
             self.assertIsInstance(inferred[0], ast.Constant)
             self.assertEqual(inferred[0].value, 3)
+    
+    def test_augassign_multi_list(self) -> None:
+        code = """
+            a = []
+            a += [1]
+            x = [1]
+            a += x
+            print (a)
+        """
+        mod = self.parse(code, __name__)
+        inferred = list(get_load_names(mod, "a")[0].infer())
+
+        self.assertEqual(len(inferred), 1)
+        self.assertIsInstance(inferred[0], ast.List)
+        assert len(inferred[0].elts)==2, inferred[0].elts
+        self.assertEqual(len(inferred[0].elts), 2)
+        self.assertEqual(inferred[0].elts[1].value, 1)
+        self.assertEqual(inferred[0].elts[0].value, 1)
+
+        mod._parser.invalidate_inference_cache()
+
+        inferred = list(inference.infer_attr(mod, 'a'))
+
+        self.assertEqual(len(inferred), 1)
+        self.assertIsInstance(inferred[0], ast.List)
+        assert len(inferred[0].elts)==2, ast.dump(inferred[0])
+        self.assertEqual(inferred[0].elts[1].value, 1)
+        self.assertEqual(inferred[0].elts[0].value, 1)
 
 # Not in scope, this should return the Uninferable result instead.
 # TODO: test that.
@@ -518,12 +547,12 @@ class FirstInfenceTests(AstuceTestCase):
         (0, *var, 4, *(*bar, 8))
         (0, *var, 4, *(*bar, *foo))
         """
-        statements = self.parse(code).body
-        self.assertEqual(next(statements[-5].value.infer()).literal_eval(), (0, 1, 2, 3))
-        self.assertEqual(next(statements[-4].value.infer()).literal_eval(), (0, 1, 2, 3, 4))
-        self.assertEqual(next(statements[-3].value.infer()).literal_eval(), (0, 1, 2, 3, 4, 5, 6, 7))
-        self.assertEqual(next(statements[-2].value.infer()).literal_eval(), (0, 1, 2, 3, 4, 5, 6, 7, 8))
-        self.assertEqual(next(statements[-1].value.infer()).literal_eval(), (0, 1, 2, 3, 4, 5, 6, 7, 999, 1000, 1001))
+        statements = get_exprs(self.parse(code).body)
+        self.assertEqual(next(statements[-5].infer()).literal_eval(), (0, 1, 2, 3))
+        self.assertEqual(next(statements[-4].infer()).literal_eval(), (0, 1, 2, 3, 4))
+        self.assertEqual(next(statements[-3].infer()).literal_eval(), (0, 1, 2, 3, 4, 5, 6, 7))
+        self.assertEqual(next(statements[-2].infer()).literal_eval(), (0, 1, 2, 3, 4, 5, 6, 7, 8))
+        self.assertEqual(next(statements[-1].infer()).literal_eval(), (0, 1, 2, 3, 4, 5, 6, 7, 999, 1000, 1001))
 
     def test_starred_in_list_literal(self) -> None:
         code = """
@@ -540,14 +569,14 @@ class FirstInfenceTests(AstuceTestCase):
         [0, *var, 4, *[*bar, 8]] #@
         [0, *var, 4, *[*bar, *foo]] #@
         """
-        statements = self.parse(code).body
-        self.assertEqual(next(statements[-7].value.infer()), statements[-7].value)
-        self.assertEqual(next(statements[-6].value.infer()).literal_eval(), [0, 1, 2, 3, 4, 5, 6, 7, 999, 1000, 1001, 3.14, 42])
-        self.assertEqual(next(statements[-5].value.infer()).literal_eval(), [0, 1, 2, 3])
-        self.assertEqual(next(statements[-4].value.infer()).literal_eval(), [0, 1, 2, 3, 4])
-        self.assertEqual(next(statements[-3].value.infer()).literal_eval(), [0, 1, 2, 3, 4, 5, 6, 7])
-        self.assertEqual(next(statements[-2].value.infer()).literal_eval(), [0, 1, 2, 3, 4, 5, 6, 7, 8])
-        self.assertEqual(next(statements[-1].value.infer()).literal_eval(), [0, 1, 2, 3, 4, 5, 6, 7, 999, 1000, 1001])
+        statements = get_exprs(self.parse(code).body)
+        self.assertEqual(next(statements[-7].infer()), statements[-7])
+        self.assertEqual(next(statements[-6].infer()).literal_eval(), [0, 1, 2, 3, 4, 5, 6, 7, 999, 1000, 1001, 3.14, 42])
+        self.assertEqual(next(statements[-5].infer()).literal_eval(), [0, 1, 2, 3])
+        self.assertEqual(next(statements[-4].infer()).literal_eval(), [0, 1, 2, 3, 4])
+        self.assertEqual(next(statements[-3].infer()).literal_eval(), [0, 1, 2, 3, 4, 5, 6, 7])
+        self.assertEqual(next(statements[-2].infer()).literal_eval(), [0, 1, 2, 3, 4, 5, 6, 7, 8])
+        self.assertEqual(next(statements[-1].infer()).literal_eval(), [0, 1, 2, 3, 4, 5, 6, 7, 999, 1000, 1001])
 
     def test_starred_in_set_literal(self) -> None:
         code = """
@@ -560,12 +589,12 @@ class FirstInfenceTests(AstuceTestCase):
         {0, *var, 4, *{*bar, 8}} #@
         {0, *var, 4, *{*bar, *foo}} #@
         """
-        statements = self.parse(code).body
-        self.assertEqual(next(statements[-5].value.infer()).literal_eval(), {0, 1, 2, 3})
-        self.assertEqual(next(statements[-4].value.infer()).literal_eval(), {0, 1, 2, 3, 4})
-        self.assertEqual(next(statements[-3].value.infer()).literal_eval(), {0, 1, 2, 3, 4, 5, 6, 7})
-        self.assertEqual(next(statements[-2].value.infer()).literal_eval(), {0, 1, 2, 3, 4, 5, 6, 7, 8})
-        self.assertEqual(next(statements[-1].value.infer()).literal_eval(), {0, 1, 2, 3, 4, 5, 6, 7, 999, 1000, 1001})
+        statements = get_exprs(self.parse(code).body)
+        self.assertEqual(next(statements[-5].infer()).literal_eval(), {0, 1, 2, 3})
+        self.assertEqual(next(statements[-4].infer()).literal_eval(), {0, 1, 2, 3, 4})
+        self.assertEqual(next(statements[-3].infer()).literal_eval(), {0, 1, 2, 3, 4, 5, 6, 7})
+        self.assertEqual(next(statements[-2].infer()).literal_eval(), {0, 1, 2, 3, 4, 5, 6, 7, 8})
+        self.assertEqual(next(statements[-1].infer()).literal_eval(), {0, 1, 2, 3, 4, 5, 6, 7, 999, 1000, 1001})
 
     def test_starred_in_literals_inference_issues(self) -> None:
         # TODO:
@@ -578,10 +607,10 @@ class FirstInfenceTests(AstuceTestCase):
         {0, *var, 4, *{*bar, 8}}
         {0, *var, 4, *{*bar, *foo}}
         """
-        statements = self.parse(code).body
+        statements = get_exprs(self.parse(code).body)
         for node in statements:
             with self.assertRaises(InferenceError):
-                next(node.value.infer())
+                next(node.infer())
 
 # Not in scope currently
 # def test_starred_in_mapping_literal(self) -> None:

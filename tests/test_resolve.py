@@ -40,7 +40,7 @@ class ResolveTest(AstuceTestCase):
         def func(a,b:int,c=True,*d,**e:Any):
             ...
         ''')
-        func = mod.body[-1]
+        func = mod.body[1]
         assert isinstance(func, ast.FunctionDef)
         elips = func.body[0]
         assert func == mod.locals['func'][0]
@@ -146,11 +146,7 @@ def test_can_get_full_imported_basename(import_:str, basename:str, expected:str)
         import_, basename
     )
     mod = fromtext(source)
-
-    node = mod.body[-1]
-    # This fails with keyerror? wtf
-    # assert node == mod.locals['ThisClass'][0] 
-    # assert node == mod.lookup('ThisClass')[1][0]
+    node = mod.locals['ThisClass'][0]
 
     assert isinstance(node, ast.ClassDef)
     basenames = node.resolve(node.bases[0].unparse())
@@ -168,9 +164,7 @@ def test_can_get_full_function_basename(import_:str, basename:str, expected:str)
         import_, basename
     )
     mod = fromtext(source)
-
-    node = mod.body[-1]
-    # assert node == mod.locals['ThisClass'][0]
+    node = mod.locals['ThisClass'][0]
     assert isinstance(node, ast.ClassDef)
     basenames = node.resolve(node.bases[0].unparse())
     assert basenames == expected

@@ -4,6 +4,7 @@ Core of the inference engine.
 """
 
 import ast
+import contextlib
 import functools
 import itertools
 import sys
@@ -30,6 +31,7 @@ def _infer_stmts(
     context = copy_context(context)
 
     for stmt in stmts:
+        # Yields Uninferables as is
         if stmt is nodes.Uninferable:
             yield stmt
             inferred = True
@@ -155,10 +157,44 @@ def get_submodule(pack:_typing.Module, name:str, *, context:OptionalInferenceCon
     except KeyError:
         return None
 
+def _get_end_of_frame_sentinel(frame_node:_typing.FrameNodeT) -> _typing.ASTstmt:
+    # we use a sentinel node when doing lookups with get_attr to void this behaviour:
+    # https://github.com/PyCQA/astroid/pull/1612#issuecomment-1152741042
+
+    assert nodes.is_frame_node(frame_node)
+    
+    if isinstance(frame_node, ast.Lambda):
+        return frame_node
+    
+    # The last element in frame nodes should be the inserted sentinel "end of" node.
+    if _is_end_of_frame_sentinel(frame_node.body[-1]):
+        return frame_node.body[-1]
+    else:
+        raise exceptions.MissingSentinelNode(node=frame_node)
+
+def _is_end_of_frame_sentinel(node:_typing.ASTNode) -> bool:
+    if not isinstance(node, ast.Expr):
+        return False
+    try:
+        v = node.value.literal_eval()
+    except ValueError:
+        return False
+    else:
+        if v == nodes._END_OF_FRAME_SENTINEL_CONSTANT:
+            return True
+    
+    return False
+    
+    # The last element in frame nodes is assumed to be the inserted sentinel "end of" node.
+    return frame_node.body[-1]
+
 def get_attr(ctx: _typing.FrameNodeT, name:str, *, ignore_locals:bool=False, context:OptionalInferenceContext=None) -> List[ASTNodeT]:
     """
     Get local attributes definitions matching the name from this frame node.
     """
+    # TODO: Handle {"__name__", "__doc__", "__file__", "__path__", "__package__"}
+    # TODO: Handle __class__, __module__, __qualname__,
+
     # Adjusted from astroid NodeNG.getattr() method, with minimal support for packages.
     
     if not name:
@@ -166,7 +202,11 @@ def get_attr(ctx: _typing.FrameNodeT, name:str, *, ignore_locals:bool=False, con
     
     assert nodes.is_frame_node(ctx), "use get_attr() only on frame nodes"
     
-    values = ctx.lookup(name)[1] if not ignore_locals else []
+    # values = ctx.lookup(name)[1] if not ignore_locals else []
+    if not ignore_locals:
+        values = _get_end_of_frame_sentinel(ctx).lookup(name)[1]
+    else: 
+        values = []
 
     if not values and isinstance(ctx, ast.Module) and ctx._is_package:
        # Support for sub-packages.
@@ -359,10 +399,15 @@ def _infer_IfExp(node:_typing.IfExp, context: OptionalInferenceContext=None) -> 
         both_branches = True
     else:
         if test is not nodes.Uninferable:
-            if test.bool_value():
-                yield from node.body.infer(context=lhs_context)
+            try:
+                inferred_literal = test.literal_eval()
+            except ValueError:
+                both_branches = True
             else:
-                yield from node.orelse.infer(context=rhs_context)
+                if bool(inferred_literal):
+                    yield from node.body.infer(context=lhs_context)
+                else:
+                    yield from node.orelse.infer(context=rhs_context)
         else:
             both_branches = True
     if both_branches:
@@ -384,7 +429,7 @@ def _infer_sequence_helper(node:Union[_typing.Tuple, _typing.List, _typing.Set],
     """
     values = []
 
-    for elt in node.elts:
+    for i, elt in enumerate(node.elts):
         if isinstance(elt, ast.Starred):
             starred = safe_infer(elt.value, context)
             if not starred:
@@ -401,7 +446,12 @@ def _infer_sequence_helper(node:Union[_typing.Tuple, _typing.List, _typing.Set],
             if infer_all_elements:
                 # This part might change is the future, astroid behaved differently for some reason
                 # TODO: Create an issue to gather more informations about this.
-                value = safe_infer(elt, context) or nodes.Uninferable
+                
+                value = safe_infer(elt, context)
+                if value is None:
+                    node._report(f"Sequence element ({i}) is not inferable")
+                    value = nodes.Uninferable
+                
                 values.append(value)
             else:
                 values.append(elt)
@@ -448,6 +498,7 @@ _OPPERATORS = {
       ast.Sub    : lambda a, b: a - b,
       ast.Mult   : lambda a, b: a * b,
       ast.Div    : lambda a, b: a / b,
+      ast.FloorDiv: lambda a, b: a // b,
       ast.Mod    : lambda a, b: a % b,
       ast.Pow    : lambda a, b: a**b,
       ast.LShift : lambda a, b: a << b,
@@ -455,6 +506,7 @@ _OPPERATORS = {
       ast.BitOr  : lambda a, b: a | b,
       ast.BitAnd : lambda a, b: a & b,
       ast.BitXor : lambda a, b: a ^ b,
+      ast.MatMult: lambda a, b: a @ b,
       
       # Compare operators
       ast.Eq     : lambda a, b: a == b,
@@ -469,6 +521,23 @@ _OPPERATORS = {
       ast.Is     : lambda i,j: i is j,
     }
 
+import operator as operatorlib
+_AUGMENTED_OPERATORS = {
+    ast.Add    : lambda a, b: operatorlib.iadd(a,b),
+    ast.Sub    : lambda a, b: operatorlib.isub(a,b),
+    ast.Mult   : lambda a, b: operatorlib.imul(a,b),
+    ast.Div    : lambda a, b: operatorlib.itruediv(a,b),
+    ast.FloorDiv: lambda a, b: operatorlib.ifloordiv(a,b),
+    ast.Mod    : lambda a, b: operatorlib.imod(a,b),
+    ast.Pow    : lambda a, b: operatorlib.ipow(a,b),
+    ast.LShift : lambda a, b: operatorlib.ilshift(a,b),
+    ast.RShift : lambda a, b: operatorlib.irshift(a,b),
+    ast.BitOr  : lambda a, b: operatorlib.ior(a,b),
+    ast.BitAnd : lambda a, b: operatorlib.iand(a,b),
+    ast.BitXor : lambda a, b: operatorlib.ixor(a,b),
+    ast.MatMult: lambda a, b: operatorlib.imatmul(a,b),
+}
+
 def _invoke_binop_inference(left: ASTNodeT, opnode: Union[_typing.BinOp, _typing.AugAssign], op:ast.operator, right: ASTNodeT, context: OptionalInferenceContext) -> InferResult:
     """
     Infer a binary operation between a left operand and a right operand.
@@ -478,8 +547,18 @@ def _invoke_binop_inference(left: ASTNodeT, opnode: Union[_typing.BinOp, _typing
 
     :note: left and right are inferred nodes.
     """
+    # This implementation only support litreral types
+    # see https://github.com/PyCQA/astroid/blob/58f470b993e368a82f545376c51a3beda83b5f74/astroid/inference.py#L715
+    # for a more generic implementation.
 
-    operator_meth = _OPPERATORS[type(op)]
+    operators = _AUGMENTED_OPERATORS if isinstance(opnode, ast.AugAssign) else _OPPERATORS
+
+    try:
+        operator_meth = operators[type(op)]
+    except KeyError:
+        opnode._report(f"Unsupported operation: op={op}")
+        yield nodes.Uninferable
+        return
     try:
         literal_left = left.literal_eval()
         literal_right = right.literal_eval()
@@ -490,8 +569,9 @@ def _invoke_binop_inference(left: ASTNodeT, opnode: Union[_typing.BinOp, _typing
         return
     try:
         inferred_literal = operator_meth(literal_left, literal_right)
-    except Exception:
+    except Exception as e:
         # wrong types
+        opnode._report(f"Operation failed ({e.__class__.__name__}): {e}; lhs={left}, rhs={right}")
         raise exceptions.InferenceError(node=opnode)
 
     yield fix_ast(literal_to_ast(inferred_literal), parent=opnode.parent)
@@ -547,8 +627,8 @@ def _infer_AugAssign(self:_typing.AugAssign, context: OptionalInferenceContext=N
     context = context or self._parser._new_context()
     lhs_context = copy_context(context)
     rhs_context = copy_context(context)
-    lhs_iter = list(_infer_lhs(self.target, context=lhs_context))
-    rhs_iter = list(self.value.infer(context=rhs_context)) # type:ignore[attr-defined]
+    lhs_iter = _infer_lhs(self.target, context=lhs_context)
+    rhs_iter = infer(self.value, context=rhs_context) # type:ignore[attr-defined]
 
     for lhs, rhs in itertools.product(lhs_iter, rhs_iter):
         if any(value is nodes.Uninferable for value in (rhs, lhs)):

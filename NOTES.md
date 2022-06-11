@@ -1,18 +1,10 @@
 
 # TODO list:
 
-- [DONE] Finish code in _assigned_statements.py 
-- [DONE] and plug it in with _infer_assign_name. 
-- [DONE] Infer imports for modules in the system.
-- Improve the documentation of _infer_assign_name to link to the astroid name of this method.
-- [PROPOSED] Clarify API that is going to be used to access class/module level variables.
-- Invalidate the inference cache everytime a new module is parsed.
 - Adjust _infer_Call to return an 'Instance' of the annotated type if the function uses type annotation.
 - Adjust _infer_Call to return an inferred node if we're talking about builtins (and all parties are inferable)
 - First apply set of transformations, as described in [Scalpel 2.1 Code Rewriter.](https://arxiv.org/pdf/2202.11840.pdf)
     - `ast.Str`, `ast.Bytes`, `ast.Num` to `ast.Constant` to ease support for python 3.6.
-    - `__all__.extend(X)` -> `__all__ += X` (only at the module statements level)
-    - `__all__.append(X)` -> `__all__ += [X]` (only at the module statements level)
     - `list()` -> `[]`, same for other builtins.
     - Rewrite simple attribute assigments outside out class scope inside the class, meaning::
         class C:
@@ -30,7 +22,7 @@
       TODO: check if this is actually correct.
 
 - Investigate manners to move away from patching the AST classes, but without maintaining a set of node class.
-- Create a module astuce.nodenav
+- Create a module astuce.nodenav and move the code related to node navigation inside it.
 - Document the core principles of astuce:
   - The inference system.
     - Name inference is recursive:
@@ -39,12 +31,13 @@
     - As a general rule, inference on statements (ast.stmt) either return self or Uninferable, an exception to that rules are augmented assigments.
   - Limitations: 
     - Will not proceed to inter-procedural analysis, this is not in the scope of this project.
+    - The filter statement function does not provide path sensitive information. Nevertheless, utilities in this library can help building control flow graphs and together build a more precise inference system. Though, some simple constraints handling could be handled: https://github.com/PyCQA/astroid/pull/1189
     - Type hints will be considered as a source of information rather than a post-condition to check, this is not a type checker.
         - Calling infer() on a ast.Call node will most likely resulting into Uninferable, though some support migh be added for builtins.
 - Implement unary operator inference
-- Remove ASTNode.infer_name(str) and create inference.infer_attr(ctx, name)
-- Implement inference.infer_attr
-- Implement _infer_alias for imports
+- Implement comparators inference
+- Generate API docs
+- Implement https://github.com/PyCQA/astroid/pull/1610/files
 
 # Notes:
 - `list.pop()` is a good example where mutation and return value are important, it could be hard to make work...

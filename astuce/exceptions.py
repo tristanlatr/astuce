@@ -93,3 +93,8 @@ class AttributeInferenceError(ResolveError):
     def __init__(self, message:str="{attribute!r} not found on {target!r}.", **kws:Any):
         super().__init__(message, **kws)
 
+class MissingSentinelNode(StaticAnalysisException):
+    node = None
+
+    def __init__(self, message:str="Sentinel node not found on {node!r}.", **kws:Any):
+        super().__init__(message, **kws)

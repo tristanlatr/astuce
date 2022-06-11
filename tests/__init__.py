@@ -1,12 +1,12 @@
 
 import ast, sys, io
 import logging
-from typing import Any
+from typing import Any, List
 from textwrap import dedent
 
 import pytest, unittest
 
-from astuce import setup_logger, nodes, parser, _typing
+from astuce import helpers, inference, setup_logger, nodes, parser, _typing
 
 require_version = lambda _v:pytest.mark.skipif(sys.version_info < _v, reason=f"requires python {'.'.join((str(v) for v in _v))}")
 
@@ -61,3 +61,20 @@ class capture_output(list):
         self._stream.flush()
         self.extend(self._stream.getvalue().splitlines())
         _logger.removeHandler(self.handler)
+
+def get_load_names(node:_typing.ASTNode, name:str) -> List[ast.Name]:
+    return [n for n in helpers.nodes_of_class(
+        node, ast.Name, 
+        predicate= lambda n: nodes.get_context(n) == nodes.Context.Load) 
+        
+        if n.id == name]
+
+def get_exprs(nodes:List[_typing.ASTNode]) -> List[_typing.ASTexpr]:
+    """
+    Get all expressions wrapped inside ast.Expr in the list, 
+    except the one added by astuce.
+    """
+    filtered_body = [o.value for o in filter(
+            lambda o: not inference._is_end_of_frame_sentinel(o) 
+                and isinstance(o, ast.Expr), nodes)]
+    return filtered_body

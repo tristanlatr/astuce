@@ -3,9 +3,9 @@ import functools
 from typing import List
 
 from astuce import exceptions, inference, nodes, helpers
-from astuce.filter_statements import are_exclusive
+from astuce.filter_statements import are_exclusive, filter_stmts
 from .test_nodes import CODE_IF_BRANCHES_STATEMENTS
-from . import AstuceTestCase, require_version
+from . import AstuceTestCase, require_version, get_load_names
 from astuce._typing import ASTNode as ASTNodeT
 
 class LookupTest(AstuceTestCase):
@@ -69,13 +69,6 @@ class LookupTest(AstuceTestCase):
         self.assertEqual(1, len(empty_annassign_inferred))
         self.assertIs(empty_annassign_inferred[0], nodes.Uninferable)
 
-
-def get_load_names(node:ASTNodeT, name:str) -> List[ast.Name]:
-    return [n for n in helpers.nodes_of_class(
-        node, ast.Name, 
-        predicate= lambda n: nodes.get_context(n) == nodes.Context.Load) 
-        
-        if n.id == name]
 
 class LookupTest2(AstuceTestCase):
     # def setUp(self) -> None:
@@ -433,7 +426,7 @@ class LookupTest2(AstuceTestCase):
                     return 4
         """
         mod = self.parse(code, __name__)
-        decname = mod.body[1].body[-1].decorator_list[0]
+        decname = mod.locals['FileA'][0].locals['funcA'][0].decorator_list[0]
         self.assertIsInstance(decname, ast.Name)
         it = decname.infer()
         obj = next(it)
@@ -1006,6 +999,47 @@ class LookupControlFlowTest(AstuceTestCase):
         _, stmts = x_name.lookup("x")
         self.assertEqual(len(stmts), 1)
         self.assertEqual(stmts[0].lineno, 8)
+    
+    def test_except_assign_after_block_in_class(self) -> None:
+        """When a variable is assigned in an except clause, it is returned
+        when that variable is used after the except block.
+        """
+        code = """
+        class C:
+            try:
+                1 / 0
+            except ZeroDivisionError:
+                x = 10
+            except NameError:
+                x = 100
+            print(x)
+        """
+        astroid = self.parse(code)
+        x_name, = get_load_names(astroid, "x")
+        _, stmts = x_name.lookup("x")
+        self.assertEqual(len(stmts), 2)
+        self.assertCountEqual([stmt.lineno for stmt in stmts], [6, 8])
+
+    def test_except_assign_after_block_overwritten_in_class(self) -> None:
+        """When a variable is assigned in an except clause, it is not returned
+        when it is reassigned and used after the except block.
+        """
+        code = """
+        class C:
+            try:
+                1 / 0
+            except ZeroDivisionError:
+                x = 10
+            except NameError:
+                x = 100
+            x = 1000
+            print(x)
+        """
+        astroid = self.parse(code)
+        x_name, = get_load_names(astroid, "x")
+        _, stmts = x_name.lookup("x")
+        self.assertEqual(len(stmts), 1)
+        self.assertEqual(stmts[0].lineno, 9)
 
 # Licensed under the LGPL: https://www.gnu.org/licenses/old-licenses/lgpl-2.1.en.html
 # For details: https://github.com/PyCQA/astroid/blob/main/LICENSE
@@ -1089,3 +1123,44 @@ class TestAreExclusive(AstuceTestCase):
         self.assertEqual(are_exclusive(f2, f1), True)
         self.assertEqual(are_exclusive(f4, f1), False)
         self.assertEqual(are_exclusive(f4, f2), True)
+
+class TestGetAttr(AstuceTestCase):
+
+    
+    def test_except_assign_exclusive_branches_get_attr(self) -> None:
+        """When a variable is assigned in exlcusive branches, both are returned
+        """
+        code = """
+            try:
+                1 / 0
+            except ZeroDivisionError:
+                x = 10
+            except NameError:
+                x = 100
+            print(x)
+        """
+        astroid = self.parse(code)
+        stmts = inference.get_attr(astroid, 'x')
+        self.assertEqual(len(stmts), 2)
+        
+        self.assertEqual(stmts[0].lineno, 5)
+        self.assertEqual(stmts[1].lineno, 7)
+    
+    def test_except_assign_after_block_overwritten_get_attr(self) -> None:
+        """When a variable is assigned in an except clause, it is not returned
+        when it is reassigned and used after the except block.
+        """
+        code = """
+            try:
+                1 / 0
+            except ZeroDivisionError:
+                x = 10
+            except NameError:
+                x = 100
+            x = 1000
+            print(x)
+        """
+        astroid = self.parse(code)
+        stmts = inference.get_attr(astroid, 'x')
+        self.assertEqual(len(stmts), 1)
+        self.assertEqual(stmts[0].lineno, 8)

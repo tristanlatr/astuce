@@ -5,9 +5,10 @@ from typing import Any
 
 import pytest
 
-from astuce import nodes, inference, exceptions
+from astuce import nodes, inference, exceptions, _lookup
 from astuce.exceptions import InferenceError
-from . import AstuceTestCase, capture_output, fromtext
+from astuce.filter_statements import filter_stmts
+from . import AstuceTestCase, capture_output, get_exprs, fromtext, get_load_names
 
 class Warns(AstuceTestCase):
     def test_some_warnings(self) -> None:
@@ -16,10 +17,10 @@ class Warns(AstuceTestCase):
             import b
             class A:...
 
-            [A()]
-            []
-            [] + [A()]
-            [] + b.a + ''
+            w = [A()]
+            v = []
+            i = [] + [A()]
+            j = [] + b.a + ''
             '''
         )
         # with capture_output() as lines:
@@ -31,23 +32,24 @@ class Warns(AstuceTestCase):
         assert lines == ['test:???: test'], lines
 
         with capture_output() as lines:
-            assert inference.safe_infer(mod.body[-3]).literal_eval() == []
+            assert inference.safe_infer(mod.locals['v'][0]).literal_eval() == []
         assert lines == [], lines
 
         with capture_output() as lines:
-            inference.safe_infer(mod.body[-4]) is None
-        assert lines == [], lines
+            inference.safe_infer(mod.locals['w'][0]) is None
+        assert lines == ['test:5: Sequence element (0) is not inferable'], lines
 
         with capture_output() as lines:
-            assert list(mod.body[-1].infer()) == [nodes.Uninferable]          
+            assert list(mod.locals['j'][0].infer()) == [nodes.Uninferable]          
         assert len(lines) == 4, lines
         # TODO: Is warning like this good?
         # assert all('Uninferable binary operation' in l for l in lines), lines
 
         with capture_output() as lines:
-            assert list(mod.body[-2].infer()) == [nodes.Uninferable]          
-        assert len(lines) == 1, lines
-        assert "Uninferable operation" in lines[0], lines[0]
+            assert list(mod.locals['i'][0].infer()) == [nodes.Uninferable]          
+        assert len(lines) == 2, lines
+        assert "Sequence element (0) is not inferable" in lines[0], lines[0]
+        assert "Uninferable operation" in lines[1], lines[1]
 
 
 class InferAttrTest(AstuceTestCase):
@@ -57,8 +59,12 @@ class InferAttrTest(AstuceTestCase):
         code = """
             test = ''
             class Pouet:
+                __name__ = "erased"
                 __name__ = "pouet"
                 test += __name__
+                bob = "pouet"
+                print('testing')
+                print('testing')
             
             class NoName: 
                 ann:int
@@ -74,7 +80,29 @@ class InferAttrTest(AstuceTestCase):
         astroid = self.parse(code)
         
         P = astroid.locals['Pouet'][0]
-        inferred = list(inference.infer_attr(P, "__name__"))
+
+        assert len(filter_stmts(P, P.locals['__name__'], P, 0)) == 1
+        
+        # with inference._tmp_end_body_name(P, '__name__') as _temp:
+        #     assert _temp.parent in P.children
+        #     assert P.body[-1] == _temp.parent
+
+        #     # assert P.locals['__name__'] == []
+            
+
+        #     # assert inference.safe_infer(_temp) == P.locals['__name__'][0], inference.safe_infer(_temp)
+        #     # assert _lookup.lookup(_temp, '__name__', 0)[1] != []
+        
+        P.body[-1].unparse() == "print('testing')"
+
+        assert _lookup.lookup(P.body[-1].value, '__name__', 0)[1] != [], _lookup.lookup(P.body[-1].value, '__name__', 0)
+        assert _lookup.lookup(P, '__name__', 0)[1] != [], _lookup.lookup(P, '__name__', 0)
+        
+        
+
+        inferred = list(inference.infer_attr(P, "bob"))
+        # inferred = list(inference.infer_attr(P, "__name__"))
+        
         assert len(inferred) == 1
         self.assertEqual(inferred[0].literal_eval(), "pouet")   
 
@@ -139,38 +167,40 @@ class ImportsTests(AstuceTestCase):
         assert nodes.get_origin_module(mod1.locals['a'][0]) == 'pack.subpack'
         assert nodes.get_origin_module(mod1.locals['pack'][0]) == 'pack'
 
+        filtered_body = get_exprs(mod1.body)
+
         # pack.f
-        assert inference.safe_infer(mod1.body[-1])
+        assert inference.safe_infer(filtered_body[-1])
 
         # pack.subpack.E (externaly imported name)
-        assert inference.safe_infer(mod1.body[-2]) == None, inference.safe_infer(mod1.body[-2])
+        assert inference.safe_infer(filtered_body[-2]) == None, inference.safe_infer(filtered_body[-2])
         
         # pack.subpack
         with capture_output() as lines:
             assert subpack == inference.get_attr(pack, 'subpack')[0] == inference.get_attr(pack, 'subpack', ignore_locals=True)[0]
-            assert inference.safe_infer(mod1.body[-3]) == subpack
+            assert inference.safe_infer(filtered_body[-3]) == subpack
         assert lines == [], lines
 
         # pack.subpack.C
-        assert inference.safe_infer(mod1.body[-4]) == inference.get_attr(subpack, 'C')[0], list(inference.infer(mod1.body[-3]))
+        assert inference.safe_infer(filtered_body[-4]) == inference.get_attr(subpack, 'C')[0], list(inference.infer(filtered_body[-3]))
         # mod2.m, we can't infer calls for now.
-        assert list(inference.infer(mod1.body[-5])) == [nodes.Uninferable]
+        assert list(inference.infer(filtered_body[-5])) == [nodes.Uninferable]
         # mod2.l
-        assert inference.safe_infer(mod1.body[-6]) == next(inference.infer_attr(mod2, 'l'))
+        assert inference.safe_infer(filtered_body[-6]) == next(inference.infer_attr(mod2, 'l'))
         # mod2.k
-        assert inference.safe_infer(mod1.body[-7]) == next(inference.infer_attr(mod2, 'k'))
+        assert inference.safe_infer(filtered_body[-7]) == next(inference.infer_attr(mod2, 'k'))
 
         # a.C
         with capture_output() as lines:
-            inference.safe_infer(mod1.body[-8]) 
-            #== inference.get_attr(subpack, 'C')[0], inference.safe_infer(mod1.body[-8])
+            inference.safe_infer(filtered_body[-8]) 
+            #== inference.get_attr(subpack, 'C')[0], inference.safe_infer(filtered_body[-8])
         assert lines == [], lines
 
         # # a
-        assert inference.safe_infer(mod1.body[-9]) == subpack
+        assert inference.safe_infer(filtered_body[-9]) == subpack
         
         # # pack
-        assert inference.safe_infer(mod1.body[-10]) == pack
+        assert inference.safe_infer(filtered_body[-10]) == pack
         
 
 
@@ -205,15 +235,17 @@ class ImportsTests(AstuceTestCase):
         _m = range(10)
         ''', modname='mod2')
 
-        f = list(inference.infer(mod1.body[-1]))
-        assert f == [pack.body[-1]], f
+        filtered_body = get_exprs(mod1.body)
+
+        f = list(inference.infer(filtered_body[-1]))
+        assert f == [pack.locals['f'][0]], f
         # E
-        assert list(inference.infer(mod1.body[-2])) == [nodes.Uninferable]
+        assert list(inference.infer(filtered_body[-2])) == [nodes.Uninferable]
         # C
-        assert list(inference.infer(mod1.body[-3])) == [subpack.body[-1]]
+        assert list(inference.infer(filtered_body[-3])) == [subpack.locals['C'][0]]
         
         # m
-        m = list(inference.infer(mod1.body[-4]))
+        m = list(inference.infer(filtered_body[-4]))
         # We can't infer calls at this time.
         assert m == [nodes.Uninferable], m
         
@@ -228,13 +260,13 @@ class ImportsTests(AstuceTestCase):
         assert lines == []
 
         with capture_output() as lines:
-            l = inference.safe_infer(mod1.body[-5])
+            l = inference.safe_infer(filtered_body[-5])
         
         assert lines == []
         assert l.literal_eval() == ('i', 'j')
 
         # k
-        assert inference.safe_infer(mod1.body[-6]).literal_eval() == 'fr'
+        assert inference.safe_infer(filtered_body[-6]).literal_eval() == 'fr'
 
     def test_import_cycles(self):
         # TODO
@@ -244,24 +276,67 @@ class ImportsTests(AstuceTestCase):
 
 class SequenceInfenceTests(AstuceTestCase):
     
-    def test_list_extend(self):
-        return NotImplemented
+    def test_list_augassign(self):
+
         mod1 = self.parse('''
-        from mod2 import l as _l
-        l = ['f', 'k']
-        l.extend(_l)
-        l
+        from mod2 import __all__ as _l
+        __all__ = ['f'] 
+        __all__ += ['k']
+        __all__ += []
+        __all__ += _l
+        __all__ += []
+        __all__
         ''', modname='mod1')
 
         mod2 = self.parse('''
-        l = ('i', 'j')
+        __all__ = ('i', 'j')
         ''', modname='mod2')
 
-        assert next(mod2.locals['l'][0].infer()).literal_eval() == ('i', 'j')
+        assert next(mod2.locals['__all__'][0].infer()).literal_eval() == ('i', 'j')
+
+        with capture_output() as lines:
+            list(inference.infer_attr(mod1, '__all__'))[0] #.literal_eval()
+        assert lines == [], lines
         
-        inferred = list(mod1.body[-1].value.infer())
+        with capture_output() as lines:
+            inferred = list(get_load_names(mod1, '__all__')[0].infer())
+        assert lines == [], lines
+
         assert len(inferred) == 1
-        assert inferred[0].literal_eval() == ['f', 'k', 'i', 'j']
+        assert inferred[0].literal_eval() == ['f', 'k', 'i', 'j'], inferred[0].literal_eval()
+
+        
+    def test_list_extend(self):
+
+        mod1 = self.parse('''
+        from mod2 import __all__ as _l
+        __all__ = ['f', 'k']
+        __all__.extend(_l)
+        __all__
+        ''', modname='mod1')
+
+        mod2 = self.parse('''
+        __all__ = ('i', 'j')
+        ''', modname='mod2')
+
+        assert next(mod2.locals['__all__'][0].infer()).literal_eval() == ('i', 'j')
+
+        with capture_output() as lines:
+            list(inference.infer_attr(mod1, '__all__'))[0] #.literal_eval()
+        assert lines == [], lines
+
+        filtered_body = get_exprs(mod1.body)
+
+        # with capture_output() as lines:
+        #     assert inference.safe_infer(fbody[-2]), list(fbody[-2].infer())
+        # assert lines == [], lines
+
+        with capture_output() as lines:
+            inferred = list(filtered_body[-1].infer())
+        assert lines == [], lines
+
+        assert len(inferred) == 1
+        assert inferred[0].literal_eval() == ['f', 'k', 'i', 'j'], inferred[0].literal_eval()
 
 class MoreInferenceTests(AstuceTestCase):
 
@@ -277,8 +352,8 @@ class MoreInferenceTests(AstuceTestCase):
                     print(a)
                     yield a
         a = A()
-        a.test
+        test = a.test
         """
-        ).body[-1]
-        inferred = next(node.infer())
+        )
+        inferred = next(node.locals['test'][0].infer())
         assert isinstance(inferred, nodes.Method)
