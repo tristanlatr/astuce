@@ -27,6 +27,8 @@ if TYPE_CHECKING:
     from .parser import Parser
     from ._context import OptionalInferenceContext
 
+_END_OF_FRAME_SENTINEL_CONSTANT = 430335967
+
 @object.__new__
 class Uninferable:
     """Special object which is returned when inference fails."""
@@ -366,7 +368,8 @@ class ASTNode:
         from . import inference
         return inference.infer(self, context) #type:ignore[arg-type]
     
-    @lru_cache()
+    # @lru_cache()
+    # Using cache breaks some tests here
     def literal_eval(self) -> Any:
         return ast.literal_eval(cast(ast.AST, self))
 

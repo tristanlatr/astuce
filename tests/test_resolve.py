@@ -40,7 +40,7 @@ class ResolveTest(AstuceTestCase):
         def func(a,b:int,c=True,*d,**e:Any):
             ...
         ''')
-        func = mod.body[-1]
+        func = mod.body[1]
         assert isinstance(func, ast.FunctionDef)
         elips = func.body[0]
         assert func == mod.locals['func'][0]

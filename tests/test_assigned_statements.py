@@ -50,14 +50,14 @@ class TestAssignedStatements(AstuceTestCase):
         # This test ensure that the assigned_stmts() function does not 
         # actually infers tuple assigment's values
         for firstline in ['from whatever import a,b', '', 'a,b=None,None']:
-            assign_stmts = fromtext(
+            assign_stmts = [o for o in fromtext(
                 f"""
                 {firstline}
                 c = a #@
 
                 d, e = b, c #@
                 """
-                ).body
+                ).body if isinstance(o, ast.Assign)]
 
             simple_assnode = next(nodes_of_class(assign_stmts[-2], ast.Name, predicate=nodes.is_assign_name))
             assigned = list(assigned_stmts(simple_assnode))

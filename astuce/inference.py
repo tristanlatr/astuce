@@ -4,6 +4,7 @@ Core of the inference engine.
 """
 
 import ast
+import contextlib
 import functools
 import itertools
 import sys
@@ -30,6 +31,7 @@ def _infer_stmts(
     context = copy_context(context)
 
     for stmt in stmts:
+        # Yields Uninferables as is
         if stmt is nodes.Uninferable:
             yield stmt
             inferred = True
@@ -155,10 +157,44 @@ def get_submodule(pack:_typing.Module, name:str, *, context:OptionalInferenceCon
     except KeyError:
         return None
 
+def _get_end_of_frame_sentinel(frame_node:_typing.FrameNodeT) -> _typing.ASTstmt:
+    # we use a sentinel node when doing lookups with get_attr to void this behaviour:
+    # https://github.com/PyCQA/astroid/pull/1612#issuecomment-1152741042
+
+    assert nodes.is_frame_node(frame_node)
+    
+    if isinstance(frame_node, ast.Lambda):
+        return frame_node
+    
+    # The last element in frame nodes should be the inserted sentinel "end of" node.
+    if _is_end_of_frame_sentinel(frame_node.body[-1]):
+        return frame_node.body[-1]
+    else:
+        raise exceptions.MissingSentinelNode(node=frame_node)
+
+def _is_end_of_frame_sentinel(node:_typing.ASTNode) -> bool:
+    if not isinstance(node, ast.Expr):
+        return False
+    try:
+        v = node.value.literal_eval()
+    except ValueError:
+        return False
+    else:
+        if v == nodes._END_OF_FRAME_SENTINEL_CONSTANT:
+            return True
+    
+    return False
+    
+    # The last element in frame nodes is assumed to be the inserted sentinel "end of" node.
+    return frame_node.body[-1]
+
 def get_attr(ctx: _typing.FrameNodeT, name:str, *, ignore_locals:bool=False, context:OptionalInferenceContext=None) -> List[ASTNodeT]:
     """
     Get local attributes definitions matching the name from this frame node.
     """
+    # TODO: Handle {"__name__", "__doc__", "__file__", "__path__", "__package__"}
+    # TODO: Handle __class__, __module__, __qualname__,
+
     # Adjusted from astroid NodeNG.getattr() method, with minimal support for packages.
     
     if not name:
@@ -166,7 +202,11 @@ def get_attr(ctx: _typing.FrameNodeT, name:str, *, ignore_locals:bool=False, con
     
     assert nodes.is_frame_node(ctx), "use get_attr() only on frame nodes"
     
-    values = ctx.lookup(name)[1] if not ignore_locals else []
+    # values = ctx.lookup(name)[1] if not ignore_locals else []
+    if not ignore_locals:
+        values = _get_end_of_frame_sentinel(ctx).lookup(name)[1]
+    else: 
+        values = []
 
     if not values and isinstance(ctx, ast.Module) and ctx._is_package:
        # Support for sub-packages.
@@ -359,10 +399,15 @@ def _infer_IfExp(node:_typing.IfExp, context: OptionalInferenceContext=None) -> 
         both_branches = True
     else:
         if test is not nodes.Uninferable:
-            if test.bool_value():
-                yield from node.body.infer(context=lhs_context)
+            try:
+                inferred_literal = test.literal_eval()
+            except ValueError:
+                both_branches = True
             else:
-                yield from node.orelse.infer(context=rhs_context)
+                if bool(inferred_literal):
+                    yield from node.body.infer(context=lhs_context)
+                else:
+                    yield from node.orelse.infer(context=rhs_context)
         else:
             both_branches = True
     if both_branches:
@@ -384,7 +429,7 @@ def _infer_sequence_helper(node:Union[_typing.Tuple, _typing.List, _typing.Set],
     """
     values = []
 
-    for elt in node.elts:
+    for i, elt in enumerate(node.elts):
         if isinstance(elt, ast.Starred):
             starred = safe_infer(elt.value, context)
             if not starred:
@@ -401,7 +446,12 @@ def _infer_sequence_helper(node:Union[_typing.Tuple, _typing.List, _typing.Set],
             if infer_all_elements:
                 # This part might change is the future, astroid behaved differently for some reason
                 # TODO: Create an issue to gather more informations about this.
-                value = safe_infer(elt, context) or nodes.Uninferable
+                
+                value = safe_infer(elt, context)
+                if value is None:
+                    node._report(f"Sequence element ({i}) is not inferable")
+                    value = nodes.Uninferable
+                
                 values.append(value)
             else:
                 values.append(elt)
@@ -577,8 +627,8 @@ def _infer_AugAssign(self:_typing.AugAssign, context: OptionalInferenceContext=N
     context = context or self._parser._new_context()
     lhs_context = copy_context(context)
     rhs_context = copy_context(context)
-    lhs_iter = list(_infer_lhs(self.target, context=lhs_context))
-    rhs_iter = list(self.value.infer(context=rhs_context)) # type:ignore[attr-defined]
+    lhs_iter = _infer_lhs(self.target, context=lhs_context)
+    rhs_iter = infer(self.value, context=rhs_context) # type:ignore[attr-defined]
 
     for lhs, rhs in itertools.product(lhs_iter, rhs_iter):
         if any(value is nodes.Uninferable for value in (rhs, lhs)):

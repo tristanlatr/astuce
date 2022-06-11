@@ -11,7 +11,7 @@ from functools import lru_cache, partial
 import warnings
 import sys
 import ast
-from typing import Any, Callable, Dict, Iterator, List, Optional, cast
+from typing import Any, Callable, Dict, Iterator, List, Optional, Union, cast
 
 if sys.version_info >= (3,8):
     _parse = partial(ast.parse, type_comments=True)
@@ -36,8 +36,10 @@ else:
             from . import _astunparse 
             _unparse = _astunparse.unparse
 
-from .nodes import ASTNode, Instance, get_context, Context, is_assign_name, is_del_name, is_scoped_node
-from . import _typing, exceptions, _context
+from .nodes import _END_OF_FRAME_SENTINEL_CONSTANT, ASTNode, Instance, is_assign_name, is_del_name, is_scoped_node
+from . import _typing, _context, _astutils
+
+
 
 def _set_local(self:'_typing.ASTNode', name:str, node:'ast.AST') -> None:
     """Define that the given name is declared in the given statement node.
@@ -101,17 +103,31 @@ class _AstuceModuleVisitor(ast.NodeTransformer):
             assert isinstance(node, ast.Module)
         
         return r
+
+    def _get_end_of_frame_sentinel(self) -> ast.stmt:
+        return ast.Expr(ast.Constant(_END_OF_FRAME_SENTINEL_CONSTANT))
     
+    def visit_Module(self, node:_typing.Module) -> _typing.Module:
+        # append "end of" statement
+        node.body += (self._get_end_of_frame_sentinel(),)
+        return self.generic_visit(node)
+
     def visit_FunctionDef(self, node: _typing.FunctionDef) -> _typing.FunctionDef:
         _set_local(node.parent, node.name, node)
+        # append "end of" statement
+        node.body += (self._get_end_of_frame_sentinel(),)
         return self.generic_visit(node)
     
     def visit_AsyncFunctionDef(self, node: _typing.AsyncFunctionDef) -> _typing.AsyncFunctionDef:
         _set_local(node.parent, node.name, node)
+        # append "end of" statement
+        node.body += (self._get_end_of_frame_sentinel(),)
         return self.generic_visit(node)
     
     def visit_ClassDef(self, node: _typing.ClassDef) -> _typing.ClassDef:
         _set_local(node.parent, node.name, node)
+        # append "end of" statement
+        node.body += (self._get_end_of_frame_sentinel(),)
         return self.generic_visit(node)
     
     def visit_Import(self, node: _typing.Import) -> _typing.Import:
@@ -160,11 +176,32 @@ class _AstuceModuleVisitor(ast.NodeTransformer):
         return self.generic_visit(node)
     
     def visit_Attribute(self, node: _typing.Attribute) -> _typing.Attribute:
-
         if is_assign_name(node) and (not 
           # Prohibit a local save if we are in an ExceptHandler.
           any(isinstance(o, ast.ExceptHandler) for o in node.node_ancestors())):
             self.parser._assignattr.append(node)
+        return self.generic_visit(node)
+    
+    # Transform statement level __all__.extend() and __all__.append() into augmented assignments
+    # TODO: think of a more extensible way to transform the tree, it should not be necessary to traverse it twise, though.
+    def visit_Expr(self, node:_typing.Expr) -> Union[_typing.Expr, _typing.AugAssign]:
+        v = node.value
+        if isinstance(v, ast.Call) and isinstance(v.func, ast.Attribute):
+            o = v.func.value
+            a = v.func.attr
+
+            if len(v.args)==1 and len(v.keywords)==0:
+                # We can safely apply this transformation because we know __all__ should be a list or tuple.
+                if isinstance(o, ast.Name) and o.id == '__all__':
+                    aug = None
+                    if a == 'extend':
+                        node._report("Transforming __all__.extend() into an augmented assigment")
+                        aug = ast.AugAssign(ast.Name(o.id, ast.Store()), ast.Add(), v.args[0])
+                    elif a == 'append':
+                        node._report("Transforming __all__.append() into an augmented assigment")
+                        aug = ast.AugAssign(ast.Name(o.id, ast.Store()), ast.Add(), ast.List(elts=[v.args[0]]))
+                    if aug:
+                        return _astutils.fix_ast(self.visit(aug), parent=node.parent)
 
         return self.generic_visit(node)
 
@@ -209,7 +246,7 @@ class Parser:
         """
         self._inference_cache.clear()
 
-    @lru_cache
+    # @lru_cache
     def unparse(self, node: ast.AST) -> str:
         """
         Unparse an ast.AST object and generate a code string.
