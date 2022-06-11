@@ -6,31 +6,9 @@ from textwrap import dedent
 from typing import Iterator, Tuple
 import pytest
 
-from astuce import expressions, parser, nodes, infer_expr
+from astuce import parser, nodes
 from . import AstuceTestCase, fromtext
 
-@pytest.mark.parametrize(
-        ("source", "expected"), 
-        [("import typing as t;var: t.Generic", "t.Generic -> typing.Generic"), 
-         ("from typing import Generic as G;var: G", "G -> typing.Generic"),
-        ("from typing import Generic\nvar: Generic[T]", "Generic[T] -> typing.Generic[T]"),
-        ("from pydocspec import _model as m\nvar: m.TreeRoot[T]", "m.TreeRoot[T] -> pydocspec._model.TreeRoot[T]"),
-        ("var: dict[str, str]", "dict[str, str] -> dict[str, str]"),
-        ]
-    )
-def test_infer_expr(source:str, expected:str) -> None:
-
-    mod = fromtext(source)
-    var = mod.locals['var'][0]
-    assert isinstance(var, ast.Name)
-    annassing = var.parent
-    assert isinstance(annassing, ast.AnnAssign)
-    ann = annassing.annotation
-    expr = infer_expr.get_annotation(ann)
-
-    assert isinstance(expr, (expressions.Name, expressions.Expression))
-    assert f"{ann.unparse()} -> {infer_expr._full(expr)}" == expected
-    
 
 class ResolveTest(AstuceTestCase):
 
