@@ -20,7 +20,7 @@ Why?
 ====
 
 I needed a inference library that supports the standard AST nodes such that,
-it can be used in `pyoctor <https://github.com/twisted/pydoctor>`_. 
+it can be used in `pydoctor <https://github.com/twisted/pydoctor>`_. 
 
 If can help:
  - Infer what's the value of complex ``__all__`` variables and other literal types.
