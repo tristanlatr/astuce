@@ -5,19 +5,19 @@
 
 Example usage:
 
-.. code::
+.. python::
 
-    from astuce import Parser, inference
+    from astuce import parser, inference
 
-    parser = Parser() 
+    p = parser.Parser() 
 
-    mod1 = parser.parse('''
+    mod1 = p.parse('''
     from mod2 import __all__ as _l
     __all__ = ['f', 'k']
     __all__.extend(_l)
     ''')
 
-    mod2 = parser.parse('''
+    mod2 = p.parse('''
     __all__ = ('i', 'j')
     ''')
 
@@ -34,9 +34,7 @@ import sys
 from typing import TextIO
 
 from .nodes import ASTNode, Instance
-# from .expressions import Name, Expression
-# from .inference import (parse__all__, get_annotation, get_value, 
-#                         get_name, get_names, get_instance_names)
+
 
 ##### Logger setup
 
