@@ -1,9 +1,46 @@
 """
 `ast.AST` inference utilities.
 
+What is this?
+=============
+
+This is a derived work from `astroid <https://github.com/PyCQA/astroid>`_.
+
+The aim of this module is to provide an enhanced version of the AST nodes 
+that keeps 100% compatibility with the standard AST nodes.
+
+The node classes have additional methods and attributes for different usages. 
+Methods and attributes are added by patching ast classes.
+
+They include some support for some simple static inference and local name scopes.
+
+It works well with literals.
+
+Why?
+====
+
+I needed a inference library that supports the standard AST nodes such that,
+it can be used in `pyoctor <https://github.com/twisted/pydoctor>`_. 
+
+If can help:
+ - Infer what's the value of complex ``__all__`` variables and other literal types.
+ - Trace back where a name was assigned, filtering ignorable statements.
+ - Navigating in the tree with handy functions.
+
+Limitations
+===========
+
+Astuce is smart, but not very. 
+
+- It is intra-procedural: Does not try to infer what **value** a `ast.Call` might return in a generic manner.
+  Type hints will be considered as a source of information to get the return type of a call, this is not a type checker.
+- It is not path sensitive: Does not support constraints from `ast.If` blocks or assertions.
+- It can't create AST by inspecting living objects.
+
 .. TODO list all key function/methods in a table here.
 
-Example usage:
+Example usage
+=============
 
 .. python::
 

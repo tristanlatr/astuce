@@ -36,7 +36,6 @@
         - Calling infer() on a ast.Call node will most likely resulting into Uninferable, though some support migh be added for builtins.
 - Implement unary operator inference
 - Implement comparators inference
-- Generate API docs
 - Implement https://github.com/PyCQA/astroid/pull/1610/files
 
 # Notes:
@@ -74,29 +73,3 @@
     - _infer_name() should be adjusted such that it looks up in this dictionnary and 
         applies the supported mutations to each inferable results, 
         - Use the same filter_stmt() code to filter the applicable loadnames statements
-
-# Proposed API
-
-```python
-
-from astuce import Parser, inference
-# maybe it could take an options parameter to tweak some stuff.
-parser = Parser() 
-
-mod1 = parser.parse('''
-from mod2 import l as _l
-l = ['f', 'k']
-l.extend(_l)
-''')
-
-mod2 = parser.parse('''
-l = ('i', 'j')
-''')
-
-inferred = list(inference.infer_attr(mod2, 'l'))
-assert len(inferred) == 1
-assert inferred[0].literal_eval() == ['f', 'k', 'i', 'j']
-
-```
-
-
