@@ -11,7 +11,7 @@ from . import _typing
 
 _builtins_names = dir(builtins)
 
-def lookup(self:'_typing.ASTNode', name:str, offset:int) -> None:
+def lookup(self:'_typing.ASTNode', name:str, offset:int) -> Tuple['_typing.ASTNode', List['_typing.ASTNode']]:
     from astuce import nodes
     if nodes.is_scoped_node(self):
         return _scope_lookup(self, self, name, offset=offset)
@@ -28,13 +28,10 @@ def _scope_lookup(self:'_typing.ASTNode', node: '_typing.ASTNode', name:str, off
         return _base_scope_lookup(self, node, name, offset)
 
 def _module_lookup(self:'_typing.ASTNode', node: '_typing.ASTNode', name:str, offset:int=0) -> Tuple['_typing.ASTNode', List['_typing.ASTNode']]:
-    # TODO: Handle {"__name__", "__doc__", "__file__", "__path__", "__package__"}
     """The names of module attributes available through the global scope."""
-
     return _base_scope_lookup(self, node, name, offset)
 
 def _class_lookup(self:'_typing.ASTNode', node: '_typing.ASTNode', name:str, offset:int=0) -> Tuple['_typing.ASTNode', List['_typing.ASTNode']]:
-    # TODO: Handle __module__, __qualname__,
     assert isinstance(self, ast.ClassDef)
 
     # If the name looks like a builtin name, just try to look
