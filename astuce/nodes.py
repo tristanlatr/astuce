@@ -493,10 +493,6 @@ class ASTNode:
         :returntype: tuple[ASTNode, List[_typing.LocalsAssignT]]
         """
         return _lookup.lookup(self, name, offset)
-    
-    def infer_name(self, name:str) -> Iterator['ASTNode']:
-        # TODO
-        return
 
 class Context(enum.Enum):
     Load = 1
