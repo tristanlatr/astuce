@@ -13,8 +13,8 @@ class Test__all__ListTransforms(AstuceTestCase):
                 """
                 __all__ = []
                 m = [1]
-                __all__ += [1]
-                __all__ += m
+                __all__.append(1)
+                __all__.extend(m)
                 """)
         # assert lines == ['test:4: Transforming __all__.append() into an augmented assigment', 
         # 'test:5: Transforming __all__.extend() into an augmented assigment'], lines
