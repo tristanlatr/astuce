@@ -1,5 +1,30 @@
 """
-Some `ast.AST` inference helpers.
+`ast.AST` inference utilities.
+
+.. TODO list all key function/methods in a table here.
+
+Example usage:
+
+.. code::
+
+    from astuce import Parser, inference
+
+    parser = Parser() 
+
+    mod1 = parser.parse('''
+    from mod2 import __all__ as _l
+    __all__ = ['f', 'k']
+    __all__.extend(_l)
+    ''')
+
+    mod2 = parser.parse('''
+    __all__ = ('i', 'j')
+    ''')
+
+    inferred = list(inference.infer_attr(mod2, '__all__'))
+    assert len(inferred) == 1
+    assert inferred[0].literal_eval() == ['f', 'k', 'i', 'j']
+
 """
 
 import ast
