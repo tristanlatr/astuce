@@ -77,6 +77,13 @@
       </div>
       
       <div>
+         
+          <div class="childrenKindTitle">Contents</div>
+          <ul><li><a class="rst-reference internal" href="#rst-what-is-this" id="rst-toc-entry-1">What is this?</a></li>
+<li><a class="rst-reference internal" href="#rst-why" id="rst-toc-entry-2">Why?</a></li>
+<li><a class="rst-reference internal" href="#rst-limitations" id="rst-toc-entry-3">Limitations</a></li>
+<li><a class="rst-reference internal" href="#rst-example-usage" id="rst-toc-entry-4">Example usage</a></li>
+</ul>
         
 
         <div class="childrenKindTitle">Modules</div>
@@ -397,8 +404,43 @@
 
         <div class="moduleDocstring">
           <div><p><code><a href="https://docs.python.org/3/library/ast.html#ast.AST" class="intersphinx-link">ast.AST</a></code> inference utilities.</p>
+<div class="rst-section" id="rst-what-is-this">
+<h2 class="heading">What is this?</h2>
+<p>This is a derived work from <a class="rst-reference external" href="https://github.com/PyCQA/astroid" target="_top">astroid</a>.</p>
+<p>The aim of this module is to provide an enhanced version of the AST nodes
+that keeps 100% compatibility with the standard AST nodes.</p>
+<p>The node classes have additional methods and attributes for different usages.
+Methods and attributes are added by patching ast classes.</p>
+<p>They include some support for some simple static inference and local name scopes.</p>
+<p>It works well with literals.</p>
+</div>
+<div class="rst-section" id="rst-why">
+<h2 class="heading">Why?</h2>
+<p>I needed a inference library that supports the standard AST nodes such that,
+it can be used in <a class="rst-reference external" href="https://github.com/twisted/pydoctor" target="_top">pyoctor</a>.</p>
+<dl class="rst-docutils">
+<dt>If can help:</dt>
+<dd><ul class="rst-first rst-last rst-simple">
+<li>Infer what's the value of complex <tt class="rst-docutils literal">__all__</tt> variables and other literal types.</li>
+<li>Trace back where a name was assigned, filtering ignorable statements.</li>
+<li>Navigating in the tree with handy functions.</li>
+</ul>
+</dd>
+</dl>
+</div>
+<div class="rst-section" id="rst-limitations">
+<h2 class="heading">Limitations</h2>
+<p>Astuce is smart, but not very.</p>
+<ul class="rst-simple">
+<li>It is intra-procedural: Does not try to infer what <strong>value</strong> a <code><a href="https://docs.python.org/3/library/ast.html#ast.Call" class="intersphinx-link">ast.Call</a></code> might return in a generic manner.
+Type hints will be considered as a source of information to get the return type of a call, this is not a type checker.</li>
+<li>It is not path sensitive: Does not support constraints from <code><a href="https://docs.python.org/3/library/ast.html#ast.If" class="intersphinx-link">ast.If</a></code> blocks or assertions.</li>
+<li>It can't create AST by inspecting living objects.</li>
+</ul>
 <!-- TODO list all key function/methods in a table here. -->
-<p>Example usage:</p>
+</div>
+<div class="rst-section" id="rst-example-usage">
+<h2 class="heading">Example usage</h2>
 <pre class="py-doctest">
 <span class="py-keyword">from</span> astuce <span class="py-keyword">import</span> parser, inference
 
@@ -417,6 +459,7 @@ mod2 = p.parse(<span class="py-string">'''</span>
 inferred = <span class="py-builtin">list</span>(inference.infer_attr(mod2, <span class="py-string">'__all__'</span>))
 <span class="py-keyword">assert</span> <span class="py-builtin">len</span>(inferred) == 1
 <span class="py-keyword">assert</span> inferred[0].literal_eval() == [<span class="py-string">'f'</span>, <span class="py-string">'k'</span>, <span class="py-string">'i'</span>, <span class="py-string">'j'</span>]</pre></div>
+</div>
         </div>
 
         <div id="splitTables">
@@ -542,7 +585,7 @@ inferred = <span class="py-builtin">list</span>(inference.infer_attr(mod2, <span
   <div class="functionHeader">
     
     <span class="py-keyword">def</span> <span class="py-defname">setup_logger</span>(*, name=<span class="rst-variable-quote">'</span><span class="rst-variable-string">astuce</span><span class="rst-variable-quote">'</span>, verbose=<a href="https://docs.python.org/3/library/constants.html#False" class="intersphinx-link">False</a>, quiet=<a href="https://docs.python.org/3/library/constants.html#False" class="intersphinx-link">False</a>, stream=<a href="https://docs.python.org/3/library/sys.html#sys.stdout" class="intersphinx-link">sys.stdout</a>, format_string=<span class="rst-variable-quote">'</span><span class="rst-variable-string">%(message)s</span><span class="rst-variable-quote">'</span>):
-    <a class="sourceLink" href="https://github.com/tristanlatr/astuce/tree/main/astuce/__init__.py#L41">
+    <a class="sourceLink" href="https://github.com/tristanlatr/astuce/tree/main/astuce/__init__.py#L78">
       
       (source)
     </a>
@@ -565,7 +608,7 @@ inferred = <span class="py-builtin">list</span>(inference.infer_attr(mod2, <span
   <div class="functionHeader">
     
     <span class="py-defname">_patched</span>: <code><a href="https://docs.python.org/3/library/functions.html#bool" class="intersphinx-link">bool</a></code> =
-    <a class="sourceLink" href="https://github.com/tristanlatr/astuce/tree/main/astuce/__init__.py#L69">
+    <a class="sourceLink" href="https://github.com/tristanlatr/astuce/tree/main/astuce/__init__.py#L106">
       
       (source)
     </a>
@@ -588,7 +631,7 @@ inferred = <span class="py-builtin">list</span>(inference.infer_attr(mod2, <span
   <div class="functionHeader">
     
     <span class="py-keyword">def</span> <span class="py-defname">_patch_ast</span>():
-    <a class="sourceLink" href="https://github.com/tristanlatr/astuce/tree/main/astuce/__init__.py#L71">
+    <a class="sourceLink" href="https://github.com/tristanlatr/astuce/tree/main/astuce/__init__.py#L108">
       
       (source)
     </a>
@@ -612,7 +655,7 @@ inferred = <span class="py-builtin">list</span>(inference.infer_attr(mod2, <span
     <div class="container">
       <a href="index.html">API Documentation</a> for <a href="https://github.com/tristanlatr/astuce/" class="projecthome">astuce</a>,
     generated by <a href="https://github.com/twisted/pydoctor/">pydoctor</a>
-      22.5.1 at 2022-06-11 06:09:27.
+      22.5.1 at 2022-06-11 16:03:19.
     </div>
     
     <script src="ajax.js" type="text/javascript"></script>
