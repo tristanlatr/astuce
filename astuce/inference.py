@@ -184,9 +184,6 @@ def _is_end_of_frame_sentinel(node:_typing.ASTNode) -> bool:
             return True
     
     return False
-    
-    # The last element in frame nodes is assumed to be the inserted sentinel "end of" node.
-    return frame_node.body[-1]
 
 def get_attr(ctx: _typing.FrameNodeT, name:str, *, ignore_locals:bool=False, context:OptionalInferenceContext=None) -> List[ASTNodeT]:
     """
