@@ -743,3 +743,80 @@ class Instance:
         
         return TypeInfo(_type, classdef=classdef)
         
+def are_exclusive(stmt1: 'ASTNode', stmt2: 'ASTNode') -> bool:
+    """
+    return true if the two given statements are mutually exclusive
+
+    algorithm :
+    1) index stmt1's parents
+    2) climb among stmt2's parents until we find a common parent
+    3) if the common parent is a If or Try statement, look if nodes are
+        in exclusive branches
+    """
+    # index stmt1's parents
+    exceptions = None
+    stmt1_parents = {}
+    children = {}
+    previous = stmt1
+    for node in stmt1.node_ancestors():
+        stmt1_parents[node] = 1
+        children[node] = previous
+        previous = node
+    # climb among stmt2's parents until we find a common parent
+    previous = stmt2
+    for node in stmt2.node_ancestors():
+        if node in stmt1_parents:
+            # if the common parent is a If or TryExcept statement, look if
+            # nodes are in exclusive branches
+            if isinstance(node, ast.If) and exceptions is None:
+                if (
+                    node.locate_child(previous)[1]
+                    is not node.locate_child(children[node])[1]
+                ):
+                    return True
+            elif isinstance(node, ast.Try):
+                c2attr, c2node = node.locate_child(previous)
+                c1attr, c1node = node.locate_child(children[node])
+                if c1node is not c2node:
+                    first_in_body_caught_by_handlers = False
+                    second_in_body_caught_by_handlers = False
+                    first_in_else_other_in_handlers = (
+                        c2attr == "handlers" and c1attr == "orelse"
+                    )
+                    second_in_else_other_in_handlers = (
+                        c2attr == "orelse" and c1attr == "handlers"
+                    )
+                    # TODO: Add support for selecting expect handlers - for builtin exceptions at least.
+                    if any(
+                        (
+                            first_in_body_caught_by_handlers,
+                            second_in_body_caught_by_handlers,
+                            first_in_else_other_in_handlers,
+                            second_in_else_other_in_handlers,
+                        )
+                    ):
+                        return True
+                elif c2attr == "handlers" and c1attr == "handlers":
+                    return previous is not children[node]
+            return False
+        previous = node
+    return False
+
+def is_orelse(node: 'ASTNode') -> bool:
+    """
+    Is this If node is part of the the C{else} branch of a parent If node.
+
+    :note: Always returns False if C{node} is not an L{ast.If}.
+    """
+
+    parent = node.parent
+    if isinstance(parent, ast.If) and node in parent.orelse:
+        return True
+    return False
+
+def get_if_statement_ancestor(node: 'ASTNode') -> Optional['ASTNode']:
+    """Return the first parent node that is an If node (or None)"""
+    for parent in node.node_ancestors():
+        if isinstance(parent, ast.If):
+            return parent
+    return None
