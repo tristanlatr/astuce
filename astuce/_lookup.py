@@ -112,4 +112,3 @@ def _base_scope_lookup(self:'_typing.ASTNode', node: '_typing.ASTNode', name:str
     # self is at the top level of a module, and we couldn't find references to this name
     return (node, []) #type:ignore[unreachable]
     # NameInferenceError is raised by callers.
-    # raise LookupError(f"couldn't find references to {name!r}")
