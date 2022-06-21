@@ -315,17 +315,6 @@ class ASTNode:
     def _is_statement(self) -> bool:
         return isinstance(self, ast.stmt)
     
-    def has_base(self, node:ast.AST) -> bool:
-        """
-        Check if this `ast.ClassDef` node inherits from the given type.
-
-        :param node: The node defining the base to look for.
-            Usually this is a :class:`Name` node.
-        :type node: ASTNode
-        """
-        if not isinstance(self, ast.ClassDef):
-            return False
-        return bool(node in self.bases)
     
     def locate_child(self, child:'ASTNode', recurse:bool=False) -> Tuple[str, Union['_typing.ASTNode', Sequence['_typing.ASTNode']]]:
         """Find the field of this node that contains the given child.

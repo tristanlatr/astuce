@@ -162,6 +162,18 @@ def _comprehension_get_filtered_stmts(self: 'ASTNode', lookup_node:'ASTNode', no
 
     return stmts, False
 
+def has_base(self: 'ASTNode', node:ast.AST) -> bool:
+    """
+    Check if this `ast.ClassDef` node inherits from the given type.
+
+    :param node: The node defining the base to look for.
+        Usually this is a :class:`Name` node.
+    :type node: ASTNode
+    """
+    if not isinstance(self, ast.ClassDef):
+        return False
+    return bool(node in self.bases)
+
 def filter_stmts(base_node: 'ASTNode', stmts:List[LocalsAssignT], frame: 'ASTNode', offset:int) -> List['ASTNode']:
     """
     Filter the given list of statements to remove ignorable statements.
@@ -241,7 +253,7 @@ def filter_stmts(base_node: 'ASTNode', stmts:List[LocalsAssignT], frame: 'ASTNod
         # Fixes issue #375
         if mystmt is stmt and base_node._is_from_decorator:
             continue
-        if node.has_base(base_node):
+        if has_base(node, base_node):
             break
 
         # if isinstance(node, EmptyNode):
