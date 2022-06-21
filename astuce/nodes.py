@@ -311,11 +311,6 @@ class ASTNode:
             return self
         return self.parent.statement
     
-    @cached_property
-    def _is_statement(self) -> bool:
-        return isinstance(self, ast.stmt)
-    
-    
     def locate_child(self, child:'ASTNode', recurse:bool=False) -> Tuple[str, Union['_typing.ASTNode', Sequence['_typing.ASTNode']]]:
         """Find the field of this node that contains the given child.
         :param child: The child node to search fields for.
@@ -357,7 +352,6 @@ class ASTNode:
         from . import inference
         return inference.infer(self, context) #type:ignore[arg-type]
     
-    # @lru_cache()
     # Using cache breaks some tests here
     def literal_eval(self) -> Any:
         return ast.literal_eval(cast(ast.AST, self))
