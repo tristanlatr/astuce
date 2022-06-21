@@ -3,7 +3,7 @@ import functools
 from typing import List
 
 from astuce import exceptions, inference, nodes, helpers
-from astuce.filter_statements import are_exclusive, filter_stmts
+from astuce._filter_statements import are_exclusive, filter_stmts
 from .test_nodes import CODE_IF_BRANCHES_STATEMENTS
 from . import AstuceTestCase, require_version, get_load_names
 from astuce._typing import ASTNode as ASTNodeT

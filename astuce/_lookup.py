@@ -92,7 +92,7 @@ def _function_lookup(self:'_typing.ASTNode', node: '_typing.ASTNode', name:str, 
 def _base_scope_lookup(self:'_typing.ASTNode', node: '_typing.ASTNode', name:str, offset:int=0) -> Tuple['_typing.ASTNode', List['_typing.ASTNode']]:
     """XXX method for interfacing the scope lookup"""
 
-    from .filter_statements import filter_stmts # workaround cyclic imports.
+    from ._filter_statements import filter_stmts # workaround cyclic imports.
 
     try:
         stmts = filter_stmts(node, self.locals[name], self, offset)

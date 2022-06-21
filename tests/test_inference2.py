@@ -7,7 +7,7 @@ import pytest
 
 from astuce import nodes, inference, exceptions, _lookup
 from astuce.exceptions import InferenceError
-from astuce.filter_statements import filter_stmts
+from astuce._filter_statements import filter_stmts
 from . import AstuceTestCase, capture_output, get_exprs, fromtext, get_load_names
 
 class Warns(AstuceTestCase):
