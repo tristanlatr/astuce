@@ -36,9 +36,9 @@ else:
             from . import _astunparse 
             _unparse = _astunparse.unparse
 
-from .nodes import _END_OF_FRAME_SENTINEL_CONSTANT, ASTNode, Instance, is_assign_name, is_del_name, is_scoped_node
-from . import _typing, _context, _astutils
 
+from .nodes import _END_OF_FRAME_SENTINEL_CONSTANT, ASTNode, Instance, is_assign_name, is_del_name, is_scoped_node, fix_ast
+from . import _typing, _context
 
 
 def _set_local(self:'_typing.ASTNode', name:str, node:'ast.AST') -> None:
@@ -201,7 +201,7 @@ class _AstuceModuleVisitor(ast.NodeTransformer):
                         node._report("Transforming __all__.append() into an augmented assigment")
                         aug = ast.AugAssign(ast.Name(o.id, ast.Store()), ast.Add(), ast.List(elts=[v.args[0]]))
                     if aug:
-                        return _astutils.fix_ast(self.visit(aug), parent=node.parent)
+                        return fix_ast(self.visit(aug), parent=node.parent)
 
         return self.generic_visit(node)
 

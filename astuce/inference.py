@@ -12,8 +12,8 @@ from typing import Any, Callable, Iterable, Iterator, Optional, List, Type, Unio
 from . import _context, nodes, exceptions, _decorators
 from . import _typing
 from ._typing import ASTNode as ASTNodeT, _InferMethT, InferResult, UninferableT
+from .nodes import fix_ast, literal_to_ast
 from ._context import OptionalInferenceContext, copy_context, InferenceContext
-from ._astutils import fix_ast, literal_to_ast
 from ._assigned_statements import assigned_stmts
 from ._inference_decorators import path_wrapper, yes_if_nothing_inferred, raise_if_nothing_inferred
 
