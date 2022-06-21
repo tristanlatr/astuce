@@ -147,6 +147,26 @@
         
 
         
+            <div class="itemName"><code><a href="#are_exclusive" class="internal-link" title="astuce.nodes.are_exclusive">are<wbr></wbr>_exclusive</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#fix_ast" class="internal-link" title="astuce.nodes.fix_ast">fix<wbr></wbr>_ast</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
             <div class="itemName"><code><a href="#get_context" class="internal-link" title="astuce.nodes.get_context">get<wbr></wbr>_context</a></code>
             </div>
         
@@ -158,6 +178,16 @@
 
         
             <div class="itemName"><code><a href="#get_full_import_name" class="internal-link" title="astuce.nodes.get_full_import_name">get<wbr></wbr>_full<wbr></wbr>_import<wbr></wbr>_name</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#get_if_statement_ancestor" class="internal-link" title="astuce.nodes.get_if_statement_ancestor">get<wbr></wbr>_if<wbr></wbr>_statement<wbr></wbr>_ancestor</a></code>
             </div>
         
 
@@ -217,7 +247,47 @@
         
 
         
+            <div class="itemName"><code><a href="#is_orelse" class="internal-link" title="astuce.nodes.is_orelse">is<wbr></wbr>_orelse</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
             <div class="itemName"><code><a href="#is_scoped_node" class="internal-link" title="astuce.nodes.is_scoped_node">is<wbr></wbr>_scoped<wbr></wbr>_node</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#literal_to_ast" class="internal-link" title="astuce.nodes.literal_to_ast">literal<wbr></wbr>_to<wbr></wbr>_ast</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#nodes_of_class" class="internal-link" title="astuce.nodes.nodes_of_class">nodes<wbr></wbr>_of<wbr></wbr>_class</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#qname_to_ast" class="internal-link" title="astuce.nodes.qname_to_ast">qname<wbr></wbr>_to<wbr></wbr>_ast</a></code>
             </div>
         
 
@@ -306,26 +376,6 @@
         
 
         
-            <div class="itemName"><code><a href="astuce.filter_statements.html" class="internal-link" title="astuce.filter_statements">filter<wbr></wbr>_statements</a></code>
-            </div>
-        
-
-    </li><li class="">
-        
-        
-        
-
-        
-            <div class="itemName"><code><a href="astuce.helpers.html" class="internal-link" title="astuce.helpers">helpers</a></code>
-            </div>
-        
-
-    </li><li class="">
-        
-        
-        
-
-        
             <div class="itemName"><code><a href="astuce.inference.html" class="internal-link" title="astuce.inference">inference</a></code>
             </div>
         
@@ -376,16 +426,6 @@
         
 
         
-            <div class="itemName"><code><a href="astuce._astutils.html" class="internal-link" title="astuce._astutils">_astutils</a></code>
-            </div>
-        
-
-    </li><li class="private">
-        
-        
-        
-
-        
             <div class="itemName"><code><a href="astuce._context.html" class="internal-link" title="astuce._context">_context</a></code>
             </div>
         
@@ -397,6 +437,16 @@
 
         
             <div class="itemName"><code><a href="astuce._decorators.html" class="internal-link" title="astuce._decorators">_decorators</a></code>
+            </div>
+        
+
+    </li><li class="private">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="astuce._filter_statements.html" class="internal-link" title="astuce._filter_statements">_filter<wbr></wbr>_statements</a></code>
             </div>
         
 
@@ -588,7 +638,7 @@
         </div>
 
         <div id="splitTables">
-          <table class="children sortable" id="id32">
+          <table class="children sortable" id="id30">
   
   
   <tr class="class">
@@ -619,6 +669,16 @@
   </tr><tr class="function">
     
     <td>Function</td>
+    <td><code><a href="#are_exclusive" class="internal-link" title="astuce.nodes.are_exclusive">are<wbr></wbr>_exclusive</a></code></td>
+    <td>return true if the two given statements are mutually exclusive</td>
+  </tr><tr class="function">
+    
+    <td>Function</td>
+    <td><code><a href="#fix_ast" class="internal-link" title="astuce.nodes.fix_ast">fix<wbr></wbr>_ast</a></code></td>
+    <td>Fix a newly created AST tree to be compatible with astuce.</td>
+  </tr><tr class="function">
+    
+    <td>Function</td>
     <td><code><a href="#get_context" class="internal-link" title="astuce.nodes.get_context">get<wbr></wbr>_context</a></code></td>
     <td>Wraps the context ast context classes into a more friendly enumeration.</td>
   </tr><tr class="function">
@@ -626,6 +686,11 @@
     <td>Function</td>
     <td><code><a href="#get_full_import_name" class="internal-link" title="astuce.nodes.get_full_import_name">get<wbr></wbr>_full<wbr></wbr>_import<wbr></wbr>_name</a></code></td>
     <td>Get the full path of a name from a <tt class="rst-docutils literal">from .x import y</tt> or <tt class="rst-docutils literal">import y</tt> alias.</td>
+  </tr><tr class="function">
+    
+    <td>Function</td>
+    <td><code><a href="#get_if_statement_ancestor" class="internal-link" title="astuce.nodes.get_if_statement_ancestor">get<wbr></wbr>_if<wbr></wbr>_statement<wbr></wbr>_ancestor</a></code></td>
+    <td>Return the first parent node that is an If node (or None)</td>
   </tr><tr class="function">
     
     <td>Function</td>
@@ -654,8 +719,28 @@
   </tr><tr class="function">
     
     <td>Function</td>
+    <td><code><a href="#is_orelse" class="internal-link" title="astuce.nodes.is_orelse">is<wbr></wbr>_orelse</a></code></td>
+    <td>Is this If node is part of the the C{else} branch of a parent If node.</td>
+  </tr><tr class="function">
+    
+    <td>Function</td>
     <td><code><a href="#is_scoped_node" class="internal-link" title="astuce.nodes.is_scoped_node">is<wbr></wbr>_scoped<wbr></wbr>_node</a></code></td>
     <td>Whether this node is a scope.</td>
+  </tr><tr class="function">
+    
+    <td>Function</td>
+    <td><code><a href="#literal_to_ast" class="internal-link" title="astuce.nodes.literal_to_ast">literal<wbr></wbr>_to<wbr></wbr>_ast</a></code></td>
+    <td>Transform a literal object into it's AST counterpart.</td>
+  </tr><tr class="function">
+    
+    <td>Function</td>
+    <td><code><a href="#nodes_of_class" class="internal-link" title="astuce.nodes.nodes_of_class">nodes<wbr></wbr>_of<wbr></wbr>_class</a></code></td>
+    <td>Get the nodes (including this one or below) of the given types.</td>
+  </tr><tr class="function">
+    
+    <td>Function</td>
+    <td><code><a href="#qname_to_ast" class="internal-link" title="astuce.nodes.qname_to_ast">qname<wbr></wbr>_to<wbr></wbr>_ast</a></code></td>
+    <td>Transform a dotted name (i.e <tt class="rst-docutils literal">twisted.internet.reactor</tt>) into it's AST couterparts.</td>
   </tr><tr class="function">
     
     <td>Function</td>
@@ -687,6 +772,58 @@
           <div class="basefunction">
   
   
+  <a name="astuce.nodes.are_exclusive">
+    
+  </a>
+  <a name="are_exclusive">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-keyword">def</span> <span class="py-defname">are_exclusive</span>(stmt1, stmt2):
+    <a class="sourceLink" href="https://github.com/tristanlatr/astuce/tree/main/astuce/nodes.py#L729">
+      
+      (source)
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    
+    <div><p>return true if the two given statements are mutually exclusive</p>
+<p>algorithm :
+1) index stmt1's parents
+2) climb among stmt2's parents until we find a common parent
+3) if the common parent is a If or Try statement, look if nodes are</p>
+<blockquote>
+in exclusive branches</blockquote>
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">stmt1:</span><code><a href="astuce.nodes.ASTNode.html" class="internal-link" title="astuce.nodes.ASTNode">ASTNode</a></code></td><td class="fieldArgDesc"><span class="undocumented">Undocumented</span></td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">stmt2:</span><code><a href="astuce.nodes.ASTNode.html" class="internal-link" title="astuce.nodes.ASTNode">ASTNode</a></code></td><td class="fieldArgDesc"><span class="undocumented">Undocumented</span></td></tr><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc"><span class="undocumented">Undocumented</span></td></tr></table></div>
+  </div>
+</div><div class="basefunction">
+  
+  
+  <a name="astuce.nodes.fix_ast">
+    
+  </a>
+  <a name="fix_ast">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-keyword">def</span> <span class="py-defname">fix_ast</span>(node, parent):
+    <a class="sourceLink" href="https://github.com/tristanlatr/astuce/tree/main/astuce/nodes.py#L819">
+      
+      (source)
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    
+    <div><p>Fix a newly created AST tree to be compatible with astuce.</p>
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">node:</span><code><a href="astuce._typing.ASTNode.html" class="internal-link" title="astuce._typing.ASTNode">_typing.ASTNode</a></code></td><td class="fieldArgDesc"><span class="undocumented">Undocumented</span></td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">parent:</span><code><a href="https://docs.python.org/3/library/typing.html#typing.Optional" class="intersphinx-link">Optional</a>[<wbr></wbr><a href="astuce._typing.ASTNode.html" class="internal-link" title="astuce._typing.ASTNode">_typing.ASTNode</a>]</code></td><td class="fieldArgDesc"><span class="undocumented">Undocumented</span></td></tr><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="astuce._typing.ASTNode.html" class="internal-link" title="astuce._typing.ASTNode">_typing.ASTNode</a></code></td><td class="fieldArgDesc"><span class="undocumented">Undocumented</span></td></tr></table></div>
+  </div>
+</div><div class="basefunction">
+  
+  
   <a name="astuce.nodes.get_context">
     
   </a>
@@ -696,7 +833,7 @@
   <div class="functionHeader">
     @<a href="https://docs.python.org/3/library/functools.html#functools.lru_cache" class="intersphinx-link">functools.lru_cache</a>(<wbr></wbr>maxsize=<a href="https://docs.python.org/3/library/constants.html#None" class="intersphinx-link">None</a>)<br />
     <span class="py-keyword">def</span> <span class="py-defname">get_context</span>(node):
-    <a class="sourceLink" href="https://github.com/tristanlatr/astuce/tree/main/astuce/nodes.py#L521">
+    <a class="sourceLink" href="https://github.com/tristanlatr/astuce/tree/main/astuce/nodes.py#L504">
       
       (source)
     </a>
@@ -720,7 +857,7 @@
   <div class="functionHeader">
     
     <span class="py-keyword">def</span> <span class="py-defname">get_full_import_name</span>(alias):
-    <a class="sourceLink" href="https://github.com/tristanlatr/astuce/tree/main/astuce/nodes.py#L603">
+    <a class="sourceLink" href="https://github.com/tristanlatr/astuce/tree/main/astuce/nodes.py#L586">
       
       (source)
     </a>
@@ -740,6 +877,29 @@ import c.abc
 </div><div class="basefunction">
   
   
+  <a name="astuce.nodes.get_if_statement_ancestor">
+    
+  </a>
+  <a name="get_if_statement_ancestor">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-keyword">def</span> <span class="py-defname">get_if_statement_ancestor</span>(node):
+    <a class="sourceLink" href="https://github.com/tristanlatr/astuce/tree/main/astuce/nodes.py#L800">
+      
+      (source)
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    
+    <div><p>Return the first parent node that is an If node (or None)</p>
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">node:</span><code><a href="astuce.nodes.ASTNode.html" class="internal-link" title="astuce.nodes.ASTNode">ASTNode</a></code></td><td class="fieldArgDesc"><span class="undocumented">Undocumented</span></td></tr><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/typing.html#typing.Optional" class="intersphinx-link">Optional</a>[<wbr></wbr><a href="astuce.nodes.ASTNode.html" class="internal-link" title="astuce.nodes.ASTNode">ASTNode</a>]</code></td><td class="fieldArgDesc"><span class="undocumented">Undocumented</span></td></tr></table></div>
+  </div>
+</div><div class="basefunction">
+  
+  
   <a name="astuce.nodes.get_module_parent">
     
   </a>
@@ -749,7 +909,7 @@ import c.abc
   <div class="functionHeader">
     
     <span class="py-keyword">def</span> <span class="py-defname">get_module_parent</span>(node):
-    <a class="sourceLink" href="https://github.com/tristanlatr/astuce/tree/main/astuce/nodes.py#L549">
+    <a class="sourceLink" href="https://github.com/tristanlatr/astuce/tree/main/astuce/nodes.py#L532">
       
       (source)
     </a>
@@ -774,7 +934,7 @@ So we should not overide this behaviour.</p>
   <div class="functionHeader">
     
     <span class="py-keyword">def</span> <span class="py-defname">get_origin_module</span>(alias):
-    <a class="sourceLink" href="https://github.com/tristanlatr/astuce/tree/main/astuce/nodes.py#L565">
+    <a class="sourceLink" href="https://github.com/tristanlatr/astuce/tree/main/astuce/nodes.py#L548">
       
       (source)
     </a>
@@ -819,7 +979,7 @@ pass
   <div class="functionHeader">
     
     <span class="py-keyword">def</span> <span class="py-defname">is_assign_name</span>(node):
-    <a class="sourceLink" href="https://github.com/tristanlatr/astuce/tree/main/astuce/nodes.py#L509">
+    <a class="sourceLink" href="https://github.com/tristanlatr/astuce/tree/main/astuce/nodes.py#L492">
       
       (source)
     </a>
@@ -842,7 +1002,7 @@ pass
   <div class="functionHeader">
     
     <span class="py-keyword">def</span> <span class="py-defname">is_del_name</span>(node):
-    <a class="sourceLink" href="https://github.com/tristanlatr/astuce/tree/main/astuce/nodes.py#L515">
+    <a class="sourceLink" href="https://github.com/tristanlatr/astuce/tree/main/astuce/nodes.py#L498">
       
       (source)
     </a>
@@ -865,7 +1025,7 @@ pass
   <div class="functionHeader">
     
     <span class="py-keyword">def</span> <span class="py-defname">is_frame_node</span>(node):
-    <a class="sourceLink" href="https://github.com/tristanlatr/astuce/tree/main/astuce/nodes.py#L535">
+    <a class="sourceLink" href="https://github.com/tristanlatr/astuce/tree/main/astuce/nodes.py#L518">
       
       (source)
     </a>
@@ -879,6 +1039,29 @@ pass
 </div><div class="basefunction">
   
   
+  <a name="astuce.nodes.is_orelse">
+    
+  </a>
+  <a name="is_orelse">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-keyword">def</span> <span class="py-defname">is_orelse</span>(node):
+    <a class="sourceLink" href="https://github.com/tristanlatr/astuce/tree/main/astuce/nodes.py#L788">
+      
+      (source)
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    
+    <div><p>Is this If node is part of the the C{else} branch of a parent If node.</p>
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">node:</span><code><a href="astuce.nodes.ASTNode.html" class="internal-link" title="astuce.nodes.ASTNode">ASTNode</a></code></td><td class="fieldArgDesc"><span class="undocumented">Undocumented</span></td></tr><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc"><span class="undocumented">Undocumented</span></td></tr><tr class="fieldStart"><td class="fieldName" colspan="2">Note</td></tr><tr><td colspan="2">Always returns False if C{node} is not an L{ast.If}.</td></tr></table></div>
+  </div>
+</div><div class="basefunction">
+  
+  
   <a name="astuce.nodes.is_scoped_node">
     
   </a>
@@ -888,7 +1071,7 @@ pass
   <div class="functionHeader">
     
     <span class="py-keyword">def</span> <span class="py-defname">is_scoped_node</span>(node):
-    <a class="sourceLink" href="https://github.com/tristanlatr/astuce/tree/main/astuce/nodes.py#L541">
+    <a class="sourceLink" href="https://github.com/tristanlatr/astuce/tree/main/astuce/nodes.py#L524">
       
       (source)
     </a>
@@ -902,6 +1085,79 @@ pass
 </div><div class="basefunction">
   
   
+  <a name="astuce.nodes.literal_to_ast">
+    
+  </a>
+  <a name="literal_to_ast">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-keyword">def</span> <span class="py-defname">literal_to_ast</span>(ob):
+    <a class="sourceLink" href="https://github.com/tristanlatr/astuce/tree/main/astuce/nodes.py#L845">
+      
+      (source)
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    
+    <div><p>Transform a literal object into it's AST counterpart.</p>
+<p>The object provided may only consist of the following
+Python builtin types: strings, bytes, numbers, tuples, lists, dicts,
+sets, booleans, and None.</p>
+<p>Normally, <tt class="rst-docutils literal">AST</tt> and <tt class="rst-docutils literal">literal_to_ast(ast.literal_eval(AST))</tt> are equivalent.</p>
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">ob:</span><code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a></code></td><td class="fieldArgDesc"><span class="undocumented">Undocumented</span></td></tr><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code>ast.expr</code></td><td class="fieldArgDesc"><span class="undocumented">Undocumented</span></td></tr></table></div>
+  </div>
+</div><div class="basefunction">
+  
+  
+  <a name="astuce.nodes.nodes_of_class">
+    
+  </a>
+  <a name="nodes_of_class">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-keyword">def</span> <span class="py-defname">nodes_of_class</span>(self, klass, predicate=<a href="https://docs.python.org/3/library/constants.html#None" class="intersphinx-link">None</a>):
+    <a class="sourceLink" href="https://github.com/tristanlatr/astuce/tree/main/astuce/nodes.py#L876">
+      
+      (source)
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    
+    <div><p>Get the nodes (including this one or below) of the given types.</p>
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">klass:</span><code><a href="https://docs.python.org/3/library/typing.html#typing.Union" class="intersphinx-link">Union</a>[<wbr></wbr><a href="https://docs.python.org/3/library/typing.html#typing.Type" class="intersphinx-link">Type</a>[<wbr></wbr><a href="https://docs.python.org/3/library/ast.html#ast.AST" class="intersphinx-link">ast.AST</a>], <wbr></wbr><a href="https://docs.python.org/3/library/typing.html#typing.Tuple" class="intersphinx-link">Tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/library/typing.html#typing.Type" class="intersphinx-link">Type</a>[<wbr></wbr><a href="https://docs.python.org/3/library/ast.html#ast.AST" class="intersphinx-link">ast.AST</a>], <wbr></wbr><span class="rst-variable-ellipsis">...</span>]]</code></td><td class="fieldArgDesc">The types of node to search for.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">predicate:</span><code><a href="https://docs.python.org/3/library/typing.html#typing.Optional" class="intersphinx-link">Optional</a>[<wbr></wbr><a href="https://docs.python.org/3/library/typing.html#typing.Callable" class="intersphinx-link">Callable</a>[<wbr></wbr>[<wbr></wbr><a href="astuce._typing.ASTNode.html" class="internal-link" title="astuce._typing.ASTNode">_typing.ASTNode</a>], <wbr></wbr><a href="https://docs.python.org/3/library/functions.html#bool" class="intersphinx-link">bool</a>]]</code></td><td class="fieldArgDesc">Callable that returns False value to ignore more objects.</td></tr><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/typing.html#typing.Iterator" class="intersphinx-link">Iterator</a>[<wbr></wbr><a href="astuce._typing.ASTNode.html" class="internal-link" title="astuce._typing.ASTNode">_typing.ASTNode</a>]</code></td><td class="fieldArgDesc">The node of the given types.</td></tr></table></div>
+  </div>
+</div><div class="basefunction">
+  
+  
+  <a name="astuce.nodes.qname_to_ast">
+    
+  </a>
+  <a name="qname_to_ast">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-keyword">def</span> <span class="py-defname">qname_to_ast</span>(name):
+    <a class="sourceLink" href="https://github.com/tristanlatr/astuce/tree/main/astuce/nodes.py#L807">
+      
+      (source)
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    
+    <div><p>Transform a dotted name (i.e <tt class="rst-docutils literal">twisted.internet.reactor</tt>) into it's AST couterparts.</p>
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">name:</span><code><a href="https://docs.python.org/3/library/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc"><span class="undocumented">Undocumented</span></td></tr><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/typing.html#typing.Union" class="intersphinx-link">Union</a>[<wbr></wbr><a href="https://docs.python.org/3/library/ast.html#ast.Name" class="intersphinx-link">ast.Name</a>, <wbr></wbr><a href="https://docs.python.org/3/library/ast.html#ast.Attribute" class="intersphinx-link">ast.Attribute</a>]</code></td><td class="fieldArgDesc"><span class="undocumented">Undocumented</span></td></tr></table></div>
+  </div>
+</div><div class="basefunction">
+  
+  
   <a name="astuce.nodes.relative_to_absolute">
     
   </a>
@@ -911,7 +1167,7 @@ pass
   <div class="functionHeader">
     
     <span class="py-keyword">def</span> <span class="py-defname">relative_to_absolute</span>(node):
-    <a class="sourceLink" href="https://github.com/tristanlatr/astuce/tree/main/astuce/nodes.py#L635">
+    <a class="sourceLink" href="https://github.com/tristanlatr/astuce/tree/main/astuce/nodes.py#L618">
       
       (source)
     </a>
@@ -935,7 +1191,7 @@ be found in the system.</td></tr></table></div>
   <div class="functionHeader">
     
     <span class="py-keyword">def</span> <span class="py-defname">_get_full_origin_name</span>(import_from):
-    <a class="sourceLink" href="https://github.com/tristanlatr/astuce/tree/main/astuce/nodes.py#L622">
+    <a class="sourceLink" href="https://github.com/tristanlatr/astuce/tree/main/astuce/nodes.py#L605">
       
       (source)
     </a>
@@ -958,7 +1214,7 @@ be found in the system.</td></tr></table></div>
   <div class="functionHeader">
     
     <span class="py-defname">_CONTEXT_MAP</span> =
-    <a class="sourceLink" href="https://github.com/tristanlatr/astuce/tree/main/astuce/nodes.py#L502">
+    <a class="sourceLink" href="https://github.com/tristanlatr/astuce/tree/main/astuce/nodes.py#L485">
       
       (source)
     </a>
@@ -1008,7 +1264,7 @@ be found in the system.</td></tr></table></div>
     <div class="container">
       <a href="index.html">API Documentation</a> for <a href="https://github.com/tristanlatr/astuce/" class="projecthome">astuce</a>,
     generated by <a href="https://github.com/twisted/pydoctor/">pydoctor</a>
-      22.5.1 at 2022-06-11 19:09:55.
+      22.5.1 at 2022-06-21 03:51:47.
     </div>
     
     <script src="ajax.js" type="text/javascript"></script>
