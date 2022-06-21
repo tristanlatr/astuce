@@ -21,7 +21,7 @@ else:
     from functools import cached_property  # noqa: WPS440
 
 from .exceptions import InferenceError, LastNodeError, RootNodeError
-from . import _typing, _astutils
+from . import _typing
 
 if TYPE_CHECKING:
     from .parser import Parser
@@ -311,22 +311,6 @@ class ASTNode:
             return self
         return self.parent.statement
     
-    @cached_property
-    def _is_statement(self) -> bool:
-        return isinstance(self, ast.stmt)
-    
-    def has_base(self, node:ast.AST) -> bool:
-        """
-        Check if this `ast.ClassDef` node inherits from the given type.
-
-        :param node: The node defining the base to look for.
-            Usually this is a :class:`Name` node.
-        :type node: ASTNode
-        """
-        if not isinstance(self, ast.ClassDef):
-            return False
-        return bool(node in self.bases)
-    
     def locate_child(self, child:'ASTNode', recurse:bool=False) -> Tuple[str, Union['_typing.ASTNode', Sequence['_typing.ASTNode']]]:
         """Find the field of this node that contains the given child.
         :param child: The child node to search fields for.
@@ -368,7 +352,6 @@ class ASTNode:
         from . import inference
         return inference.infer(self, context) #type:ignore[arg-type]
     
-    # @lru_cache()
     # Using cache breaks some tests here
     def literal_eval(self) -> Any:
         return ast.literal_eval(cast(ast.AST, self))
@@ -729,17 +712,186 @@ class Instance:
         if type_annotation is not None:
             _type = type_annotation
         elif classdef is not None:
-            _type = _astutils.qname_to_ast(classdef.qname)
+            _type = qname_to_ast(classdef.qname)
         elif isinstance(self, ast.List):
-            _type = _astutils.qname_to_ast("list")
+            _type = qname_to_ast("list")
         elif isinstance(self, ast.Set):
-            _type = _astutils.qname_to_ast("set")
+            _type = qname_to_ast("set")
         elif isinstance(self, ast.Tuple):
-            _type = _astutils.qname_to_ast("tuple")
+            _type = qname_to_ast("tuple")
         elif isinstance(self, ast.Dict):
-            _type = _astutils.qname_to_ast("dict")
+            _type = qname_to_ast("dict")
         elif isinstance(self, ast.Constant) and self.value is not ...:
-            _type = _astutils.qname_to_ast(self.value.__class__.__name__)
+            _type = qname_to_ast(self.value.__class__.__name__)
         
         return TypeInfo(_type, classdef=classdef)
         
+def are_exclusive(stmt1: 'ASTNode', stmt2: 'ASTNode') -> bool:
+    """
+    return true if the two given statements are mutually exclusive
+
+    algorithm :
+    1) index stmt1's parents
+    2) climb among stmt2's parents until we find a common parent
+    3) if the common parent is a If or Try statement, look if nodes are
+        in exclusive branches
+    """
+    # index stmt1's parents
+    exceptions = None
+    stmt1_parents = {}
+    children = {}
+    previous = stmt1
+    for node in stmt1.node_ancestors():
+        stmt1_parents[node] = 1
+        children[node] = previous
+        previous = node
+    # climb among stmt2's parents until we find a common parent
+    previous = stmt2
+    for node in stmt2.node_ancestors():
+        if node in stmt1_parents:
+            # if the common parent is a If or TryExcept statement, look if
+            # nodes are in exclusive branches
+            if isinstance(node, ast.If) and exceptions is None:
+                if (
+                    node.locate_child(previous)[1]
+                    is not node.locate_child(children[node])[1]
+                ):
+                    return True
+            elif isinstance(node, ast.Try):
+                c2attr, c2node = node.locate_child(previous)
+                c1attr, c1node = node.locate_child(children[node])
+                if c1node is not c2node:
+                    first_in_body_caught_by_handlers = False
+                    second_in_body_caught_by_handlers = False
+                    first_in_else_other_in_handlers = (
+                        c2attr == "handlers" and c1attr == "orelse"
+                    )
+                    second_in_else_other_in_handlers = (
+                        c2attr == "orelse" and c1attr == "handlers"
+                    )
+                    # TODO: Add support for selecting expect handlers - for builtin exceptions at least.
+                    if any(
+                        (
+                            first_in_body_caught_by_handlers,
+                            second_in_body_caught_by_handlers,
+                            first_in_else_other_in_handlers,
+                            second_in_else_other_in_handlers,
+                        )
+                    ):
+                        return True
+                elif c2attr == "handlers" and c1attr == "handlers":
+                    return previous is not children[node]
+            return False
+        previous = node
+    return False
+
+def is_orelse(node: 'ASTNode') -> bool:
+    """
+    Is this If node is part of the the C{else} branch of a parent If node.
+
+    :note: Always returns False if C{node} is not an L{ast.If}.
+    """
+
+    parent = node.parent
+    if isinstance(parent, ast.If) and node in parent.orelse:
+        return True
+    return False
+
+def get_if_statement_ancestor(node: 'ASTNode') -> Optional['ASTNode']:
+    """Return the first parent node that is an If node (or None)"""
+    for parent in node.node_ancestors():
+        if isinstance(parent, ast.If):
+            return parent
+    return None
+
+def qname_to_ast(name:str) -> Union[ast.Name, ast.Attribute]:
+    """
+    Transform a dotted name (i.e ``twisted.internet.reactor``) into it's AST couterparts.
+    """
+    parts = name.split('.')
+    assert parts, "must not be empty"
+    
+    if len(parts)==1:
+        return ast.Name(parts[0], ast.Load())
+    else:
+        return ast.Attribute(qname_to_ast('.'.join(parts[:-1])), parts[-1], ast.Load())
+
+def fix_ast(node:_typing.ASTNode, parent:Optional[_typing.ASTNode]) -> _typing.ASTNode:
+    """
+    Fix a newly created AST tree to be compatible with astuce.
+    """
+
+    def fix_missing_parents(node:_typing.ASTNode, parent:_typing.ASTNode) -> _typing.ASTNode:
+        """
+        Fix the missing ``parent`` attribute, starting at node.
+        Also setup the ``_parser`` attribute.
+        """
+        def _fix(_node:_typing.ASTNode, _parent:_typing.ASTNode) -> None:
+            _parent._parser._init_new_node(_node, _parent)
+            for child in _node.children:
+                _fix(child, _node)
+        _fix(node, parent)
+        return node
+
+    if parent is None:
+        parent = getattr(node, 'parent', None)
+        assert parent is not None, f"missing required argument 'parent'"
+    # TODO: Locations doesn't really makes sens for inferred nodes. 
+    # But it's handy to have the context linenumber here.
+    return fix_missing_parents(
+        ast.fix_missing_locations(
+            ast.copy_location(node, parent)), parent)
+
+def literal_to_ast(ob:Any) -> ast.expr:
+    """
+    Transform a literal object into it's AST counterpart.
+    
+    The object provided may only consist of the following
+    Python builtin types: strings, bytes, numbers, tuples, lists, dicts,
+    sets, booleans, and None.
+
+    Normally, ``AST`` and ``literal_to_ast(ast.literal_eval(AST))`` are equivalent.
+    """
+    def _convert(thing:Any) -> ast.expr:
+        if isinstance(thing, tuple):
+            return ast.Tuple.create_instance(elts=list(map(_convert, thing))) # type:ignore[no-any-return, attr-defined]
+        elif isinstance(thing, list):
+            return ast.List.create_instance(elts=list(map(_convert, thing))) # type:ignore[no-any-return, attr-defined]
+        elif isinstance(thing, set):
+            return ast.Set.create_instance(elts=list(map(_convert, thing))) # type:ignore[no-any-return, attr-defined]
+        elif isinstance(thing, dict):
+            values = []
+            keys = []
+            for k,v in thing.items():
+                values.append(_convert(v))
+                keys.append(_convert(k))
+            return ast.Dict.create_instance(keys=keys, values=values) # type:ignore[no-any-return, attr-defined]
+        elif isinstance(thing, (int, float, complex, bytes, str, bool)):
+            return ast.Constant.create_instance(thing) # type:ignore[no-any-return, attr-defined]
+        elif thing is None:
+            return ast.Constant.create_instance(None) # type:ignore[no-any-return, attr-defined]
+        raise ValueError(f"Not a literal: {thing!r}")
+    return _convert(ob)
+
+def nodes_of_class(
+    self:_typing.ASTNode,
+    klass: Union[Type[ast.AST], Tuple[Type[ast.AST], ...]],
+    predicate: Optional[Callable[[_typing.ASTNode], bool]]=None
+) -> Iterator['_typing.ASTNode']:
+    """Get the nodes (including this one or below) of the given types.
+
+    :param klass: The types of node to search for.
+    :param predicate: Callable that returns False value to ignore more objects.
+
+    :returns: The node of the given types.
+    """
+    if isinstance(self, klass):
+        if predicate is not None:
+            if bool(predicate(self))==True:
+                yield self
+        else:
+            yield self
+
+    for child_node in self.children:
+        yield from nodes_of_class(child_node, klass, predicate)
+

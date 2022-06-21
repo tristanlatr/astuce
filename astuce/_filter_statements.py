@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import ast
 from typing import List, Optional, Tuple, Union
-from .nodes import ASTNode, is_assign_name, is_del_name 
+from .nodes import ASTNode, is_assign_name, is_del_name, are_exclusive, is_orelse, get_if_statement_ancestor
 # TODO: we don't actaully need to import ASTNode here and is_assign_name, is_del_name should go into new module
 # This avoid to have import this module from within the function in _lookup.py.
 
@@ -54,26 +54,27 @@ PARENT_ASSIGNMENT_NODES = (ast.Name, ast.Attribute, ast.arg, ast.List,
 
 CONTAINER_NODES = (ast.List, ast.Set, ast.Tuple)
 
-def get_assign_type(node: 'ASTNode') -> 'ASTNode':
+def get_assign_type(node: 'LocalsAssignT') -> 'ASTNode':
     """
-    The type of assignment that this node performs. 
-    For a `ast.Name`, return the parent `ast.Assign` node that define the name.
+    Get the node that assigned the name represented by the node. 
 
+    For a `ast.Name`, return the parent `ast.Assign` or `ast.AnnAssign` node that define the name.
 
-    This will generally return the statement it self.
+    For others, it return the statement it self.
     """
+
+    def _should_use_parent_assign_type(node: 'ASTNode') -> bool:
+        # mimics astroid.mixins.ParentAssignTypeMixin
+        if isinstance(node, PARENT_ASSIGNMENT_NODES):
+            if isinstance(node, (ast.Name, ast.Attribute)):
+                return is_assign_name(node) or is_del_name(node)
+            else:
+                return True
+        return False
+
     if _should_use_parent_assign_type(node):
         return get_assign_type(node.parent)
     return node
-
-def _should_use_parent_assign_type(node: 'ASTNode') -> bool:
-    # mimics astroid.mixins.ParentAssignTypeMixin
-    if isinstance(node, PARENT_ASSIGNMENT_NODES):
-        if isinstance(node, (ast.Name, ast.Attribute)):
-            return is_assign_name(node) or is_del_name(node)
-        else:
-            return True
-    return False
 
 def optionally_assigns(self: 'ASTNode') -> bool:
     """
@@ -87,65 +88,6 @@ def optionally_assigns(self: 'ASTNode') -> bool:
 # TODO: Create a function to find the first common parent in beetween two nodes.
 # Use it in are_exclusive() and also use in the same fashion to filter nodes based
 # on pre-evaluated ifs conditions.
-
-def are_exclusive(stmt1: 'ASTNode', stmt2: 'ASTNode') -> bool:
-    """
-    return true if the two given statements are mutually exclusive
-
-    algorithm :
-    1) index stmt1's parents
-    2) climb among stmt2's parents until we find a common parent
-    3) if the common parent is a If or Try statement, look if nodes are
-        in exclusive branches
-    """
-    # index stmt1's parents
-    exceptions = None
-    stmt1_parents = {}
-    children = {}
-    previous = stmt1
-    for node in stmt1.node_ancestors():
-        stmt1_parents[node] = 1
-        children[node] = previous
-        previous = node
-    # climb among stmt2's parents until we find a common parent
-    previous = stmt2
-    for node in stmt2.node_ancestors():
-        if node in stmt1_parents:
-            # if the common parent is a If or TryExcept statement, look if
-            # nodes are in exclusive branches
-            if isinstance(node, ast.If) and exceptions is None:
-                if (
-                    node.locate_child(previous)[1]
-                    is not node.locate_child(children[node])[1]
-                ):
-                    return True
-            elif isinstance(node, ast.Try):
-                c2attr, c2node = node.locate_child(previous)
-                c1attr, c1node = node.locate_child(children[node])
-                if c1node is not c2node:
-                    first_in_body_caught_by_handlers = False
-                    second_in_body_caught_by_handlers = False
-                    first_in_else_other_in_handlers = (
-                        c2attr == "handlers" and c1attr == "orelse"
-                    )
-                    second_in_else_other_in_handlers = (
-                        c2attr == "orelse" and c1attr == "handlers"
-                    )
-                    # TODO: Add support for selecting expect handlers - for builtin exceptions at least.
-                    if any(
-                        (
-                            first_in_body_caught_by_handlers,
-                            second_in_body_caught_by_handlers,
-                            first_in_else_other_in_handlers,
-                            second_in_else_other_in_handlers,
-                        )
-                    ):
-                        return True
-                elif c2attr == "handlers" and c1attr == "handlers":
-                    return previous is not children[node]
-            return False
-        previous = node
-    return False
 
 def _get_filtered_node_statements(
     base_node: 'ASTNode', stmt_nodes: List[LocalsAssignT]
@@ -166,14 +108,7 @@ def _get_filtered_node_statements(
         ]
     return statements
 
-def _get_if_statement_ancestor(node: 'ASTNode') -> Optional['ASTNode']:
-    """Return the first parent node that is an If node (or None)"""
-    for parent in node.node_ancestors():
-        if isinstance(parent, ast.If):
-            return parent
-    return None
-
-def _get_filtered_stmts(self: 'ASTNode', base_node: 'ASTNode', node: 'ASTNode', _stmts:List['ASTNode'], mystmt:Optional['ASTNode'] ) -> Tuple[List['ASTNode'], bool]:
+def _get_filtered_stmts(self: 'ASTNode', base_node: 'ASTNode', node: 'LocalsAssignT', _stmts:List['ASTNode'], mystmt:Optional['ASTNode'] ) -> Tuple[List['ASTNode'], bool]:
     """
     :param self: the assign_type.
     :param base_node: the lookup context node in which the filtering happends.
@@ -190,7 +125,7 @@ def _get_filtered_stmts(self: 'ASTNode', base_node: 'ASTNode', node: 'ASTNode', 
         return _assign_type_get_filtered_stmts(self, base_node, node, _stmts, mystmt)
     assert False, f"statement not supported: {self.__class__.__name__}"
 
-def _filter_statement_get_filtered_stmts(self: 'ASTNode', _:'ASTNode', node: 'ASTNode', _stmts:List['ASTNode'], mystmt:Optional['ASTNode']) -> Tuple[List['ASTNode'], bool]:
+def _filter_statement_get_filtered_stmts(self: 'ASTNode', _:'ASTNode', node: 'LocalsAssignT', _stmts:List['ASTNode'], mystmt:Optional['ASTNode']) -> Tuple[List['ASTNode'], bool]:
     # from astroid FilterStmtsMixin
     """method used in _filter_stmts to get statements and trigger break"""
     if self.statement is mystmt:
@@ -200,7 +135,7 @@ def _filter_statement_get_filtered_stmts(self: 'ASTNode', _:'ASTNode', node: 'AS
     return _stmts, False
 
 def _assign_type_get_filtered_stmts(
-    self: 'ASTNode', lookup_node:'ASTNode', node: 'ASTNode', _stmts:List['ASTNode'], mystmt:Optional['ASTNode']
+    self: 'ASTNode', lookup_node:'ASTNode', node: 'LocalsAssignT', _stmts:List['ASTNode'], mystmt:Optional['ASTNode']
 ) -> Tuple[List['ASTNode'], bool]:
     # from AssignTypeMixin
     """method used in filter_stmts"""
@@ -212,7 +147,7 @@ def _assign_type_get_filtered_stmts(
         return [node], True
     return _stmts, False
 
-def _comprehension_get_filtered_stmts(self: 'ASTNode', lookup_node:'ASTNode', node: 'ASTNode', stmts:List['ASTNode'], mystmt:Optional['ASTNode']) -> Tuple[List['ASTNode'], bool]:
+def _comprehension_get_filtered_stmts(self: 'ASTNode', lookup_node:'ASTNode', node: 'LocalsAssignT', stmts:List['ASTNode'], mystmt:Optional['ASTNode']) -> Tuple[List['ASTNode'], bool]:
     # from Comprehension
     """method used in filter_stmts"""
     if self is mystmt:
@@ -226,6 +161,18 @@ def _comprehension_get_filtered_stmts(self: 'ASTNode', lookup_node:'ASTNode', no
         return [node], True
 
     return stmts, False
+
+def has_base(self: 'ASTNode', node:ast.AST) -> bool:
+    """
+    Check if this `ast.ClassDef` node inherits from the given type.
+
+    :param node: The node defining the base to look for.
+        Usually this is a :class:`Name` node.
+    :type node: ASTNode
+    """
+    if not isinstance(self, ast.ClassDef):
+        return False
+    return bool(node in self.bases)
 
 def filter_stmts(base_node: 'ASTNode', stmts:List[LocalsAssignT], frame: 'ASTNode', offset:int) -> List['ASTNode']:
     """
@@ -306,7 +253,7 @@ def filter_stmts(base_node: 'ASTNode', stmts:List[LocalsAssignT], frame: 'ASTNod
         # Fixes issue #375
         if mystmt is stmt and base_node._is_from_decorator:
             continue
-        if node.has_base(base_node):
+        if has_base(node, base_node):
             break
 
         # if isinstance(node, EmptyNode):
@@ -335,17 +282,17 @@ def filter_stmts(base_node: 'ASTNode', stmts:List[LocalsAssignT], frame: 'ASTNod
 
         if isinstance(assign_type, ast.NamedExpr):
             # If the NamedExpr is in an if statement we do some basic control flow inference
-            if_parent = _get_if_statement_ancestor(assign_type)
+            if_parent = get_if_statement_ancestor(assign_type)
             if if_parent:
                 # If the if statement is within another if statement we append the node
                 # to possible statements
-                if _get_if_statement_ancestor(if_parent):
+                if get_if_statement_ancestor(if_parent):
                     optional_assign = False
                     _stmts.append(node)
                     _stmt_parents.append(stmt.parent)
                 # If the if statement is first-level and not within an orelse block
                 # we know that it will be evaluated
-                elif not _is_orelse(if_parent):
+                elif not is_orelse(if_parent):
                     _stmts = [node]
                     _stmt_parents = [stmt.parent]
                 # Else we do not known enough about the control flow to be 100% certain
@@ -438,9 +385,3 @@ def filter_stmts(base_node: 'ASTNode', stmts:List[LocalsAssignT], frame: 'ASTNod
             _stmt_parents.append(stmt.parent)
     return _stmts
 
-
-def _is_orelse(node: 'ASTNode') -> bool:
-    parent = node.parent
-    if isinstance(parent, ast.If) and node in parent.orelse:
-        return True
-    return False

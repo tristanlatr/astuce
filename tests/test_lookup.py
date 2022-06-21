@@ -2,8 +2,8 @@ import ast
 import functools
 from typing import List
 
-from astuce import exceptions, inference, nodes, helpers
-from astuce.filter_statements import are_exclusive, filter_stmts
+from astuce import exceptions, inference, nodes
+from astuce._filter_statements import are_exclusive, filter_stmts
 from .test_nodes import CODE_IF_BRANCHES_STATEMENTS
 from . import AstuceTestCase, require_version, get_load_names
 from astuce._typing import ASTNode as ASTNodeT
@@ -89,7 +89,7 @@ class LookupTest2(AstuceTestCase):
         """
         mod = self.parse(code)
         # a & b
-        a = next(helpers.nodes_of_class(mod, ast.Name, 
+        a = next(nodes.nodes_of_class(mod, ast.Name, 
             predicate= lambda n: not nodes.is_assign_name(n)))
         self.assertEqual(a.lineno, 2)
         self.assertEqual(len(mod.lookup("b")[1]), 1)
@@ -134,7 +134,7 @@ class LookupTest2(AstuceTestCase):
         astroid = self.parse(code, __name__)
         cls1 = astroid.locals["A"][0]
         cls2 = astroid.locals["A"][1]
-        name = next(helpers.nodes_of_class(cls2, ast.Name, lambda n: not nodes.is_assign_name(n)))
+        name = next(nodes.nodes_of_class(cls2, ast.Name, lambda n: not nodes.is_assign_name(n)))
         
         self.assertEqual(next(name.infer()), cls1)
 

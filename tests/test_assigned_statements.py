@@ -4,7 +4,7 @@ import ast
 
 from astuce import inference, nodes
 from astuce._assigned_statements import assigned_stmts
-from astuce.helpers import nodes_of_class
+from astuce.nodes import nodes_of_class
 from . import fromtext, AstuceTestCase
 
 

@@ -12,8 +12,8 @@ from typing import Any, Callable, Iterable, Iterator, Optional, List, Type, Unio
 from . import _context, nodes, exceptions, _decorators
 from . import _typing
 from ._typing import ASTNode as ASTNodeT, _InferMethT, InferResult, UninferableT
+from .nodes import fix_ast, literal_to_ast
 from ._context import OptionalInferenceContext, copy_context, InferenceContext
-from ._astutils import fix_ast, literal_to_ast
 from ._assigned_statements import assigned_stmts
 from ._inference_decorators import path_wrapper, yes_if_nothing_inferred, raise_if_nothing_inferred
 
@@ -456,7 +456,7 @@ def _infer_sequence_helper(node:Union[_typing.Tuple, _typing.List, _typing.Set],
 
 
 @raise_if_nothing_inferred
-def infer_sequence(self:Union[_typing.Tuple, _typing.List, _typing.Set], context: OptionalInferenceContext=None, assign_context:bool=False) -> InferResult:
+def _infer_sequence(self:Union[_typing.Tuple, _typing.List, _typing.Set], context: OptionalInferenceContext=None, assign_context:bool=False) -> InferResult:
 
     # avoids cyclic inferences on lists by checking if the node has Starred or NamedExpr nodes, 
     # but that's only applicable if we're in an assigment context, otherwise always infer all values of the list.
@@ -478,9 +478,9 @@ def infer_sequence(self:Union[_typing.Tuple, _typing.List, _typing.Set], context
     else:
         yield self
 
-_infer_List = infer_sequence
-_infer_Tuple = infer_sequence
-_infer_Set = infer_sequence
+_infer_List = _infer_sequence
+_infer_Tuple = _infer_sequence
+_infer_Set = _infer_sequence
 
 _OPPERATORS = {
     

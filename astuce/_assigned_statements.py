@@ -125,7 +125,7 @@ def _wrap_resolve_assignment_parts(node:_typing.ASTNode, assign_path: list[int],
     if isinstance(node, (ast.List, ast.Tuple)):
         from astuce import inference
         yield from _resolve_assignment_parts(
-            inference.infer_sequence(node, context=context, assign_context=True), 
+            inference._infer_sequence(node, context=context, assign_context=True), 
             assign_path, context
         )
     else:

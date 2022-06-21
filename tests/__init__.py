@@ -6,7 +6,7 @@ from textwrap import dedent
 
 import pytest, unittest
 
-from astuce import helpers, inference, setup_logger, nodes, parser, _typing
+from astuce import inference, setup_logger, nodes, parser, _typing
 
 require_version = lambda _v:pytest.mark.skipif(sys.version_info < _v, reason=f"requires python {'.'.join((str(v) for v in _v))}")
 
@@ -63,7 +63,7 @@ class capture_output(list):
         _logger.removeHandler(self.handler)
 
 def get_load_names(node:_typing.ASTNode, name:str) -> List[ast.Name]:
-    return [n for n in helpers.nodes_of_class(
+    return [n for n in nodes.nodes_of_class(
         node, ast.Name, 
         predicate= lambda n: nodes.get_context(n) == nodes.Context.Load) 
         
