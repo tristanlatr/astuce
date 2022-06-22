@@ -195,6 +195,7 @@ class MonkeyPatcherMixinTests(unittest.TestCase):
         assert not issubclass(self.mod.AST, Node)
     
     def test_addMixinPatch_Multiple(self):
+        original_List = self.mod.List
         self.monkeyPatcher.addMixinPatch(
             self.mod, 'List', [Node, Instance]
         )
@@ -203,6 +204,10 @@ class MonkeyPatcherMixinTests(unittest.TestCase):
             assert len(self.mod.List.__bases__)==3
             assert issubclass(self.mod.List, Node)
             assert issubclass(self.mod.List, Instance)
+            instance = self.mod.List()
+            assert isinstance(instance, original_List)
+            assert isinstance(instance, Node)
+            assert isinstance(instance, Instance)
         
         self.monkeyPatcher.runWithPatches(check)
         assert not issubclass(self.mod.List, Node)
