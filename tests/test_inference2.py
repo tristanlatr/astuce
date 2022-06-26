@@ -319,6 +319,7 @@ class SequenceInfenceTests(AstuceTestCase):
         __all__ = ('i', 'j')
         ''', modname='mod2')
 
+        assert next(mod1.locals['__all__'][0].infer()).literal_eval() == ['f', 'k']
         assert next(mod2.locals['__all__'][0].infer()).literal_eval() == ('i', 'j')
 
         with capture_output() as lines:

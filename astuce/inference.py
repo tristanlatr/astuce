@@ -334,7 +334,7 @@ def _infer_assign_name(node:ASTNodeT, context: OptionalInferenceContext) -> Infe
 
 @path_wrapper
 @raise_if_nothing_inferred
-def _infer_Name(node:ASTNodeT, context: OptionalInferenceContext) -> InferResult:
+def _infer_Name(node:_typing.Name, context: OptionalInferenceContext) -> InferResult:
     if nodes.is_assign_name(node):
         return _infer_assign_name(node, context)
     elif nodes.is_del_name(node):
