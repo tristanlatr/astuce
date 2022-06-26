@@ -72,7 +72,7 @@ import sys
 from typing import TextIO
 
 from .nodes import ASTNode, Instance
-
+from .monkey import MonkeyPatcher
 
 ##### Logger setup
 
@@ -108,12 +108,14 @@ _patched = False
 
 def _patch_ast() -> None:
     """Extend the base `ast.AST` class to provide more functionality."""
+    patcher = MonkeyPatcher()
     global _patched  # noqa: WPS420
     if _patched:
         return
     
     # Patch
     for name, member in inspect.getmembers(ast):
+        # TODO: List all classes
         if name not in ["AST",
              "stmt", 
              "expr", 
@@ -126,11 +128,12 @@ def _patch_ast() -> None:
              "excepthandler",
              "type_ignore", # Ignore classes that are not concrete
              ] and inspect.isclass(member):
-            if issubclass(member, ast.AST) and ASTNode not in member.mro():  # noqa: WPS609
-                member.__bases__ = (*member.__bases__, ASTNode)  # noqa: WPS609
+            
             if name in ["Constant", "List", "Tuple", "Set", "Dict"]:
-                if issubclass(member, ast.AST) and Instance not in member.mro():  # noqa: WPS609
-                    member.__bases__ = (*member.__bases__, Instance)  # noqa: WPS609
+                patcher.addMixinPatch(ast, name, [ASTNode, Instance])
+            elif issubclass(member, ast.AST) and ASTNode not in member.mro():
+                patcher.addMixinPatch(ast, name, [ASTNode])
+    patcher.patch()
     _patched = True  # noqa: WPS122,WPS442
 
 _patch_ast()
