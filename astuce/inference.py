@@ -176,7 +176,7 @@ def _is_end_of_frame_sentinel(node:_typing.ASTNode) -> bool:
     if not isinstance(node, ast.Expr):
         return False
     try:
-        v = node.value.literal_eval()
+        v = ast.literal_eval(node.value)
     except ValueError:
         return False
     else:
@@ -397,7 +397,7 @@ def _infer_IfExp(node:_typing.IfExp, context: OptionalInferenceContext=None) -> 
     else:
         if test is not nodes.Uninferable:
             try:
-                inferred_literal = test.literal_eval()
+                inferred_literal = ast.literal_eval(test)
             except ValueError:
                 both_branches = True
             else:
@@ -557,8 +557,8 @@ def _invoke_binop_inference(left: ASTNodeT, opnode: Union[_typing.BinOp, _typing
         yield nodes.Uninferable
         return
     try:
-        literal_left = left.literal_eval()
-        literal_right = right.literal_eval()
+        literal_left = ast.literal_eval(left)
+        literal_right = ast.literal_eval(right)
     except ValueError:
         # Unlike astroid, we can't infer binary operations on nodes that can't be evaluated as literals.
         opnode._report(f"Uninferable operation: lhs={left}, rhs={right}")

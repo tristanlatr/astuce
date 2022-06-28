@@ -33,12 +33,8 @@ class Test__all__ListTransforms(AstuceTestCase):
         assert len(get_all_) == 1, get_all_
         
         with capture_output() as lines:
-            assert inference.safe_infer(get_all_[0]).literal_eval() == [1,1]
+            assert ast.literal_eval(inference.safe_infer(get_all_[0])) == [1,1]
         assert lines == [], lines
-
-        # with capture_output() as lines:
-        #     assert list(inference.infer_attr(module, '__all__'))[0].literal_eval() == [1,-1]
-        # assert lines == [], lines
 
         assert len(module.locals['__all__']) == 3, module.locals['__all__']
         

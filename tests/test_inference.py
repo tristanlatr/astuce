@@ -172,7 +172,7 @@ class FirstInfenceTests(AstuceTestCase):
         self.assertIsInstance(inferred.type_info.type_annotation, ast.Name)
         self.assertEqual(inferred.type_info.type_annotation.id, "str")
         # self.assertIsInstance(inferred.type_info.classdef, ast.ClassDef)
-        self.assertEqual(inferred.literal_eval(), "_")
+        self.assertEqual(ast.literal_eval(inferred), "_")
 
         code = "s = {1}"
         mod = self.parse(code)
@@ -281,19 +281,20 @@ class FirstInfenceTests(AstuceTestCase):
 #     )
 
     def test_unary_not(self) -> None:
-        return
+        return NotImplemented
+
         for code in (
             "a = not (1,); b = not ()",
             "a = not {1:2}; b = not {}",
             "a = not [1, 2]; b = not []",
-            "a = not {1, 2}; b = not set()", # set() is a special case because it's handled by ast.literal_eval()
+            "a = not {1, 2}; b = not set()", # set() is a special case because it's handled by ast.literal_eval
             "a = not 1; b = not 0",
             'a = not "a"; b = not ""',
             'a = not b"a"; b = not b""',
         ):
             mod = self.parse(code)
-            assert next(mod.locals["a"][0].infer()).literal_eval() == False
-            assert next(mod.locals["b"][0].infer()).literal_eval() == False
+            assert ast.literal_eval(next(mod.locals["a"][0].infer())) == False
+            assert ast.literal_eval(next(mod.locals["b"][0].infer())) == False
 
     @pytest.mark.xfail
     def test_unary_op_numbers(self) -> None:
@@ -311,7 +312,7 @@ class FirstInfenceTests(AstuceTestCase):
         for node, expected_value in zip(ast_nodes, expected):
             inferred = next(node.value.infer())
             self.assertEqual(inferred.value, expected_value)
-            self.assertEqual(inferred.literal_eval(), expected_value)
+            self.assertEqual(ast.literal_eval(inferred), expected_value)
 
     def _test_const_inferred(self, node: ast.Name, value: Any) -> None:
         inferred = list(node.infer())
@@ -548,11 +549,11 @@ class FirstInfenceTests(AstuceTestCase):
         (0, *var, 4, *(*bar, *foo))
         """
         statements = get_exprs(self.parse(code).body)
-        self.assertEqual(next(statements[-5].infer()).literal_eval(), (0, 1, 2, 3))
-        self.assertEqual(next(statements[-4].infer()).literal_eval(), (0, 1, 2, 3, 4))
-        self.assertEqual(next(statements[-3].infer()).literal_eval(), (0, 1, 2, 3, 4, 5, 6, 7))
-        self.assertEqual(next(statements[-2].infer()).literal_eval(), (0, 1, 2, 3, 4, 5, 6, 7, 8))
-        self.assertEqual(next(statements[-1].infer()).literal_eval(), (0, 1, 2, 3, 4, 5, 6, 7, 999, 1000, 1001))
+        self.assertEqual(ast.literal_eval(next(statements[-5].infer())), (0, 1, 2, 3))
+        self.assertEqual(ast.literal_eval(next(statements[-4].infer())), (0, 1, 2, 3, 4))
+        self.assertEqual(ast.literal_eval(next(statements[-3].infer())), (0, 1, 2, 3, 4, 5, 6, 7))
+        self.assertEqual(ast.literal_eval(next(statements[-2].infer())), (0, 1, 2, 3, 4, 5, 6, 7, 8))
+        self.assertEqual(ast.literal_eval(next(statements[-1].infer())), (0, 1, 2, 3, 4, 5, 6, 7, 999, 1000, 1001))
 
     def test_starred_in_list_literal(self) -> None:
         code = """
@@ -571,12 +572,13 @@ class FirstInfenceTests(AstuceTestCase):
         """
         statements = get_exprs(self.parse(code).body)
         self.assertEqual(next(statements[-7].infer()), statements[-7])
-        self.assertEqual(next(statements[-6].infer()).literal_eval(), [0, 1, 2, 3, 4, 5, 6, 7, 999, 1000, 1001, 3.14, 42])
-        self.assertEqual(next(statements[-5].infer()).literal_eval(), [0, 1, 2, 3])
-        self.assertEqual(next(statements[-4].infer()).literal_eval(), [0, 1, 2, 3, 4])
-        self.assertEqual(next(statements[-3].infer()).literal_eval(), [0, 1, 2, 3, 4, 5, 6, 7])
-        self.assertEqual(next(statements[-2].infer()).literal_eval(), [0, 1, 2, 3, 4, 5, 6, 7, 8])
-        self.assertEqual(next(statements[-1].infer()).literal_eval(), [0, 1, 2, 3, 4, 5, 6, 7, 999, 1000, 1001])
+        self.assertEqual(ast.literal_eval(next(statements[-7].infer())), ast.literal_eval(statements[-7]))
+        self.assertEqual(ast.literal_eval(next(statements[-6].infer())), [0, 1, 2, 3, 4, 5, 6, 7, 999, 1000, 1001, 3.14, 42])
+        self.assertEqual(ast.literal_eval(next(statements[-5].infer())), [0, 1, 2, 3])
+        self.assertEqual(ast.literal_eval(next(statements[-4].infer())), [0, 1, 2, 3, 4])
+        self.assertEqual(ast.literal_eval(next(statements[-3].infer())), [0, 1, 2, 3, 4, 5, 6, 7])
+        self.assertEqual(ast.literal_eval(next(statements[-2].infer())), [0, 1, 2, 3, 4, 5, 6, 7, 8])
+        self.assertEqual(ast.literal_eval(next(statements[-1].infer())), [0, 1, 2, 3, 4, 5, 6, 7, 999, 1000, 1001])
 
     def test_starred_in_set_literal(self) -> None:
         code = """
@@ -590,11 +592,11 @@ class FirstInfenceTests(AstuceTestCase):
         {0, *var, 4, *{*bar, *foo}} #@
         """
         statements = get_exprs(self.parse(code).body)
-        self.assertEqual(next(statements[-5].infer()).literal_eval(), {0, 1, 2, 3})
-        self.assertEqual(next(statements[-4].infer()).literal_eval(), {0, 1, 2, 3, 4})
-        self.assertEqual(next(statements[-3].infer()).literal_eval(), {0, 1, 2, 3, 4, 5, 6, 7})
-        self.assertEqual(next(statements[-2].infer()).literal_eval(), {0, 1, 2, 3, 4, 5, 6, 7, 8})
-        self.assertEqual(next(statements[-1].infer()).literal_eval(), {0, 1, 2, 3, 4, 5, 6, 7, 999, 1000, 1001})
+        self.assertEqual(ast.literal_eval(next(statements[-5].infer())), {0, 1, 2, 3})
+        self.assertEqual(ast.literal_eval(next(statements[-4].infer())), {0, 1, 2, 3, 4})
+        self.assertEqual(ast.literal_eval(next(statements[-3].infer())), {0, 1, 2, 3, 4, 5, 6, 7})
+        self.assertEqual(ast.literal_eval(next(statements[-2].infer())), {0, 1, 2, 3, 4, 5, 6, 7, 8})
+        self.assertEqual(ast.literal_eval(next(statements[-1].infer())), {0, 1, 2, 3, 4, 5, 6, 7, 999, 1000, 1001})
 
     def test_starred_in_literals_inference_issues(self) -> None:
         # TODO:

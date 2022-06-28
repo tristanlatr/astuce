@@ -61,7 +61,7 @@ Example usage
 
     inferred = list(inference.infer_attr(mod2, '__all__'))
     assert len(inferred) == 1
-    assert inferred[0].literal_eval() == ['f', 'k', 'i', 'j']
+    assert ast.literal_eval(inferred[0]) == ['f', 'k', 'i', 'j']
 
 """
 
