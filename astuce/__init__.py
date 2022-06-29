@@ -71,7 +71,7 @@ import sys
 from typing import TextIO
 
 from .nodes import ASTNode, Instance
-from .monkey import MonkeyPatcher
+from ._monkey import MonkeyPatcher
 
 ##### Logger setup
 

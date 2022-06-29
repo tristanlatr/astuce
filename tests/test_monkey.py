@@ -12,7 +12,7 @@ from typing import Type
 
 import unittest
 
-from astuce.monkey import MonkeyPatcher
+from astuce._monkey import MonkeyPatcher
 
 class NotATestCase_TestObj:
     def __init__(self):
