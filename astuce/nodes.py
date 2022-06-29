@@ -352,10 +352,6 @@ class ASTNode:
         from . import inference
         return inference.infer(self, context) #type:ignore[arg-type]
     
-    # Using cache breaks some tests here
-    def literal_eval(self) -> Any:
-        return ast.literal_eval(cast(ast.AST, self))
-
     # The MIT License (MIT)
     # Copyright (c) 2015 Read the Docs, Inc
     def resolve(self, basename: str) -> str:

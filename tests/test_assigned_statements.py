@@ -19,7 +19,7 @@ def assertConstNodesEqual(nodes_list_expected: list[object], nodes_list_got: lis
         assert len(nodes_list_expected) == len(nodes_list_got)
 
         for node, expected_value in zip(nodes_list_got, nodes_list_expected):
-            assert expected_value == node.literal_eval()
+            assert expected_value == ast.literal_eval(node)
 
 
 class TestAssignedStatements(AstuceTestCase):
@@ -107,7 +107,7 @@ class TestAssignedStatements(AstuceTestCase):
         a_nodes = list(nodes_of_class(parsed, ast.Name, predicate=lambda n: n.id=='a'))
         assert len(a_nodes) == 3
         for node in a_nodes:
-            assert list(node.infer())[0].literal_eval()==[], list(node.infer())
+            assert ast.literal_eval(list(node.infer())[0])==[], list(node.infer())
 
         for node in nodes_of_class(parsed, ast.Name, predicate=nodes.is_assign_name):
             r = list(inference.infer(node.parent.value))

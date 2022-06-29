@@ -32,7 +32,7 @@ class Warns(AstuceTestCase):
         assert lines == ['test:???: test'], lines
 
         with capture_output() as lines:
-            assert inference.safe_infer(mod.locals['v'][0]).literal_eval() == []
+            assert ast.literal_eval(inference.safe_infer(mod.locals['v'][0])) == []
         assert lines == [], lines
 
         with capture_output() as lines:
@@ -104,7 +104,7 @@ class InferAttrTest(AstuceTestCase):
         # inferred = list(inference.infer_attr(P, "__name__"))
         
         assert len(inferred) == 1
-        self.assertEqual(inferred[0].literal_eval(), "pouet")   
+        self.assertEqual(ast.literal_eval(inferred[0]), "pouet")   
 
         N = astroid.locals['NoName'][0]
         self.assertRaises(exceptions.AttributeInferenceError, lambda:inference.get_attr(N, "notfound"))
@@ -116,13 +116,13 @@ class InferAttrTest(AstuceTestCase):
 
         inferred = list(inference.infer_attr(astroid, "test"))
         assert len(inferred) == 1
-        assert inferred[0].literal_eval() == ''
+        assert ast.literal_eval(inferred[0]) == ''
         inferred = list(inference.infer_attr(P, "test"))
         assert len(inferred) == 1
-        assert inferred[0].literal_eval() == 'pouet'
+        assert ast.literal_eval(inferred[0]) == 'pouet'
         inferred = list(inference.infer_attr(N, "test"))
         assert len(inferred) == 1
-        assert inferred[0].literal_eval() == '_NoName'
+        assert ast.literal_eval(inferred[0]) == '_NoName'
 
 class ImportsTests(AstuceTestCase):
     def test_import_simple(self):
@@ -263,10 +263,10 @@ class ImportsTests(AstuceTestCase):
             l = inference.safe_infer(filtered_body[-5])
         
         assert lines == []
-        assert l.literal_eval() == ('i', 'j')
+        assert ast.literal_eval(l) == ('i', 'j')
 
         # k
-        assert inference.safe_infer(filtered_body[-6]).literal_eval() == 'fr'
+        assert ast.literal_eval(inference.safe_infer(filtered_body[-6])) == 'fr'
 
     def test_import_cycles(self):
         # TODO
@@ -292,10 +292,10 @@ class SequenceInfenceTests(AstuceTestCase):
         __all__ = ('i', 'j')
         ''', modname='mod2')
 
-        assert next(mod2.locals['__all__'][0].infer()).literal_eval() == ('i', 'j')
+        assert ast.literal_eval(next(mod2.locals['__all__'][0].infer())) == ('i', 'j')
 
         with capture_output() as lines:
-            list(inference.infer_attr(mod1, '__all__'))[0] #.literal_eval()
+            list(inference.infer_attr(mod1, '__all__'))[0]
         assert lines == [], lines
         
         with capture_output() as lines:
@@ -303,7 +303,7 @@ class SequenceInfenceTests(AstuceTestCase):
         assert lines == [], lines
 
         assert len(inferred) == 1
-        assert inferred[0].literal_eval() == ['f', 'k', 'i', 'j'], inferred[0].literal_eval()
+        assert ast.literal_eval(inferred[0]) == ['f', 'k', 'i', 'j'], ast.literal_eval(inferred[0])
 
         
     def test_list_extend(self):
@@ -319,10 +319,11 @@ class SequenceInfenceTests(AstuceTestCase):
         __all__ = ('i', 'j')
         ''', modname='mod2')
 
-        assert next(mod2.locals['__all__'][0].infer()).literal_eval() == ('i', 'j')
+        assert ast.literal_eval(next(mod1.locals['__all__'][0].infer())) == ['f', 'k']
+        assert ast.literal_eval(next(mod2.locals['__all__'][0].infer())) == ('i', 'j')
 
         with capture_output() as lines:
-            list(inference.infer_attr(mod1, '__all__'))[0] #.literal_eval()
+            list(inference.infer_attr(mod1, '__all__'))[0]
         assert lines == [], lines
 
         filtered_body = get_exprs(mod1.body)
@@ -336,7 +337,7 @@ class SequenceInfenceTests(AstuceTestCase):
         assert lines == [], lines
 
         assert len(inferred) == 1
-        assert inferred[0].literal_eval() == ['f', 'k', 'i', 'j'], inferred[0].literal_eval()
+        assert ast.literal_eval(inferred[0]) == ['f', 'k', 'i', 'j'], ast.literal_eval(inferred[0])
 
 class MoreInferenceTests(AstuceTestCase):
 

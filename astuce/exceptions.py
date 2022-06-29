@@ -28,6 +28,11 @@ class StaticAnalysisException(Exception):
 class LastNodeError(StaticAnalysisException):
     """Exception raised when trying to access a next or previous node."""
 
+class MissingParent(StaticAnalysisException):
+    node = None
+    def __init__(self, message:str="Missing parent for node {node!r}.", **kws:Any):
+        super().__init__(message, **kws)
+
 class RootNodeError(StaticAnalysisException):
     """Exception raised when trying to use an incompatible API on a root node."""
 
