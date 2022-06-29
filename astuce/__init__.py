@@ -180,8 +180,6 @@ _patcher.addMixinPatch(ast, 'Mod', [ASTNode])
 _patcher.addMixinPatch(ast, 'Module', [ASTNode])
 _patcher.addMixinPatch(ast, 'Mult', [ASTNode])
 _patcher.addMixinPatch(ast, 'Name', [ASTNode])
-_patcher.addMixinPatch(ast, 'NameConstant', [ASTNode])
-_patcher.addMixinPatch(ast, 'NamedExpr', [ASTNode])
 _patcher.addMixinPatch(ast, 'Nonlocal', [ASTNode])
 _patcher.addMixinPatch(ast, 'Not', [ASTNode])
 _patcher.addMixinPatch(ast, 'NotEq', [ASTNode])
@@ -215,6 +213,12 @@ _patcher.addMixinPatch(ast, 'comprehension', [ASTNode])
 _patcher.addMixinPatch(ast, 'keyword', [ASTNode])
 _patcher.addMixinPatch(ast, 'slice', [ASTNode])
 _patcher.addMixinPatch(ast, 'withitem', [ASTNode])
+
+# Deprecated in 3.8; use Constant
+_patcher.addMixinPatch(ast, 'NameConstant', [ASTNode])
+
+if sys.version_info >= (3,8):
+    _patcher.addMixinPatch(ast, 'NamedExpr', [ASTNode])
 
 if sys.version_info >= (3,11):
     _patcher.addMixinPatch(ast, 'TryStar', [ASTNode])
