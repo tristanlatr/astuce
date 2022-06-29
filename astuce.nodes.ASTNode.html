@@ -104,16 +104,6 @@
         
 
         
-            <div class="itemName"><code><a href="#literal_eval" class="internal-link" title="astuce.nodes.ASTNode.literal_eval">literal<wbr></wbr>_eval</a></code>
-            </div>
-        
-
-    </li><li class="">
-        
-        
-        
-
-        
             <div class="itemName"><code><a href="#locate_child" class="internal-link" title="astuce.nodes.ASTNode.locate_child">locate<wbr></wbr>_child</a></code>
             </div>
         
@@ -826,18 +816,13 @@
         </div>
 
         <div id="splitTables">
-          <table class="children sortable" id="id32">
+          <table class="children sortable" id="id36">
   
   
   <tr class="method">
     
     <td>Method</td>
     <td><code><a href="#infer" class="internal-link" title="astuce.nodes.ASTNode.infer">infer</a></code></td>
-    <td><span class="undocumented">Undocumented</span></td>
-  </tr><tr class="method">
-    
-    <td>Method</td>
-    <td><code><a href="#literal_eval" class="internal-link" title="astuce.nodes.ASTNode.literal_eval">literal<wbr></wbr>_eval</a></code></td>
     <td><span class="undocumented">Undocumented</span></td>
   </tr><tr class="method">
     
@@ -1032,28 +1017,6 @@
 </div><div class="basemethod">
   
   
-  <a name="astuce.nodes.ASTNode.literal_eval">
-    
-  </a>
-  <a name="literal_eval">
-    
-  </a>
-  <div class="functionHeader">
-    
-    <span class="py-keyword">def</span> <span class="py-defname">literal_eval</span>(self):
-    <a class="sourceLink" href="https://github.com/tristanlatr/astuce/tree/main/astuce/nodes.py#L356">
-      
-      (source)
-    </a>
-  </div>
-  <div class="docstring functionBody">
-    
-    
-    <div><p class="undocumented">Undocumented</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a></code></td><td class="fieldArgDesc"><span class="undocumented">Undocumented</span></td></tr></table></div>
-  </div>
-</div><div class="basemethod">
-  
-  
   <a name="astuce.nodes.ASTNode.locate_child">
     
   </a>
@@ -1093,7 +1056,7 @@ the given child.</td></tr></table></div>
   <div class="functionHeader">
     @<a href="https://docs.python.org/3/library/functools.html#functools.lru_cache" class="intersphinx-link">lru_cache</a>()<br />
     <span class="py-keyword">def</span> <span class="py-defname">lookup</span>(self, name, offset=0):
-    <a class="sourceLink" href="https://github.com/tristanlatr/astuce/tree/main/astuce/nodes.py#L463">
+    <a class="sourceLink" href="https://github.com/tristanlatr/astuce/tree/main/astuce/nodes.py#L459">
       
       (source)
     </a>
@@ -1120,7 +1083,7 @@ given name according to the scope node where it has been found.</td></tr></table
   <div class="functionHeader">
     
     <span class="py-keyword">def</span> <span class="py-defname">node_ancestors</span>(self):
-    <a class="sourceLink" href="https://github.com/tristanlatr/astuce/tree/main/astuce/nodes.py#L406">
+    <a class="sourceLink" href="https://github.com/tristanlatr/astuce/tree/main/astuce/nodes.py#L402">
       
       (source)
     </a>
@@ -1143,7 +1106,7 @@ given name according to the scope node where it has been found.</td></tr></table
   <div class="functionHeader">
     
     <span class="py-keyword">def</span> <span class="py-defname">parent_of</span>(self, node):
-    <a class="sourceLink" href="https://github.com/tristanlatr/astuce/tree/main/astuce/nodes.py#L438">
+    <a class="sourceLink" href="https://github.com/tristanlatr/astuce/tree/main/astuce/nodes.py#L434">
       
       (source)
     </a>
@@ -1171,7 +1134,7 @@ False otherwise.</blockquote>
   <div class="functionHeader">
     
     <span class="py-keyword">def</span> <span class="py-defname">resolve</span>(self, basename):
-    <a class="sourceLink" href="https://github.com/tristanlatr/astuce/tree/main/astuce/nodes.py#L361">
+    <a class="sourceLink" href="https://github.com/tristanlatr/astuce/tree/main/astuce/nodes.py#L357">
       
       (source)
     </a>
@@ -1194,7 +1157,7 @@ False otherwise.</blockquote>
   <div class="functionHeader">
     @<a href="https://docs.python.org/3/library/functools.html#functools.lru_cache" class="intersphinx-link">lru_cache</a>()<br />
     <span class="py-keyword">def</span> <span class="py-defname">unparse</span>(self):
-    <a class="sourceLink" href="https://github.com/tristanlatr/astuce/tree/main/astuce/nodes.py#L459">
+    <a class="sourceLink" href="https://github.com/tristanlatr/astuce/tree/main/astuce/nodes.py#L455">
       
       (source)
     </a>
@@ -1677,7 +1640,7 @@ When called on a <code><a href="astuce._typing.Module.html" class="internal-link
   <div class="functionHeader">
     
     <span class="py-keyword">def</span> <span class="py-defname">_report</span>(self, descr, lineno_offset=0):
-    <a class="sourceLink" href="https://github.com/tristanlatr/astuce/tree/main/astuce/nodes.py#L413">
+    <a class="sourceLink" href="https://github.com/tristanlatr/astuce/tree/main/astuce/nodes.py#L409">
       
       (source)
     </a>
@@ -1815,7 +1778,7 @@ When called on a <code><a href="astuce._typing.Module.html" class="internal-link
   <div class="functionHeader">
     @cached_property<br />
     <span class="py-defname">_is_from_decorator</span>: <code><a href="https://docs.python.org/3/library/functions.html#bool" class="intersphinx-link">bool</a></code> =
-    <a class="sourceLink" href="https://github.com/tristanlatr/astuce/tree/main/astuce/nodes.py#L448">
+    <a class="sourceLink" href="https://github.com/tristanlatr/astuce/tree/main/astuce/nodes.py#L444">
       
       (source)
     </a>
@@ -1840,7 +1803,7 @@ When called on a <code><a href="astuce._typing.Module.html" class="internal-link
     <div class="container">
       <a href="index.html">API Documentation</a> for <a href="https://github.com/tristanlatr/astuce/" class="projecthome">astuce</a>,
     generated by <a href="https://github.com/twisted/pydoctor/">pydoctor</a>
-      22.5.1 at 2022-06-21 03:51:47.
+      22.5.1 at 2022-06-29 19:08:44.
     </div>
     
     <script src="ajax.js" type="text/javascript"></script>

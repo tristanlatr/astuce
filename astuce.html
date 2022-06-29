@@ -205,6 +205,16 @@
         
 
         
+            <div class="itemName"><code><a href="astuce._monkey.html" class="internal-link" title="astuce._monkey">_monkey</a></code>
+            </div>
+        
+
+    </li><li class="private">
+        
+        
+        
+
+        
             <div class="itemName"><code><a href="astuce._typing.html" class="internal-link" title="astuce._typing">_typing</a></code>
             </div>
         
@@ -228,16 +238,6 @@
             </div>
         
 
-    </li><li class="private">
-        
-        
-        
-
-        
-            <div class="itemName"><code><a href="#_patch_ast" class="internal-link" title="astuce._patch_ast">_patch<wbr></wbr>_ast</a></code>
-            </div>
-        
-
     </li>
 </ul> 
 
@@ -253,7 +253,7 @@
         
 
         
-            <div class="itemName"><code><a href="#_patched" class="internal-link" title="astuce._patched">_patched</a></code>
+            <div class="itemName"><code><a href="#_patcher" class="internal-link" title="astuce._patcher">_patcher</a></code>
             </div>
         
 
@@ -419,7 +419,7 @@ mod2 = p.parse(<span class="py-string">'''</span>
 
 inferred = <span class="py-builtin">list</span>(inference.infer_attr(mod2, <span class="py-string">'__all__'</span>))
 <span class="py-keyword">assert</span> <span class="py-builtin">len</span>(inferred) == 1
-<span class="py-keyword">assert</span> inferred[0].literal_eval() == [<span class="py-string">'f'</span>, <span class="py-string">'k'</span>, <span class="py-string">'i'</span>, <span class="py-string">'j'</span>]</pre></div>
+<span class="py-keyword">assert</span> ast.literal_eval(inferred[0]) == [<span class="py-string">'f'</span>, <span class="py-string">'k'</span>, <span class="py-string">'i'</span>, <span class="py-string">'j'</span>]</pre></div>
 </div>
         </div>
 
@@ -431,7 +431,7 @@ inferred = <span class="py-builtin">list</span>(inference.infer_attr(mod2, <span
     
     <td>Module</td>
     <td><code><a href="astuce.exceptions.html" class="internal-link" title="astuce.exceptions">exceptions</a></code></td>
-    <td><span class="undocumented">No module docstring; 8/9 classes documented</span></td>
+    <td><span class="undocumented">No module docstring; 8/10 classes documented</span></td>
   </tr><tr class="module">
     
     <td>Module</td>
@@ -485,6 +485,11 @@ inferred = <span class="py-builtin">list</span>(inference.infer_attr(mod2, <span
   </tr><tr class="module private">
     
     <td>Module</td>
+    <td><code><a href="astuce._monkey.html" class="internal-link" title="astuce._monkey">_monkey</a></code></td>
+    <td><span class="undocumented">No module docstring; 0/3 variable, 1/1 class documented</span></td>
+  </tr><tr class="module private">
+    
+    <td>Module</td>
     <td><code><a href="astuce._typing.html" class="internal-link" title="astuce._typing">_typing</a></code></td>
     <td>These classes are for type annotations only, do not instanciate them.</td>
   </tr>
@@ -499,15 +504,10 @@ inferred = <span class="py-builtin">list</span>(inference.infer_attr(mod2, <span
     <td>Function</td>
     <td><code><a href="#setup_logger" class="internal-link" title="astuce.setup_logger">setup<wbr></wbr>_logger</a></code></td>
     <td>Utility to (re)setup astuce's stream logger.</td>
-  </tr><tr class="function private">
-    
-    <td>Function</td>
-    <td><code><a href="#_patch_ast" class="internal-link" title="astuce._patch_ast">_patch<wbr></wbr>_ast</a></code></td>
-    <td>Extend the base <code><a href="https://docs.python.org/3/library/ast.html#ast.AST" class="intersphinx-link">ast.AST</a></code> class to provide more functionality.</td>
   </tr><tr class="variable private">
     
     <td>Variable</td>
-    <td><code><a href="#_patched" class="internal-link" title="astuce._patched">_patched</a></code></td>
+    <td><code><a href="#_patcher" class="internal-link" title="astuce._patcher">_patcher</a></code></td>
     <td><span class="undocumented">Undocumented</span></td>
   </tr>
 </table>
@@ -526,7 +526,7 @@ inferred = <span class="py-builtin">list</span>(inference.infer_attr(mod2, <span
   <div class="functionHeader">
     
     <span class="py-keyword">def</span> <span class="py-defname">setup_logger</span>(*, name=<span class="rst-variable-quote">'</span><span class="rst-variable-string">astuce</span><span class="rst-variable-quote">'</span>, verbose=<a href="https://docs.python.org/3/library/constants.html#False" class="intersphinx-link">False</a>, quiet=<a href="https://docs.python.org/3/library/constants.html#False" class="intersphinx-link">False</a>, stream=<a href="https://docs.python.org/3/library/sys.html#sys.stdout" class="intersphinx-link">sys.stdout</a>, format_string=<span class="rst-variable-quote">'</span><span class="rst-variable-string">%(message)s</span><span class="rst-variable-quote">'</span>):
-    <a class="sourceLink" href="https://github.com/tristanlatr/astuce/tree/main/astuce/__init__.py#L79">
+    <a class="sourceLink" href="https://github.com/tristanlatr/astuce/tree/main/astuce/__init__.py#L78">
       
       (source)
     </a>
@@ -540,16 +540,16 @@ inferred = <span class="py-builtin">list</span>(inference.infer_attr(mod2, <span
 </div><div class="basevariable private">
   
   
-  <a name="astuce._patched">
+  <a name="astuce._patcher">
     
   </a>
-  <a name="_patched">
+  <a name="_patcher">
     
   </a>
   <div class="functionHeader">
     
-    <span class="py-defname">_patched</span>: <code><a href="https://docs.python.org/3/library/functions.html#bool" class="intersphinx-link">bool</a></code> =
-    <a class="sourceLink" href="https://github.com/tristanlatr/astuce/tree/main/astuce/__init__.py#L107">
+    <span class="py-defname">_patcher</span> =
+    <a class="sourceLink" href="https://github.com/tristanlatr/astuce/tree/main/astuce/__init__.py#L106">
       
       (source)
     </a>
@@ -559,29 +559,6 @@ inferred = <span class="py-builtin">list</span>(inference.infer_attr(mod2, <span
     
     <div><p class="undocumented">Undocumented</p></div>
     
-  </div>
-</div><div class="basefunction private">
-  
-  
-  <a name="astuce._patch_ast">
-    
-  </a>
-  <a name="_patch_ast">
-    
-  </a>
-  <div class="functionHeader">
-    
-    <span class="py-keyword">def</span> <span class="py-defname">_patch_ast</span>():
-    <a class="sourceLink" href="https://github.com/tristanlatr/astuce/tree/main/astuce/__init__.py#L109">
-      
-      (source)
-    </a>
-  </div>
-  <div class="docstring functionBody">
-    
-    
-    <div><p>Extend the base <code><a href="https://docs.python.org/3/library/ast.html#ast.AST" class="intersphinx-link">ast.AST</a></code> class to provide more functionality.</p>
-</div>
   </div>
 </div>
         </div>
@@ -596,7 +573,7 @@ inferred = <span class="py-builtin">list</span>(inference.infer_attr(mod2, <span
     <div class="container">
       <a href="index.html">API Documentation</a> for <a href="https://github.com/tristanlatr/astuce/" class="projecthome">astuce</a>,
     generated by <a href="https://github.com/twisted/pydoctor/">pydoctor</a>
-      22.5.1 at 2022-06-21 03:51:47.
+      22.5.1 at 2022-06-29 19:08:44.
     </div>
     
     <script src="ajax.js" type="text/javascript"></script>

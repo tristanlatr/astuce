@@ -6,7 +6,7 @@
 
   <head>
     
-    <title>astuce._context</title>
+    <title>astuce._monkey</title>
     <meta name="generator" content="pydoctor 22.5.1"> 
         
     </meta>
@@ -73,7 +73,7 @@
 
       <div class="thingTitle">
         <span>Module</span>
-        <code class="thisobject"><a href="astuce._context.html" class="internal-link" title="This module">_context</a></code> 
+        <code class="thisobject"><a href="astuce._monkey.html" class="internal-link" title="This module">_monkey</a></code> 
       </div>
       
       <div>
@@ -91,28 +91,15 @@
         
 
         
-            <div class="itemName"><code><a href="astuce._context.InferenceContext.html" class="internal-link" title="astuce._context.InferenceContext"><wbr></wbr>Inference<wbr></wbr>Context</a></code>
+            <div class="itemName"><code><a href="astuce._monkey.MonkeyPatcher.html" class="internal-link" title="astuce._monkey.MonkeyPatcher"><wbr></wbr>Monkey<wbr></wbr>Patcher</a></code>
             </div>
         
 
     </li>
 </ul>
 
-        <div class="childrenKindTitle">Functions</div>
-        <ul>
-    
-    <li class="">
         
-        
-        
-
-        
-            <div class="itemName"><code><a href="#copy_context" class="internal-link" title="astuce._context.copy_context">copy<wbr></wbr>_context</a></code>
-            </div>
-        
-
-    </li>
-</ul> 
+         
 
         
          
@@ -126,17 +113,27 @@
         
 
         
-            <div class="itemName"><code><a href="#OptionalInferenceContext" class="internal-link" title="astuce._context.OptionalInferenceContext"><wbr></wbr>Optional<wbr></wbr>Inference<wbr></wbr>Context</a></code>
+            <div class="itemName"><code><a href="#BasesPatch" class="internal-link" title="astuce._monkey.BasesPatch"><wbr></wbr>Bases<wbr></wbr>Patch</a></code>
             </div>
         
 
-    </li><li class="private">
+    </li><li class="">
         
         
         
 
         
-            <div class="itemName"><code><a href="#_InferenceCache" class="internal-link" title="astuce._context._InferenceCache">_<wbr></wbr>Inference<wbr></wbr>Cache</a></code>
+            <div class="itemName"><code><a href="#Patch" class="internal-link" title="astuce._monkey.Patch"><wbr></wbr>Patch</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#PatchT" class="internal-link" title="astuce._monkey.PatchT"><wbr></wbr>Patch<wbr></wbr>T</a></code>
             </div>
         
 
@@ -220,7 +217,7 @@
             </div>
         
 
-    </li><li class="private thisobject">
+    </li><li class="private">
         
         
         
@@ -270,7 +267,7 @@
             </div>
         
 
-    </li><li class="private">
+    </li><li class="private thisobject">
         
         
         
@@ -418,7 +415,7 @@
         </div>
 
         <div class="page-header">
-          <h1 class="module private"><code><code><a href="index.html" class="internal-link">astuce</a></code><wbr></wbr>.<code><a href="astuce._context.html" class="internal-link" title="astuce._context">_context</a></code></code></h1>
+          <h1 class="module private"><code><code><a href="index.html" class="internal-link">astuce</a></code><wbr></wbr>.<code><a href="astuce._monkey.html" class="internal-link" title="astuce._monkey">_monkey</a></code></code></h1>
           <div id="showPrivate">
             <button class="btn btn-link" onclick="togglePrivate()">Toggle Private API</button>
           </div>
@@ -429,38 +426,37 @@
         </div>
 
         <div class="extrasDocstring">
-          <a href="https://github.com/tristanlatr/astuce/tree/main/astuce/_context.py" class="sourceLink">(source)</a>
+          <a href="https://github.com/tristanlatr/astuce/tree/main/astuce/_monkey.py" class="sourceLink">(source)</a>
           <p></p>
         </div>
 
         <div class="moduleDocstring">
-          <div><p>Like astroid's inference context utilities, but more simple.</p>
-</div>
+          <div><p class="undocumented">Undocumented</p></div>
         </div>
 
         <div id="splitTables">
-          <table class="children sortable" id="id5">
+          <table class="children sortable" id="id11">
   
   
   <tr class="class">
     
     <td>Class</td>
-    <td><code><a href="astuce._context.InferenceContext.html" class="internal-link" title="astuce._context.InferenceContext"><wbr></wbr>Inference<wbr></wbr>Context</a></code></td>
-    <td>Provide context for inference.</td>
-  </tr><tr class="function">
-    
-    <td>Function</td>
-    <td><code><a href="#copy_context" class="internal-link" title="astuce._context.copy_context">copy<wbr></wbr>_context</a></code></td>
-    <td>Clone a context if given, or return a fresh context.</td>
+    <td><code><a href="astuce._monkey.MonkeyPatcher.html" class="internal-link" title="astuce._monkey.MonkeyPatcher"><wbr></wbr>Monkey<wbr></wbr>Patcher</a></code></td>
+    <td>Cover up attributes with new objects. Neat for monkey-patching things for unit-testing purposes.</td>
   </tr><tr class="variable">
     
     <td>Variable</td>
-    <td><code><a href="#OptionalInferenceContext" class="internal-link" title="astuce._context.OptionalInferenceContext"><wbr></wbr>Optional<wbr></wbr>Inference<wbr></wbr>Context</a></code></td>
+    <td><code><a href="#BasesPatch" class="internal-link" title="astuce._monkey.BasesPatch"><wbr></wbr>Bases<wbr></wbr>Patch</a></code></td>
     <td><span class="undocumented">Undocumented</span></td>
-  </tr><tr class="variable private">
+  </tr><tr class="variable">
     
     <td>Variable</td>
-    <td><code><a href="#_InferenceCache" class="internal-link" title="astuce._context._InferenceCache">_<wbr></wbr>Inference<wbr></wbr>Cache</a></code></td>
+    <td><code><a href="#Patch" class="internal-link" title="astuce._monkey.Patch"><wbr></wbr>Patch</a></code></td>
+    <td><span class="undocumented">Undocumented</span></td>
+  </tr><tr class="variable">
+    
+    <td>Variable</td>
+    <td><code><a href="#PatchT" class="internal-link" title="astuce._monkey.PatchT"><wbr></wbr>Patch<wbr></wbr>T</a></code></td>
     <td><span class="undocumented">Undocumented</span></td>
   </tr>
 </table>
@@ -470,46 +466,19 @@
         </div>
 
         <div id="childList">
-          <div class="basefunction">
+          <div class="basevariable">
   
   
-  <a name="astuce._context.copy_context">
+  <a name="astuce._monkey.BasesPatch">
     
   </a>
-  <a name="copy_context">
-    
-  </a>
-  <div class="functionHeader">
-    
-    <span class="py-keyword">def</span> <span class="py-defname">copy_context</span>(context, cache=<a href="https://docs.python.org/3/library/constants.html#None" class="intersphinx-link">None</a>, **kwargs):
-    <a class="sourceLink" href="https://github.com/tristanlatr/astuce/tree/main/astuce/_context.py#L142">
-      
-      (source)
-    </a>
-  </div>
-  <div class="docstring functionBody">
-    
-    
-    <div><p>Clone a context if given, or return a fresh context.</p>
-<ul class="rst-simple">
-<li>If <tt class="rst-docutils literal">context</tt> is <tt class="rst-docutils literal">None</tt>, <tt class="rst-docutils literal">cache</tt> dict must be passed.</li>
-<li>If <tt class="rst-docutils literal">context</tt> and <tt class="rst-docutils literal">cache</tt> are not <tt class="rst-docutils literal">None</tt>, override the new context cache.</li>
-</ul>
-<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">context:</span><code><a href="astuce._context.InferenceContext.html" class="internal-link" title="astuce._context.InferenceContext">InferenceContext</a>|<a href="https://docs.python.org/3/library/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc"><span class="undocumented">Undocumented</span></td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">cache:</span><code><a href="#_InferenceCache" class="internal-link" title="astuce._context._InferenceCache">_InferenceCache</a>|<a href="https://docs.python.org/3/library/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc"><span class="undocumented">Undocumented</span></td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">**kwargs:</span><code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a></code></td><td class="fieldArgDesc"><span class="undocumented">Undocumented</span></td></tr><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="astuce._context.InferenceContext.html" class="internal-link" title="astuce._context.InferenceContext">InferenceContext</a></code></td><td class="fieldArgDesc"><span class="undocumented">Undocumented</span></td></tr></table></div>
-  </div>
-</div><div class="basevariable">
-  
-  
-  <a name="astuce._context.OptionalInferenceContext">
-    
-  </a>
-  <a name="OptionalInferenceContext">
+  <a name="BasesPatch">
     
   </a>
   <div class="functionHeader">
     
-    <span class="py-defname">OptionalInferenceContext</span> =
-    <a class="sourceLink" href="https://github.com/tristanlatr/astuce/tree/main/astuce/_context.py#L134">
+    <span class="py-defname">BasesPatch</span> =
+    <a class="sourceLink" href="https://github.com/tristanlatr/astuce/tree/main/astuce/_monkey.py#L12">
       
       (source)
     </a>
@@ -520,19 +489,42 @@
     <div><p class="undocumented">Undocumented</p></div>
     
   </div>
-</div><div class="basevariable private">
+</div><div class="basevariable">
   
   
-  <a name="astuce._context._InferenceCache">
+  <a name="astuce._monkey.Patch">
     
   </a>
-  <a name="_InferenceCache">
+  <a name="Patch">
     
   </a>
   <div class="functionHeader">
     
-    <span class="py-defname">_InferenceCache</span> =
-    <a class="sourceLink" href="https://github.com/tristanlatr/astuce/tree/main/astuce/_context.py#L18">
+    <span class="py-defname">Patch</span> =
+    <a class="sourceLink" href="https://github.com/tristanlatr/astuce/tree/main/astuce/_monkey.py#L11">
+      
+      (source)
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    
+    <div><p class="undocumented">Undocumented</p></div>
+    
+  </div>
+</div><div class="basevariable">
+  
+  
+  <a name="astuce._monkey.PatchT">
+    
+  </a>
+  <a name="PatchT">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">PatchT</span> =
+    <a class="sourceLink" href="https://github.com/tristanlatr/astuce/tree/main/astuce/_monkey.py#L14">
       
       (source)
     </a>
