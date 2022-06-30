@@ -19,7 +19,7 @@ jobs:
       matrix:
         os: [macos-latest]
         python-version: ['3.8','3.9', '3.10']
-        tox-target: [test]
+        tox-target: [test, validate-patch]
 
     steps:
       - uses: actions/checkout@v2
