@@ -211,7 +211,6 @@ _patcher.addMixinPatch(ast, 'arg', [ASTNode])
 _patcher.addMixinPatch(ast, 'arguments', [ASTNode])
 _patcher.addMixinPatch(ast, 'comprehension', [ASTNode])
 _patcher.addMixinPatch(ast, 'keyword', [ASTNode])
-_patcher.addMixinPatch(ast, 'slice', [ASTNode])
 _patcher.addMixinPatch(ast, 'withitem', [ASTNode])
 
 # Deprecated in 3.8; use Constant
