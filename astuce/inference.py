@@ -636,10 +636,6 @@ def _infer_AugAssign(self:_typing.AugAssign, context: OptionalInferenceContext=N
 
         yield from _invoke_binop_inference(lhs, self, self.op, rhs, rhs_context)
         
-# Defers to self.value.infer()
-def _infer_Expr(self:_typing.Expr, context: OptionalInferenceContext=None) -> InferResult:
-    return self.value.infer(context=context) # type:ignore[attr-defined, no-any-return]
-
 @raise_if_nothing_inferred
 @path_wrapper
 def _infer_alias(self:_typing.alias, context: OptionalInferenceContext=None) -> InferResult:

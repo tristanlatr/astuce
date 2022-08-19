@@ -1,7 +1,6 @@
 
 # TODO list:
 
-- Remove inference function for ast.Expr, it's not meaningful.
 - Adjust _infer_Call to return an 'Instance' of the annotated type if the function uses type annotation.
 - Adjust _infer_Call to return an inferred node if we're talking about builtins (and all parties are inferable)
 - First apply set of transformations, as described in [Scalpel 2.1 Code Rewriter.](https://arxiv.org/pdf/2202.11840.pdf)
