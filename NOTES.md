@@ -22,7 +22,6 @@
       TODO: check if this is actually correct.
 
 - Investigate manners to move away from patching the AST classes, but without maintaining a set of node class.
-- Create a module astuce.nodenav and move the code related to node navigation inside it.
 - Document the core principles of astuce:
   - The inference system.
     - Name inference is recursive:
