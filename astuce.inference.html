@@ -7,7 +7,7 @@
   <head>
     
     <title>astuce.inference</title>
-    <meta name="generator" content="pydoctor 22.5.1"> 
+    <meta name="generator" content="pydoctor 22.7.0"> 
         
     </meta>
     <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
@@ -225,16 +225,6 @@
 
         
             <div class="itemName"><code><a href="#_infer_end" class="internal-link" title="astuce.inference._infer_end">_infer<wbr></wbr>_end</a></code>
-            </div>
-        
-
-    </li><li class="private">
-        
-        
-        
-
-        
-            <div class="itemName"><code><a href="#_infer_Expr" class="internal-link" title="astuce.inference._infer_Expr">_infer_<wbr></wbr>Expr</a></code>
             </div>
         
 
@@ -686,7 +676,7 @@
         </div>
 
         <div id="splitTables">
-          <table class="children sortable" id="id33">
+          <table class="children sortable" id="id72">
   
   
   <tr class="function">
@@ -759,11 +749,6 @@
     <td>Function</td>
     <td><code><a href="#_infer_end" class="internal-link" title="astuce.inference._infer_end">_infer<wbr></wbr>_end</a></code></td>
     <td>Inference's end for nodes that yield themselves on inference</td>
-  </tr><tr class="function private">
-    
-    <td>Function</td>
-    <td><code><a href="#_infer_Expr" class="internal-link" title="astuce.inference._infer_Expr">_infer_<wbr></wbr>Expr</a></code></td>
-    <td><span class="undocumented">Undocumented</span></td>
   </tr><tr class="function private">
     
     <td>Function</td>
@@ -861,7 +846,6 @@
   </div>
   <div class="docstring functionBody">
     
-    
     <div><p>Get local attributes definitions matching the name from this frame node.</p>
 <table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">ctx:</span><code><a href="astuce._typing.html#FrameNodeT" class="internal-link" title="astuce._typing.FrameNodeT">_typing.FrameNodeT</a></code></td><td class="fieldArgDesc"><span class="undocumented">Undocumented</span></td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">name:</span><code><a href="https://docs.python.org/3/library/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc"><span class="undocumented">Undocumented</span></td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">ignore<wbr></wbr>_locals:</span><code><a href="https://docs.python.org/3/library/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc"><span class="undocumented">Undocumented</span></td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">context:</span><code><a href="astuce._context.html#OptionalInferenceContext" class="internal-link" title="astuce._context.OptionalInferenceContext">OptionalInferenceContext</a></code></td><td class="fieldArgDesc"><span class="undocumented">Undocumented</span></td></tr><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/typing.html#typing.List" class="intersphinx-link">List</a>[<wbr></wbr><a href="astuce._typing.ASTNode.html" class="internal-link" title="astuce._typing.ASTNode">ASTNodeT</a>]</code></td><td class="fieldArgDesc"><span class="undocumented">Undocumented</span></td></tr></table></div>
   </div>
@@ -884,7 +868,6 @@
   </div>
   <div class="docstring functionBody">
     
-    
     <div><p class="undocumented">Undocumented</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">pack:</span><code><a href="astuce._typing.Module.html" class="internal-link" title="astuce._typing.Module">_typing.Module</a></code></td><td class="fieldArgDesc"><span class="undocumented">Undocumented</span></td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">name:</span><code><a href="https://docs.python.org/3/library/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc"><span class="undocumented">Undocumented</span></td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">context:</span><code><a href="astuce._context.html#OptionalInferenceContext" class="internal-link" title="astuce._context.OptionalInferenceContext">OptionalInferenceContext</a></code></td><td class="fieldArgDesc"><span class="undocumented">Undocumented</span></td></tr><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/typing.html#typing.Optional" class="intersphinx-link">Optional</a>[<wbr></wbr><a href="astuce._typing.ASTNode.html" class="internal-link" title="astuce._typing.ASTNode">ASTNodeT</a>]</code></td><td class="fieldArgDesc"><span class="undocumented">Undocumented</span></td></tr></table></div>
   </div>
 </div><div class="basefunction">
@@ -905,7 +888,6 @@
     </a>
   </div>
   <div class="docstring functionBody">
-    
     
     <div><p>Get a generator of the inferred values. See <code><a href="astuce.nodes.ASTNode.html#infer" class="internal-link" title="astuce.nodes.ASTNode.infer">ASTNode.infer</a></code>.</p>
 <p>This is kinda the main entry point to the inference system.</p>
@@ -930,7 +912,6 @@
   </div>
   <div class="docstring functionBody">
     
-    
     <div><p>Infer the possible values of the given variable.</p>
 <table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">ctx:</span><code><a href="astuce._typing.ASTNode.html" class="internal-link" title="astuce._typing.ASTNode">ASTNodeT</a></code></td><td class="fieldArgDesc"><span class="undocumented">Undocumented</span></td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">name:</span><code><a href="https://docs.python.org/3/library/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">The name of the variable to infer.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">context:</span><code><a href="astuce._context.html#OptionalInferenceContext" class="internal-link" title="astuce._context.OptionalInferenceContext">OptionalInferenceContext</a></code></td><td class="fieldArgDesc"><span class="undocumented">Undocumented</span></td></tr><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="astuce._typing.html#InferResult" class="internal-link" title="astuce._typing.InferResult">InferResult</a></code></td><td class="fieldArgDesc">The inferred possible values.</td></tr></table></div>
   </div>
@@ -952,7 +933,6 @@
     </a>
   </div>
   <div class="docstring functionBody">
-    
     
     <div><p>Return the inferred value for the given node.</p>
 <p>Return None if inference failed, it's Uninfereable or if there is some ambiguity (more than
@@ -978,7 +958,6 @@ one node has been inferred).</p>
   </div>
   <div class="docstring functionBody">
     
-    
     <div><p class="undocumented">Undocumented</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">frame<wbr></wbr>_node:</span><code><a href="astuce._typing.html#FrameNodeT" class="internal-link" title="astuce._typing.FrameNodeT">_typing.FrameNodeT</a></code></td><td class="fieldArgDesc"><span class="undocumented">Undocumented</span></td></tr><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="astuce._typing.ASTstmt.html" class="internal-link" title="astuce._typing.ASTstmt">_typing.ASTstmt</a></code></td><td class="fieldArgDesc"><span class="undocumented">Undocumented</span></td></tr></table></div>
   </div>
 </div><div class="basefunction private">
@@ -999,7 +978,6 @@ one node has been inferred).</p>
     </a>
   </div>
   <div class="docstring functionBody">
-    
     
     <div><p class="undocumented">Undocumented</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">node:</span><code><a href="astuce._typing.ASTNode.html" class="internal-link" title="astuce._typing.ASTNode">ASTNodeT</a></code></td><td class="fieldArgDesc"><span class="undocumented">Undocumented</span></td></tr><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="astuce._typing.html#_InferMethT" class="internal-link" title="astuce._typing._InferMethT">_InferMethT</a></code></td><td class="fieldArgDesc"><span class="undocumented">Undocumented</span></td></tr></table></div>
   </div>
@@ -1022,7 +1000,6 @@ one node has been inferred).</p>
   </div>
   <div class="docstring functionBody">
     
-    
     <div><p>Redirects to the right method to infer a node.
 Equivalent to ast astroid's NodeNG._infer() method.</p>
 <table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">node:</span><code><a href="astuce._typing.ASTNode.html" class="internal-link" title="astuce._typing.ASTNode">ASTNodeT</a></code></td><td class="fieldArgDesc"><span class="undocumented">Undocumented</span></td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">context:</span><code><a href="astuce._context.html#OptionalInferenceContext" class="internal-link" title="astuce._context.OptionalInferenceContext">OptionalInferenceContext</a></code></td><td class="fieldArgDesc"><span class="undocumented">Undocumented</span></td></tr><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="astuce._typing.html#InferResult" class="internal-link" title="astuce._typing.InferResult">InferResult</a></code></td><td class="fieldArgDesc"><span class="undocumented">Undocumented</span></td></tr></table></div>
@@ -1039,13 +1016,12 @@ Equivalent to ast astroid's NodeNG._infer() method.</p>
   <div class="functionHeader">
     @<a href="astuce._inference_decorators.html#raise_if_nothing_inferred" class="internal-link" title="astuce._inference_decorators.raise_if_nothing_inferred">raise_if_nothing_inferred</a><br />@<a href="astuce._inference_decorators.html#path_wrapper" class="internal-link" title="astuce._inference_decorators.path_wrapper">path_wrapper</a><br />
     <span class="py-keyword">def</span> <span class="py-defname">_infer_alias</span>(self, context=<a href="https://docs.python.org/3/library/constants.html#None" class="intersphinx-link">None</a>):
-    <a class="sourceLink" href="https://github.com/tristanlatr/astuce/tree/main/astuce/inference.py#L643">
+    <a class="sourceLink" href="https://github.com/tristanlatr/astuce/tree/main/astuce/inference.py#L639">
       
       (source)
     </a>
   </div>
   <div class="docstring functionBody">
-    
     
     <div><p class="undocumented">Undocumented</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">context:</span><code><a href="astuce._context.html#OptionalInferenceContext" class="internal-link" title="astuce._context.OptionalInferenceContext">OptionalInferenceContext</a></code></td><td class="fieldArgDesc"><span class="undocumented">Undocumented</span></td></tr><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="astuce._typing.html#InferResult" class="internal-link" title="astuce._typing.InferResult">InferResult</a></code></td><td class="fieldArgDesc"><span class="undocumented">Undocumented</span></td></tr></table></div>
   </div>
@@ -1067,7 +1043,6 @@ Equivalent to ast astroid's NodeNG._infer() method.</p>
     </a>
   </div>
   <div class="docstring functionBody">
-    
     
     <div><p>From astroid's inference.infer_assign() function.</p>
 <table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">node:</span><code><a href="astuce._typing.ASTNode.html" class="internal-link" title="astuce._typing.ASTNode">ASTNodeT</a></code></td><td class="fieldArgDesc"><span class="undocumented">Undocumented</span></td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">context:</span><code><a href="astuce._context.html#OptionalInferenceContext" class="internal-link" title="astuce._context.OptionalInferenceContext">OptionalInferenceContext</a></code></td><td class="fieldArgDesc"><span class="undocumented">Undocumented</span></td></tr><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="astuce._typing.html#InferResult" class="internal-link" title="astuce._typing.InferResult">InferResult</a></code></td><td class="fieldArgDesc"><span class="undocumented">Undocumented</span></td></tr></table></div>
@@ -1091,7 +1066,6 @@ Equivalent to ast astroid's NodeNG._infer() method.</p>
   </div>
   <div class="docstring functionBody">
     
-    
     <div><p class="undocumented">Undocumented</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">node:</span><code><a href="astuce._typing.Attribute.html" class="internal-link" title="astuce._typing.Attribute">_typing.Attribute</a></code></td><td class="fieldArgDesc"><span class="undocumented">Undocumented</span></td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">context:</span><code><a href="astuce._context.html#OptionalInferenceContext" class="internal-link" title="astuce._context.OptionalInferenceContext">OptionalInferenceContext</a></code></td><td class="fieldArgDesc"><span class="undocumented">Undocumented</span></td></tr><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="astuce._typing.html#InferResult" class="internal-link" title="astuce._typing.InferResult">InferResult</a></code></td><td class="fieldArgDesc"><span class="undocumented">Undocumented</span></td></tr></table></div>
   </div>
 </div><div class="basefunction private">
@@ -1112,7 +1086,6 @@ Equivalent to ast astroid's NodeNG._infer() method.</p>
     </a>
   </div>
   <div class="docstring functionBody">
-    
     
     <div><p>Inference logic for augmented binary operations.</p>
 <table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">context:</span><code><a href="astuce._context.html#OptionalInferenceContext" class="internal-link" title="astuce._context.OptionalInferenceContext">OptionalInferenceContext</a></code></td><td class="fieldArgDesc"><span class="undocumented">Undocumented</span></td></tr><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="astuce._typing.html#InferResult" class="internal-link" title="astuce._typing.InferResult">InferResult</a></code></td><td class="fieldArgDesc"><span class="undocumented">Undocumented</span></td></tr></table></div>
@@ -1136,7 +1109,6 @@ Equivalent to ast astroid's NodeNG._infer() method.</p>
   </div>
   <div class="docstring functionBody">
     
-    
     <div><p>Binary operation inference logic.</p>
 <table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">context:</span><code><a href="astuce._context.html#OptionalInferenceContext" class="internal-link" title="astuce._context.OptionalInferenceContext">OptionalInferenceContext</a></code></td><td class="fieldArgDesc"><span class="undocumented">Undocumented</span></td></tr><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="astuce._typing.html#InferResult" class="internal-link" title="astuce._typing.InferResult">InferResult</a></code></td><td class="fieldArgDesc"><span class="undocumented">Undocumented</span></td></tr><tr class="fieldStart"><td class="fieldName" colspan="2">Note</td></tr><tr><td colspan="2">From astroid's inference._infer_binop() function.</td></tr></table></div>
   </div>
@@ -1159,33 +1131,10 @@ Equivalent to ast astroid's NodeNG._infer() method.</p>
   </div>
   <div class="docstring functionBody">
     
-    
     <div><p>Inference's end for nodes that yield themselves on inference</p>
 <p>These are objects for which inference does not have any semantic,
 such as Module or Constants.</p>
 <table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">node:</span><code><a href="astuce._typing.ASTNode.html" class="internal-link" title="astuce._typing.ASTNode">ASTNodeT</a></code></td><td class="fieldArgDesc"><span class="undocumented">Undocumented</span></td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">context:</span><code><a href="astuce._context.html#OptionalInferenceContext" class="internal-link" title="astuce._context.OptionalInferenceContext">OptionalInferenceContext</a></code></td><td class="fieldArgDesc"><span class="undocumented">Undocumented</span></td></tr><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="astuce._typing.html#InferResult" class="internal-link" title="astuce._typing.InferResult">InferResult</a></code></td><td class="fieldArgDesc"><span class="undocumented">Undocumented</span></td></tr></table></div>
-  </div>
-</div><div class="basefunction private">
-  
-  
-  <a name="astuce.inference._infer_Expr">
-    
-  </a>
-  <a name="_infer_Expr">
-    
-  </a>
-  <div class="functionHeader">
-    
-    <span class="py-keyword">def</span> <span class="py-defname">_infer_Expr</span>(self, context=<a href="https://docs.python.org/3/library/constants.html#None" class="intersphinx-link">None</a>):
-    <a class="sourceLink" href="https://github.com/tristanlatr/astuce/tree/main/astuce/inference.py#L640">
-      
-      (source)
-    </a>
-  </div>
-  <div class="docstring functionBody">
-    
-    
-    <div><p class="undocumented">Undocumented</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">context:</span><code><a href="astuce._context.html#OptionalInferenceContext" class="internal-link" title="astuce._context.OptionalInferenceContext">OptionalInferenceContext</a></code></td><td class="fieldArgDesc"><span class="undocumented">Undocumented</span></td></tr><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="astuce._typing.html#InferResult" class="internal-link" title="astuce._typing.InferResult">InferResult</a></code></td><td class="fieldArgDesc"><span class="undocumented">Undocumented</span></td></tr></table></div>
   </div>
 </div><div class="basefunction private">
   
@@ -1205,7 +1154,6 @@ such as Module or Constants.</p>
     </a>
   </div>
   <div class="docstring functionBody">
-    
     
     <div><p>Support IfExp inference</p>
 <p>If we can't infer the truthiness of the condition, we default
@@ -1232,7 +1180,6 @@ depending on the condition.</p>
   </div>
   <div class="docstring functionBody">
     
-    
     <div><p class="undocumented">Undocumented</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">context:</span><code><a href="astuce._context.html#OptionalInferenceContext" class="internal-link" title="astuce._context.OptionalInferenceContext">OptionalInferenceContext</a></code></td><td class="fieldArgDesc"><span class="undocumented">Undocumented</span></td></tr><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="astuce._typing.html#InferResult" class="internal-link" title="astuce._typing.InferResult">InferResult</a></code></td><td class="fieldArgDesc"><span class="undocumented">Undocumented</span></td></tr></table></div>
   </div>
 </div><div class="basefunction private">
@@ -1253,7 +1200,6 @@ depending on the condition.</p>
     </a>
   </div>
   <div class="docstring functionBody">
-    
     
     <div><p>Infers the left hand side in augmented binary operations.</p>
 <p>@note: It only supports ast.Name instances at the moment.</p>
@@ -1278,7 +1224,6 @@ depending on the condition.</p>
   </div>
   <div class="docstring functionBody">
     
-    
     <div><p>Infer a Name: use name lookup rules.</p>
 <table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">context:</span><code><a href="astuce._context.html#OptionalInferenceContext" class="internal-link" title="astuce._context.OptionalInferenceContext">OptionalInferenceContext</a></code></td><td class="fieldArgDesc"><span class="undocumented">Undocumented</span></td></tr><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="astuce._typing.html#InferResult" class="internal-link" title="astuce._typing.InferResult">InferResult</a></code></td><td class="fieldArgDesc"><span class="undocumented">Undocumented</span></td></tr></table></div>
   </div>
@@ -1301,7 +1246,6 @@ depending on the condition.</p>
   </div>
   <div class="docstring functionBody">
     
-    
     <div><p class="undocumented">Undocumented</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">node:</span><code><a href="astuce._typing.Name.html" class="internal-link" title="astuce._typing.Name">_typing.Name</a></code></td><td class="fieldArgDesc"><span class="undocumented">Undocumented</span></td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">context:</span><code><a href="astuce._context.html#OptionalInferenceContext" class="internal-link" title="astuce._context.OptionalInferenceContext">OptionalInferenceContext</a></code></td><td class="fieldArgDesc"><span class="undocumented">Undocumented</span></td></tr><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="astuce._typing.html#InferResult" class="internal-link" title="astuce._typing.InferResult">InferResult</a></code></td><td class="fieldArgDesc"><span class="undocumented">Undocumented</span></td></tr></table></div>
   </div>
 </div><div class="basefunction private">
@@ -1323,7 +1267,6 @@ depending on the condition.</p>
   </div>
   <div class="docstring functionBody">
     
-    
     <div><p class="undocumented">Undocumented</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">context:</span><code><a href="astuce._context.html#OptionalInferenceContext" class="internal-link" title="astuce._context.OptionalInferenceContext">OptionalInferenceContext</a></code></td><td class="fieldArgDesc"><span class="undocumented">Undocumented</span></td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">assign<wbr></wbr>_context:</span><code><a href="https://docs.python.org/3/library/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc"><span class="undocumented">Undocumented</span></td></tr><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="astuce._typing.html#InferResult" class="internal-link" title="astuce._typing.InferResult">InferResult</a></code></td><td class="fieldArgDesc"><span class="undocumented">Undocumented</span></td></tr></table></div>
   </div>
 </div><div class="basefunction private">
@@ -1344,7 +1287,6 @@ depending on the condition.</p>
     </a>
   </div>
   <div class="docstring functionBody">
-    
     
     <div><p>Infer all values based on elts.</p>
 <p>If infer_all_elements is False, will only infer Starred and NamedExpr inside the list, this is used for tuple assignments.</p>
@@ -1369,7 +1311,6 @@ depending on the condition.</p>
   </div>
   <div class="docstring functionBody">
     
-    
     <div><p>Return an iterator on statements inferred by each statement in <em>stmts</em>.</p>
 <table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">stmts:</span><code><a href="https://docs.python.org/3/library/typing.html#typing.List" class="intersphinx-link">List</a>[<wbr></wbr><a href="https://docs.python.org/3/library/typing.html#typing.Union" class="intersphinx-link">Union</a>[<wbr></wbr><a href="astuce._typing.ASTNode.html" class="internal-link" title="astuce._typing.ASTNode">ASTNodeT</a>, <wbr></wbr><a href="astuce._typing.html#UninferableT" class="internal-link" title="astuce._typing.UninferableT">UninferableT</a>]]</code></td><td class="fieldArgDesc"><span class="undocumented">Undocumented</span></td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">context:</span><code><a href="astuce._context.InferenceContext.html" class="internal-link" title="astuce._context.InferenceContext">InferenceContext</a></code></td><td class="fieldArgDesc"><span class="undocumented">Undocumented</span></td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">frame:</span><code><a href="https://docs.python.org/3/library/typing.html#typing.Optional" class="intersphinx-link">Optional</a>[<wbr></wbr><a href="astuce._typing.ASTNode.html" class="internal-link" title="astuce._typing.ASTNode">ASTNodeT</a>]</code></td><td class="fieldArgDesc"><span class="undocumented">Undocumented</span></td></tr><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="astuce._typing.html#InferResult" class="internal-link" title="astuce._typing.InferResult">InferResult</a></code></td><td class="fieldArgDesc"><span class="undocumented">Undocumented</span></td></tr></table></div>
   </div>
@@ -1391,7 +1332,6 @@ depending on the condition.</p>
     </a>
   </div>
   <div class="docstring functionBody">
-    
     
     <div><p>Infer a binary operation between a left operand and a right operand.</p>
 <p>This is used by both normal binary operations and augmented binary
@@ -1417,7 +1357,6 @@ operations.</p>
   </div>
   <div class="docstring functionBody">
     
-    
     <div><p class="undocumented">Undocumented</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">node:</span><code><a href="astuce._typing.ASTNode.html" class="internal-link" title="astuce._typing.ASTNode">_typing.ASTNode</a></code></td><td class="fieldArgDesc"><span class="undocumented">Undocumented</span></td></tr><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc"><span class="undocumented">Undocumented</span></td></tr></table></div>
   </div>
 </div><div class="basefunction private">
@@ -1438,7 +1377,6 @@ operations.</p>
     </a>
   </div>
   <div class="docstring functionBody">
-    
     
     <div><p>we don't know how to resolve a statement by default</p>
 <table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">node:</span><code><a href="astuce._typing.ASTNode.html" class="internal-link" title="astuce._typing.ASTNode">ASTNodeT</a></code></td><td class="fieldArgDesc"><span class="undocumented">Undocumented</span></td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">context:</span><code><a href="astuce._context.html#OptionalInferenceContext" class="internal-link" title="astuce._context.OptionalInferenceContext">OptionalInferenceContext</a></code></td><td class="fieldArgDesc"><span class="undocumented">Undocumented</span></td></tr><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="astuce._typing.html#InferResult" class="internal-link" title="astuce._typing.InferResult">InferResult</a></code></td><td class="fieldArgDesc"><span class="undocumented">Undocumented</span></td></tr></table></div>
@@ -1461,7 +1399,6 @@ operations.</p>
     </a>
   </div>
   <div class="functionBody">
-    
     
     <div><p class="undocumented">Undocumented</p></div>
     <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code>{<wbr></wbr><a href="https://docs.python.org/3/library/ast.html#ast.Add" class="intersphinx-link">ast.Add</a>: (lambda a, b: operatorlib.iadd(a, b)),
@@ -1492,7 +1429,6 @@ operations.</p>
   </div>
   <div class="functionBody">
     
-    
     <div><p class="undocumented">Undocumented</p></div>
     <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code>{<wbr></wbr><a href="https://docs.python.org/3/library/ast.html#ast.Not" class="intersphinx-link">ast.Not</a>: (lambda o: not o),
  <wbr></wbr><a href="https://docs.python.org/3/library/ast.html#ast.Invert" class="intersphinx-link">ast.Invert</a>: (lambda o: ~o),
@@ -1522,7 +1458,6 @@ operations.</p>
   </div>
   <div class="functionBody">
     
-    
     <div><p class="undocumented">Undocumented</p></div>
     
   </div>
@@ -1539,7 +1474,7 @@ operations.</p>
     <div class="container">
       <a href="index.html">API Documentation</a> for <a href="https://github.com/tristanlatr/astuce/" class="projecthome">astuce</a>,
     generated by <a href="https://github.com/twisted/pydoctor/">pydoctor</a>
-      22.5.1 at 2022-06-30 02:38:35.
+      22.7.0 at 2022-08-31 19:01:02.
     </div>
     
     <script src="ajax.js" type="text/javascript"></script>

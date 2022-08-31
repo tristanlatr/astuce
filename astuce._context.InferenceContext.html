@@ -7,7 +7,7 @@
   <head>
     
     <title>astuce._context.InferenceContext</title>
-    <meta name="generator" content="pydoctor 22.5.1"> 
+    <meta name="generator" content="pydoctor 22.7.0"> 
         
     </meta>
     <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
@@ -498,7 +498,6 @@ Account for already visited nodes to stop infinite recursion.</p>
   </div>
   <div class="docstring functionBody">
     
-    
     <div><p>Do not instiate me directly, use copy_context() or Parser._new_context().</p>
 <table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">cache:</span><code><a href="astuce._context.html#_InferenceCache" class="internal-link" title="astuce._context._InferenceCache">_InferenceCache</a></code></td><td class="fieldArgDesc"><span class="undocumented">Undocumented</span></td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">path:</span><code><a href="https://docs.python.org/3/library/typing.html#typing.Optional" class="intersphinx-link">Optional</a>[<wbr></wbr><a href="https://docs.python.org/3/library/typing.html#typing.List" class="intersphinx-link">List</a>[<wbr></wbr><a href="astuce._typing.ASTNode.html" class="internal-link" title="astuce._typing.ASTNode">ASTNodeT</a>]]</code></td><td class="fieldArgDesc"><span class="undocumented">Undocumented</span></td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">nodes<wbr></wbr>_inferred:</span><code><a href="https://docs.python.org/3/library/typing.html#typing.Optional" class="intersphinx-link">Optional</a>[<wbr></wbr><a href="https://docs.python.org/3/library/typing.html#typing.List" class="intersphinx-link">List</a>[<wbr></wbr><a href="https://docs.python.org/3/library/functions.html#int" class="intersphinx-link">int</a>]]</code></td><td class="fieldArgDesc"><span class="undocumented">Undocumented</span></td></tr></table></div>
   </div>
@@ -521,7 +520,6 @@ Account for already visited nodes to stop infinite recursion.</p>
   </div>
   <div class="docstring functionBody">
     
-    
     <div><p class="undocumented">Undocumented</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc"><span class="undocumented">Undocumented</span></td></tr></table></div>
   </div>
 </div><div class="basemethod">
@@ -542,7 +540,6 @@ Account for already visited nodes to stop infinite recursion.</p>
     </a>
   </div>
   <div class="docstring functionBody">
-    
     
     <div><p>Clone inference path</p>
 <p>For example, each side of a binary operation (BinOp)
@@ -570,7 +567,6 @@ with argument: <tt class="rst-docutils literal"><span class="pre">cache={}</span
   </div>
   <div class="docstring functionBody">
     
-    
     <div><p class="undocumented">Undocumented</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">value:</span><code><a href="https://docs.python.org/3/library/functions.html#int" class="intersphinx-link">int</a></code></td><td class="fieldArgDesc"><span class="undocumented">Undocumented</span></td></tr></table></div>
   </div>
 </div><div class="basemethod">
@@ -591,7 +587,6 @@ with argument: <tt class="rst-docutils literal"><span class="pre">cache={}</span
     </a>
   </div>
   <div class="docstring functionBody">
-    
     
     <div><p>Push node into inference path</p>
 <p>Allows one to see if the given node has already
@@ -617,7 +612,6 @@ been looked at for this inference context</p>
   </div>
   <div class="functionBody">
     
-    
     <div><p class="undocumented">Undocumented</p></div>
     
   </div>
@@ -640,7 +634,6 @@ been looked at for this inference context</p>
   </div>
   <div class="functionBody">
     
-    
     <div><p class="undocumented">Undocumented</p></div>
     
   </div>
@@ -662,7 +655,6 @@ been looked at for this inference context</p>
     </a>
   </div>
   <div class="functionBody">
-    
     
     <div><p>type: set(NodeNG)</p>
 <p>List of visited nodes.</p>
@@ -688,7 +680,6 @@ been looked at for this inference context</p>
   </div>
   <div class="functionBody">
     
-    
     <div><p>Inferred (cached) nodes to their mapped results.</p>
 </div>
     
@@ -711,7 +702,6 @@ been looked at for this inference context</p>
     </a>
   </div>
   <div class="functionBody">
-    
     
     <div><p>Number of nodes inferred in this context and all its clones/descendents</p>
 <p>Wrap inner value in a mutable cell to allow for mutating a class
@@ -737,7 +727,6 @@ variable in the presence of __slots__</p>
     </a>
   </div>
   <div class="functionBody">
-    
     
     <div><p>Store cache here instead of using a global variable.</p>
 <p>This dict is shared by all InferenceContext instances
@@ -766,7 +755,6 @@ created by the method <code><a href="astuce.parser.Parser.html#_new_context" cla
   </div>
   <div class="functionBody">
     
-    
     <div><p class="undocumented">Undocumented</p></div>
     
   </div>
@@ -783,7 +771,7 @@ created by the method <code><a href="astuce.parser.Parser.html#_new_context" cla
     <div class="container">
       <a href="index.html">API Documentation</a> for <a href="https://github.com/tristanlatr/astuce/" class="projecthome">astuce</a>,
     generated by <a href="https://github.com/twisted/pydoctor/">pydoctor</a>
-      22.5.1 at 2022-06-30 02:38:35.
+      22.7.0 at 2022-08-31 19:01:02.
     </div>
     
     <script src="ajax.js" type="text/javascript"></script>
