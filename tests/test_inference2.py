@@ -247,6 +247,7 @@ class ImportsTests(AstuceTestCase):
         # m
         m = list(inference.infer(filtered_body[-4]))
         # We can't infer calls at this time.
+        NotImplemented
         assert m == [nodes.Uninferable], m
         
         # l

@@ -235,3 +235,6 @@ if sys.version_info >= (3,10):
     _patcher.addMixinPatch(ast, 'MatchValue', [ASTNode])
 
 _patcher.patch()
+
+# patch scalpel cfg module
+from astuce import cfg as _junk

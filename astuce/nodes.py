@@ -12,7 +12,7 @@ import warnings
 
 import attr
 
-from astuce import exceptions, _lookup
+from astuce import exceptions, _lookup, cfg
 
 # TODO: remove once Python 3.7 support is dropped
 if sys.version_info < (3, 8):
@@ -265,8 +265,7 @@ class ASTNode:
             if isinstance(self.parent, (ast.arguments, ast.keyword, ast.comprehension)):
                 return self.parent.parent.parent.scope
 
-        if isinstance(self, (ast.AsyncFunctionDef, ast.FunctionDef, ast.ClassDef, ast.Module, 
-                             ast.GeneratorExp, ast.DictComp, ast.SetComp, ast.ListComp, ast.Lambda)):
+        if is_scoped_node(self):
             return cast('_typing.ScopedNodeT', self)
         
         return self.parent.scope
@@ -472,6 +471,45 @@ class ASTNode:
         :returntype: tuple[ASTNode, List[_typing.LocalsAssignT]]
         """
         return _lookup.lookup(self, name, offset)
+    
+    @cached_property
+    def cfg(self) -> 'cfg.CFG':
+        """
+        Get the CFG of this frame node.
+        """
+        assert is_frame_node(self), 'Node must be a frame to get the CFG'
+        return _get_cfg_of_frame(self)
+
+    @cached_property
+    def block(self) -> 'cfg.Block':
+        """
+        Get the CFG block of this statement.
+        """
+        assert isinstance(self, ast.stmt), 'Node must be a statement to get the CFG block'
+        # Search the block in all blocks
+        for block in self.frame.cfg.get_all_blocks():
+            if self in block.statements:
+                return block
+        
+        raise LookupError(f"Could not find node {self} in the CFG of {self.frame.qname}")
+
+def _get_cfg_of_frame(node:'_typing.FrameNodeT') -> 'cfg.CFG':
+    
+    # dynamically patch the CFG builder such that it only computes the frame's CFG, not it's 
+    # children.
+    # So, for modules and classes, disallow new_functionCFG and new_ClassCFG
+    # But for functions leave it like the default. Because functions are usually analyzed as a whole black box
+    # whereas modules and classes
+    class CFGBuilder(cfg.CFGBuilder):
+        ...
+    
+    if isinstance(node, (ast.Module, ast.ClassDef)):
+        CFGBuilder.new_functionCFG = lambda _,n,a:None
+        CFGBuilder.new_ClassCFG = lambda _,n,a:None
+    
+    name = node._modname if isinstance(node, ast.Module) else node.name
+    return CFGBuilder().build(name, ast.Module(body=node.body), asynchr=isinstance(node, ast.AsyncFunctionDef))
+    
 
 class Context(enum.Enum):
     Load = 1
@@ -511,18 +549,21 @@ def get_context(node: Union[ast.Attribute, ast.List, ast.Name, ast.Subscript, as
     except KeyError as e:
         raise ValueError(f"Can't get the context of {node!r}") from e
 
+FRAME_NODES = (ast.Module, ast.ClassDef, ast.FunctionDef, ast.AsyncFunctionDef, ast.Lambda)
+SCOPE_NODES = (ast.AsyncFunctionDef, ast.FunctionDef, ast.ClassDef, ast.Module, 
+                             ast.GeneratorExp, ast.DictComp, ast.SetComp, ast.ListComp, ast.Lambda)
+
 def is_frame_node(node: 'ASTNode') -> bool:
     """
     Whether this node is a frame.
     """
-    return isinstance(node, (ast.Module, ast.ClassDef, ast.FunctionDef, ast.AsyncFunctionDef, ast.Lambda))
+    return isinstance(node, FRAME_NODES)
 
 def is_scoped_node(node: 'ASTNode') -> bool:
     """
     Whether this node is a scope.
     """
-    return isinstance(node, (ast.AsyncFunctionDef, ast.FunctionDef, ast.ClassDef, ast.Module, 
-                             ast.GeneratorExp, ast.DictComp, ast.SetComp, ast.ListComp, ast.Lambda))
+    return isinstance(node, SCOPE_NODES)
 
 
 def get_module_parent(node: _typing.Module) -> Optional[_typing.Module]:

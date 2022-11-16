@@ -38,7 +38,7 @@ else:
 
 
 from .nodes import _END_OF_FRAME_SENTINEL_CONSTANT, ASTNode, Instance, is_assign_name, is_del_name, is_scoped_node, fix_ast
-from . import _typing, _context
+from . import _typing, _context, cfg
 
 
 def _set_local(self:'_typing.ASTNode', name:str, node:'ast.AST') -> None:
